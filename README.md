@@ -26,4 +26,10 @@ npm install
 npm run dev -- --topic "The Future of AI Agents"
 ```
 
+## 🤝 Contributing
+Got a cool vibe or a brilliant optimization? We'd love your help! 💖
+- 🐛 **Found a bug?** Open an issue to let us know.
+- ✨ **Have a feature idea?** We are open to PRs! Just make sure to run `npm run lint` and keep the code pristine.
+- 🎨 **Documentation tweaks?** Always welcome!
+
 *Built by a Vibe Coder. Focused on Flow.*
