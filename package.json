@@ -1,0 +1,29 @@
+﻿{
+  "name": "autoresearch-agent",
+  "version": "0.1.0",
+  "description": "AI autonomous research system: takes a topic, researches, summarizes, and generates blog articles, tweet threads, and video scripts.",
+  "main": "src/index.js",
+  "bin": {
+    "autoresearch-agent": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "node tests/test.js"
+  },
+  "keywords": [
+    "vibe-coder",
+    "cli",
+    "tool"
+  ],
+  "author": "your-username",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
+
