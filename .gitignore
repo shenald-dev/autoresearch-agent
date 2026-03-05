@@ -1,7 +1,40 @@
-﻿node_modules/
-*.log
+# Dependencies
+node_modules/
+
+# Outputs
+outputs/
+!outputs/.gitkeep  # but we'll not have .gitkeep in subdirs, they are empty
+
+# Environment
 .env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Temp
+tmp/
+temp/
+*.tmp
+
+# Build artifacts (if any)
 dist/
 build/
 
+# Test coverage
+coverage/
+
+# Package lock (optional, we use package-lock.json but could ignore)
+# package-lock.json  # not ignored because it's needed

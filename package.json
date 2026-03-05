@@ -1,29 +1,51 @@
-﻿{
+{
   "name": "autoresearch-agent",
   "version": "0.1.0",
   "description": "AI autonomous research system: takes a topic, researches, summarizes, and generates blog articles, tweet threads, and video scripts.",
-  "main": "src/index.js",
+  "main": "ui/cli.js",
   "bin": {
-    "autoresearch-agent": "./bin/cli.js"
+    "autoresearch": "./bin/cli.js"
   },
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "test": "node tests/test.js"
+    "start": "node ui/cli.js",
+    "dev": "nodemon ui/cli.js",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "node tests/unit/run_all.js",
+    "test:integration": "node tests/integration/run_all.js",
+    "lint": "eslint . --ext .js",
+    "docker:build": "docker build -t autoresearch-agent:0.1.0 .",
+    "docker:run": "docker run -e OPENAI_API_KEY=xxx autoresearch-agent:0.1.0 --topic 'AI trends'"
   },
   "keywords": [
-    "vibe-coder",
-    "cli",
-    "tool"
+    "ai",
+    "research",
+    "llm",
+    "auto-blog",
+    "content-generation",
+    "vibe-coder"
   ],
-  "author": "your-username",
+  "author": "shenald.dev",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shenald-dev/autoresearch-agent.git"
+  },
   "dependencies": {
-    "express": "^4.19.2",
-    "yargs": "^17.7.2"
+    "openai": "^4.47.1",
+    "axios": "^1.6.7",
+    "cheerio": "^1.0.0-rc.12",
+    "pino": "^9.1.0",
+    "pino-pretty": "^10.3.1",
+    "yargs": "^17.7.2",
+    "express": "^4.18.2",
+    "dotenv": "^16.4.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "eslint": "^8.56.0",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
-

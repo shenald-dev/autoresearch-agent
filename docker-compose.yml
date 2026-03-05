@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  agent:
+    build: .
+    image: autoresearch-agent:0.1.0
+    container_name: autoresearch-agent
+    restart: unless-stopped
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SERPAPI_KEY=${SERPAPI_KEY}
+      - OPENAI_MODEL=gpt-4-turbo-preview
+      - OUTPUT_MD_DIR=/app/outputs/markdown
+      - OUTPUT_JSON_DIR=/app/outputs/json
+      - ENABLE_PUBLISHING=false
+    volumes:
+      - ./outputs:/app/outputs
+      - ./.env:/app/.env:ro
+    # Example usage: docker-compose run --rm agent "AI trends 2024"
+    command: ["--help"]
