@@ -1,30 +1,29 @@
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 # Copy source
 COPY . .
 
-# Build step (none needed for JS, but placeholder)
-RUN npm run build || echo "No build step"
+# Build TypeScript
+RUN npm run build
 
 # Runtime image
-FROM node:18-alpine
+FROM node:20-alpine
 WORKDIR /app
 
-# Copy from builder
-COPY --from=builder /app /app
+# Copy built app and production deps
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
 
 # Create output directories
 RUN mkdir -p outputs/markdown outputs/json
 
-# Expose port for web UI (if used)
-EXPOSE 3001
-
 # Entrypoint
-ENTRYPOINT ["node", "bin/cli.js"]
+ENTRYPOINT ["node", "dist/index.js"]
 CMD ["--help"]

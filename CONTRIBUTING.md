@@ -1,68 +1,83 @@
-﻿# Contributing to autoresearch-agent
+﻿# Contributing to AutoResearch Agent 🚀
 
-Hey! Thanks for considering contributing. This project is built with **vibe coder** principles: keep it simple, solve real problems, no bureaucracy.
-
----
-
-## ðŸŽ¯ How to Help
-
-- **Bug reports** â€” Open an issue with steps to reproduce
-- **Feature ideas** â€” Open an issue to discuss before PR
-- **Pull requests** â€” Small, focused changes only
-- **Documentation** â€” Fix typos, improve examples
+Thanks for considering contributing! This project follows **vibe coder** principles: keep it simple, solve real problems, no bureaucracy.
 
 ---
 
-## ðŸ› ï¸ Development Setup
+## 🎯 How to Help
+
+- 🐛 **Bug reports** — Open an issue with steps to reproduce
+- 💡 **Feature ideas** — Open an issue to discuss before PR
+- 🔧 **Pull requests** — Small, focused changes only
+- 📝 **Documentation** — Fix typos, improve examples
+
+---
+
+## 🛠️ Development Setup
 
 ```bash
-git clone https://github.com/your-username/autoresearch-agent.git
+git clone https://github.com/shenald-dev/autoresearch-agent.git
 cd autoresearch-agent
 npm install
-npm link  # optional, for global CLI testing
+cp .env.example .env  # Add your API keys
+npm run dev -- -t "Your Research Topic"
 ```
 
 ---
 
-## ðŸ“ Code Style
+## 📐 Code Style
 
-- Use 2 spaces for indentation
-- Semicolons? Yes.
-- Keep functions small (< 50 LOC)
-- No debug `console.log` in production code
+- TypeScript strict mode enabled
+- Use 4 spaces for indentation
+- Semicolons required
+- Keep functions small (<50 LOC)
+- No `console.log` in production code (use chalk-wrapped logging)
 - Write tests for new features
 
 ---
 
-## âœ… Before Submitting PR
+## ✅ Before Submitting PR
 
 - [ ] Tests pass (`npm test`)
-- [ ] No lint errors (if configured)
+- [ ] No lint errors (`npm run lint`)
 - [ ] README updated if needed
 - [ ] Commit message follows conventional commits (`feat:`, `fix:`, etc.)
 - [ ] One change per PR (no mega PRs)
 
 ---
 
-## ðŸ“¦ Releasing
+## 🏗️ Architecture
 
-Only maintainers (currently just the author) create releases:
+The project follows a modular agent pipeline:
+
+```
+ResearchAgent → SummarizerAgent → ContentGenerator → PublisherAgent
+```
+
+Each agent is in `src/agents/` and tools are in `src/tools/`. To add a new agent:
+
+1. Create `src/agents/MyAgent.ts` with an `execute()` method
+2. Import and wire it in `src/core/engine.ts`
+3. Add tests in `tests/`
+
+---
+
+## 📦 Releasing
 
 ```bash
 # Update version in package.json
-# Commit with "chore: release v0.1.1"
-git tag -a v0.1.1 -m "Release v0.1.1"
-git push origin v0.1.1
-gh release create v0.1.1 --title "v0.1.1" --notes "Brief description"
+git commit -m "chore: release v2.0.1"
+git tag -a v2.0.1 -m "Release v2.0.1"
+git push origin v2.0.1
+gh release create v2.0.1 --title "v2.0.1" --notes "Description"
 ```
 
 ---
 
-## ðŸ’¬ Code of Conduct
+## 💬 Code of Conduct
 
 Be nice. No jerks. That's it.
 
 ---
 
-**Happy contributing!** ðŸš€
-
+**Happy contributing!** ✨
