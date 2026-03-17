@@ -1,7 +1,6 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import ora from "ora";
-import { ResearchEngine } from "./core/engine";
 
 const program = new Command();
 
@@ -19,6 +18,10 @@ program
         const spinner = ora(`Researching: ${chalk.bold(options.topic)}`).start();
 
         try {
+            // Optimization:
+            // Lazy-load the heavy ResearchEngine module to significantly reduce
+            // CLI startup time (e.g. for --help and --version commands).
+            const { ResearchEngine } = await import("./core/engine");
             const engine = new ResearchEngine({ depth: parseInt(options.depth, 10) });
             const result = await engine.run(options.topic);
 
