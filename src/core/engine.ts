@@ -15,9 +15,19 @@ export class ResearchEngine {
 
 	constructor(config: EngineConfig) {
 		this.config = config;
+
+		const apiKey = process.env.OPENAI_API_KEY;
+		if (!apiKey) {
+			throw new Error(
+				"OPENAI_API_KEY environment variable is not set. " +
+					"Add it to your .env file or export it before running.",
+			);
+		}
+
 		this.llm = new ChatOpenAI({
-			modelName: "gpt-4-turbo-preview",
+			modelName: process.env.OPENAI_MODEL || "gpt-4-turbo-preview",
 			temperature: 0.2,
+			openAIApiKey: apiKey,
 		});
 	}
 
