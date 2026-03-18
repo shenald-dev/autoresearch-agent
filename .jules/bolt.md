@@ -13,3 +13,11 @@ Using explicit schemas (like Zod) protects the underlying application from unexp
 
 Action:
 Ensure input bounds and types are validated before passing them into the engine layer.
+
+## 2024-05-24 — Optimizing CLI Startup Time via Dynamic Imports
+
+Learning:
+CLI applications built in Node.js can suffer from slow startup times (e.g., when running `--help` or `--version`) due to eager static imports of heavy modules like `chalk`, `ora`, and `zod`. These modules are often only needed after argument parsing.
+
+Action:
+Defer importing heavy dependencies by using dynamic `await import(...)` inside action handlers. This keeps the initial parsing block lightweight and significantly reduces startup time for informational commands.
