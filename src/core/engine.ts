@@ -1,57 +1,96 @@
-import { StringOutputParser } from "@langchain/core/output_parsers";
-import { PromptTemplate } from "@langchain/core/prompts";
 import { ChatOpenAI } from "@langchain/openai";
-import * as dotenv from "dotenv";
-
-dotenv.config();
+import { PromptTemplate } from "@langchain/core/prompts";
+import { ConfigManager } from "../utils/config";
+import { GoogleSearcher } from "../tools/GoogleSearcher";
+import { WebFetcher } from "../tools/WebFetcher";
 
 export interface EngineConfig {
 	depth: number;
 }
 
+export type StatusCallback = (message: string) => void;
+
 export class ResearchEngine {
-	private llm: ChatOpenAI;
 	private config: EngineConfig;
+	private configManager: ConfigManager;
+	private searcher: GoogleSearcher;
+	private fetcher: WebFetcher;
 
 	constructor(config: EngineConfig) {
 		this.config = config;
+		this.configManager = new ConfigManager();
+		this.searcher = new GoogleSearcher();
+		// Scale max concurrency based on depth to avoid overwhelming systems but speed up deep searches
+		this.fetcher = new WebFetcher(Math.min(10, config.depth * 2));
+	}
 
-		const apiKey = process.env.OPENAI_API_KEY;
+	private async initLLM(): Promise<ChatOpenAI> {
+		const apiKey = await this.configManager.get("OPENAI_API_KEY");
 		if (!apiKey) {
-			throw new Error(
-				"OPENAI_API_KEY environment variable is not set. " +
-					"Add it to your .env file or export it before running.",
-			);
+			throw new Error("OPENAI_API_KEY is missing. Please run 'autoresearch auth' to configure it.");
 		}
 
-		this.llm = new ChatOpenAI({
-			modelName: process.env.OPENAI_MODEL || "gpt-4-turbo-preview",
+		return new ChatOpenAI({
+			modelName: (await this.configManager.get("OPENAI_MODEL")) || "gpt-4-turbo-preview",
 			temperature: 0.2,
 			openAIApiKey: apiKey,
 		});
 	}
 
-	/**
-	 * Orchestrates the research pipeline.
-	 * In a full implementation, this would chain Tools, memory, and specialized agents.
-	 */
-	public async run(topic: string): Promise<string> {
+	public async run(topic: string, onProgress?: StatusCallback): Promise<string> {
+		const updateStatus = (msg: string) => {
+			if (onProgress) onProgress(msg);
+		};
+
+		const llm = await this.initLLM();
+
+		// Phase 1: Search
+		updateStatus(`🔍 Searching Google for: "${topic}"...`);
+		const searchResults = await this.searcher.search(topic, this.config.depth * 2);
+
+		if (searchResults.length === 0) {
+			return `No results found for "${topic}". The API key may be missing or the query was too niche.`;
+		}
+
+		// Phase 2: Fetch and Extract
+		updateStatus(`📄 Discovered ${searchResults.length} sources. Fetching content concurrently...`);
+		const urls = searchResults.map(r => r.link);
+		const fetchResults = await this.fetcher.fetchBatch(urls);
+
+		// Phase 3: Synthesize
+		updateStatus(`🧠 Synthesizing ${fetchResults.size} sources into a final report...`);
+		
+		// Build context from results
+		let context = "";
+		let i = 1;
+		for (const [url, content] of fetchResults.entries()) {
+			if (!content.startsWith("Error:")) {
+				context += `[Source ${i} | ${url}]\n${content.substring(0, 1500)}\n\n`;
+			}
+			i++;
+		}
+
 		const prompt = PromptTemplate.fromTemplate(`
-      You are an expert autonomous researcher. 
-      Conduct a deep-dive analysis on the following topic to a depth level of {depth}.
-      Format the output as a clean, highly structured markdown document.
-      
-      Topic: {topic}
-    `);
+You are an expert autonomous researcher. 
+Conduct a deep-dive analysis on the following topic.
+You have successfully scraped multiple web sources related to the topic.
 
-		const chain = prompt.pipe(this.llm).pipe(new StringOutputParser());
+Topic: {topic}
 
-		// Execute the LCEL chain
+Sources Data:
+{context}
+
+Format the output as a clean, highly structured markdown document.
+Include an executive summary, main findings, and a "References" section at the bottom citing the sources provided.
+Return ONLY the markdown document.
+        `);
+
+		const chain = prompt.pipe(llm);
 		const result = await chain.invoke({
 			topic,
-			depth: this.config.depth.toString(),
+			context
 		});
 
-		return result;
+		return String(result.content);
 	}
 }

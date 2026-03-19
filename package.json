@@ -7,6 +7,7 @@
     "start": "tsx src/index.ts",
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
+    "test": "vitest run",
     "lint": "biome check src/",
     "format": "biome format --write src/"
   },
@@ -19,18 +20,18 @@
   "author": "shenald.dev",
   "license": "MIT",
   "dependencies": {
+    "@clack/prompts": "^1.1.0",
     "@langchain/core": "^0.3.0",
     "@langchain/openai": "^0.3.0",
-    "chalk": "^4.1.2",
     "commander": "^12.0.0",
-    "dotenv": "^16.4.5",
-    "ora": "^5.4.1",
+    "picocolors": "^1.1.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.0"
   }
 }
