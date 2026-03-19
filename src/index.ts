@@ -11,12 +11,14 @@ program
 	.requiredOption("-t, --topic <string>", "The topic to research")
 	.option("-d, --depth <number>", "Research depth (1-5)", "3")
 	.action(async (options) => {
-		const chalk = (await import("chalk")).default;
-		const ora = (await import("ora")).default;
-		const { z } = await import("zod");
+		const [{ default: chalk }, { default: ora }, { z }] = await Promise.all([
+			import("chalk"),
+			import("ora"),
+			import("zod"),
+		]);
 
 		const optionsSchema = z.object({
-			topic: z.string().min(1, "Topic must not be empty"),
+			topic: z.string().trim().min(1, "Topic must not be empty"),
 			depth: z.coerce
 				.number()
 				.int()

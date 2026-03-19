@@ -21,3 +21,10 @@ CLI applications built in Node.js can suffer from slow startup times (e.g., when
 
 Action:
 Defer importing heavy dependencies by using dynamic `await import(...)` inside action handlers. This keeps the initial parsing block lightweight and significantly reduces startup time for informational commands.
+## 2024-11-20 — Optimize imports and validate topic input
+
+Learning:
+Sequential dynamic imports (`await import(...)`) can introduce unnecessary latency during CLI initialization. Parallelizing them using `Promise.all` improves startup performance. Furthermore, string input validation without trimming can allow whitespace to bypass length checks, potentially causing downstream errors.
+
+Action:
+Always consider `Promise.all` when dynamically loading multiple independent modules. Always sanitize and trim string inputs before validating their length or format to prevent silent failures or unexpected behavior in downstream logic.
