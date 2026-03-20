@@ -12,6 +12,8 @@ export interface EngineConfig {
 export class ResearchEngine {
 	private llm: ChatOpenAI;
 	private config: EngineConfig;
+	// biome-ignore lint/suspicious/noExplicitAny: Langchain's Runnable interface is generic, typing it exactly here adds unnecessary bloat.
+	private chain: any;
 
 	constructor(config: EngineConfig) {
 		this.config = config;
@@ -29,13 +31,7 @@ export class ResearchEngine {
 			temperature: 0.2,
 			openAIApiKey: apiKey,
 		});
-	}
 
-	/**
-	 * Orchestrates the research pipeline.
-	 * In a full implementation, this would chain Tools, memory, and specialized agents.
-	 */
-	public async run(topic: string): Promise<string> {
 		const prompt = PromptTemplate.fromTemplate(`
       You are an expert autonomous researcher. 
       Conduct a deep-dive analysis on the following topic to a depth level of {depth}.
@@ -44,10 +40,18 @@ export class ResearchEngine {
       Topic: {topic}
     `);
 
-		const chain = prompt.pipe(this.llm).pipe(new StringOutputParser());
+		// Optimization: Construct the LangChain LCEL pipeline once during instantiation
+		// to avoid redundant string parsing and object allocation on every run().
+		this.chain = prompt.pipe(this.llm).pipe(new StringOutputParser());
+	}
 
+	/**
+	 * Orchestrates the research pipeline.
+	 * In a full implementation, this would chain Tools, memory, and specialized agents.
+	 */
+	public async run(topic: string): Promise<string> {
 		// Execute the LCEL chain
-		const result = await chain.invoke({
+		const result = await this.chain.invoke({
 			topic,
 			depth: this.config.depth.toString(),
 		});
