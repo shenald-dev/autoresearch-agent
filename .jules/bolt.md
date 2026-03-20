@@ -28,3 +28,11 @@ Sequential dynamic imports (`await import(...)`) can introduce unnecessary laten
 
 Action:
 Always consider `Promise.all` when dynamically loading multiple independent modules. Always sanitize and trim string inputs before validating their length or format to prevent silent failures or unexpected behavior in downstream logic.
+
+## 2024-11-20 — Optimize LangChain LCEL pipeline instantiation
+
+Learning:
+Constructing a LangChain LCEL `chain` (e.g., using `PromptTemplate.fromTemplate(...).pipe(...)`) incurs a slight overhead due to parsing templates, instantiating parser objects, and setting up the runnable sequence. If done inside a method like `run()` that is called multiple times, this repeated initialization can become a measurable performance bottleneck.
+
+Action:
+Always define and construct LangChain LCEL pipelines or prompts exactly once, such as during class instantiation (e.g., inside the constructor), and reuse the pre-built `chain` instance when executing tasks sequentially.
