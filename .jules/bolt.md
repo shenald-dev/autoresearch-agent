@@ -36,3 +36,11 @@ Constructing a LangChain LCEL `chain` (e.g., using `PromptTemplate.fromTemplate(
 
 Action:
 Always define and construct LangChain LCEL pipelines or prompts exactly once, such as during class instantiation (e.g., inside the constructor), and reuse the pre-built `chain` instance when executing tasks sequentially.
+
+## 2024-11-20 — Avoid duplicate LLM requests with caching
+
+Learning:
+Calling the LLM API is the most expensive and slowest operation in the application. Re-running the same `run()` parameters in the same session without caching causes unnecessary network round trips and redundant token costs.
+
+Action:
+Implement in-memory caching for predictable LLM responses (e.g., using a `Map` in the engine). This ensures duplicate requests within the same run are resolved instantly without hitting the external API.
