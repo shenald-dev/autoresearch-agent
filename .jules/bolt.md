@@ -36,3 +36,11 @@ Constructing a LangChain LCEL `chain` (e.g., using `PromptTemplate.fromTemplate(
 
 Action:
 Always define and construct LangChain LCEL pipelines or prompts exactly once, such as during class instantiation (e.g., inside the constructor), and reuse the pre-built `chain` instance when executing tasks sequentially.
+
+## 2024-11-20 — Secure Error Logging Output
+
+Learning:
+Logging the entire `error` object directly using `console.error(error)` can unintentionally expose sensitive information (like API keys, access tokens, internal file paths, or stack traces) embedded within the error object. This is a common security risk in applications that interact with third-party APIs or handle sensitive data.
+
+Action:
+Always sanitize error outputs in logs by logging only the error message (e.g., `error instanceof Error ? error.message : String(error)`) instead of the entire error object, unless detailed tracing is strictly necessary and secure.
