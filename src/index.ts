@@ -54,7 +54,9 @@ program
 			console.log(`\n${chalk.green(result)}`);
 		} catch (error) {
 			spinner.fail("Research failed.");
-			console.error(chalk.red(error));
+			console.error(
+				chalk.red(error instanceof Error ? error.message : String(error)),
+			);
 			process.exit(1);
 		}
 	});
