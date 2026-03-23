@@ -31,7 +31,7 @@ export class ResearchEngine {
 		this.llm = new ChatOpenAI({
 			modelName: process.env.OPENAI_MODEL || "gpt-4-turbo-preview",
 			temperature: 0.2,
-			openAIApiKey: apiKey,
+			apiKey: apiKey,
 		});
 
 		const prompt = PromptTemplate.fromTemplate(`
