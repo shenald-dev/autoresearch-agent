@@ -44,3 +44,11 @@ LLM API calls are expensive and latency-heavy. Caching the results of these call
 
 Action:
 Implement a simple in-memory cache (using a `Map`) to store results of expensive chain invocations. This is especially useful in scenarios where the same research topic might be requested multiple times within the same session.
+
+## 2026-03-23 — Cache Stampede Prevention with Promise Coalescing
+
+Learning:
+When multiple asynchronous requests for the exact same resource (e.g. LLM API call) arrive concurrently, a simple cache checking mechanism might trigger the expensive operation multiple times before the first one completes and populates the cache.
+
+Action:
+Instead of awaiting the result before caching, immediately cache the returned `Promise`. Subsequent concurrent requests will then get the same pending Promise from the cache and await it together, avoiding redundant network requests and saving tokens/latency. Also ensure the promise is removed from the cache on rejection.
