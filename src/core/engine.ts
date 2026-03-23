@@ -14,8 +14,10 @@ export class ResearchEngine {
 	private config: EngineConfig;
 	// biome-ignore lint/suspicious/noExplicitAny: Langchain's Runnable interface is generic, typing it exactly here adds unnecessary bloat.
 	private chain: any;
+	private cache: Map<string, string>;
 
 	constructor(config: EngineConfig) {
+		this.cache = new Map();
 		this.config = config;
 
 		const apiKey = process.env.OPENAI_API_KEY;
@@ -50,11 +52,23 @@ export class ResearchEngine {
 	 * In a full implementation, this would chain Tools, memory, and specialized agents.
 	 */
 	public async run(topic: string): Promise<string> {
+		const depthStr = this.config.depth.toString();
+		const cacheKey = `${topic}|${depthStr}`;
+
+		// Check for cached results to avoid expensive API calls
+		const cachedResult = this.cache.get(cacheKey);
+		if (cachedResult) {
+			return cachedResult;
+		}
+
 		// Execute the LCEL chain
 		const result = await this.chain.invoke({
 			topic,
-			depth: this.config.depth.toString(),
+			depth: depthStr,
 		});
+
+		// Cache the result for future reuse
+		this.cache.set(cacheKey, result);
 
 		return result;
 	}
