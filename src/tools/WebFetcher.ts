@@ -1,7 +1,7 @@
 import * as url from "url";
 
 export class WebFetcher {
-    private cache: Map<string, string>;
+    private cache: Map<string, Promise<string>>;
     private maxConcurrency: number;
 
     constructor(maxConcurrency = 3) {
@@ -43,42 +43,48 @@ export class WebFetcher {
     /**
      * Internal generic fetcher handling a single URL with error catching.
      */
-    private async fetchSingle(targetUrl: string): Promise<string> {
+    private fetchSingle(targetUrl: string): Promise<string> {
         if (!this.isValidUrl(targetUrl)) {
-            return `Error: Invalid or insecure URL provided (${targetUrl})`;
+            return Promise.resolve(`Error: Invalid or insecure URL provided (${targetUrl})`);
         }
 
         if (this.cache.has(targetUrl)) {
-            return this.cache.get(targetUrl) as string;
+            return this.cache.get(targetUrl) as Promise<string>;
         }
 
-        try {
-            // Wait with a small timeout to simulate actual fetching
-            // In a real app, this would use fetch() or puppeteer.
-            // But since AutoResearch is an MVP, we will do a real fetch here!
-            const response = await fetch(targetUrl, {
-                headers: { "User-Agent": "AutoResearchAgent/2.0" }
-            });
-            
-            if (!response.ok) {
-                return `Error: HTTP ${response.status} from ${targetUrl}`;
+        const fetchPromise = (async () => {
+            try {
+                // Wait with a small timeout to simulate actual fetching
+                // In a real app, this would use fetch() or puppeteer.
+                // But since AutoResearch is an MVP, we will do a real fetch here!
+                const response = await fetch(targetUrl, {
+                    headers: { "User-Agent": "AutoResearchAgent/2.0" }
+                });
+
+                if (!response.ok) {
+                    this.cache.delete(targetUrl);
+                    return `Error: HTTP ${response.status} from ${targetUrl}`;
+                }
+
+                const text = await response.text();
+
+                // Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
+                const strippedText = text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+                                         .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
+                                         .replace(/<[^>]+>/g, " ")
+                                         .replace(/\s+/g, " ")
+                                         .trim();
+
+                const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
+                return truncated;
+            } catch (error: unknown) {
+                this.cache.delete(targetUrl);
+                return `Error: Failed to fetch ${targetUrl} - ${error instanceof Error ? error.message : String(error)}`;
             }
+        })();
 
-            const text = await response.text();
-            
-            // Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
-            const strippedText = text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-                                     .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
-                                     .replace(/<[^>]+>/g, " ")
-                                     .replace(/\s+/g, " ")
-                                     .trim();
-
-            const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
-            this.cache.set(targetUrl, truncated);
-            return truncated;
-        } catch (error: any) {
-            return `Error: Failed to fetch ${targetUrl} - ${error.message}`;
-        }
+        this.cache.set(targetUrl, fetchPromise);
+        return fetchPromise;
     }
 
     /**
