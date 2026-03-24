@@ -21,3 +21,11 @@ CLI applications built in Node.js can suffer from slow startup times (e.g., when
 
 Action:
 Defer importing heavy dependencies by using dynamic `await import(...)` inside action handlers. This keeps the initial parsing block lightweight and significantly reduces startup time for informational commands.
+
+## 2024-05-25 — Prevent Network Cache Stampedes with Promise Coalescing
+
+Learning:
+When launching multiple concurrent network requests (e.g. `fetchBatch`), multiple calls pointing to the same URL could bypass the cache if the first request hasn't completed yet. This causes duplicate network requests and unnecessary resource consumption.
+
+Action:
+Implemented Promise Coalescing in `WebFetcher`'s `fetchSingle` method. By immediately caching the pending `Promise` instead of the awaited result, subsequent requests for the same URL reuse the exact same promise. This reduces duplicate network I/O and speeds up fetching duplicate sources.
