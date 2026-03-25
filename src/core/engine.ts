@@ -15,6 +15,7 @@ export class ResearchEngine {
 	private configManager: ConfigManager;
 	private searcher: GoogleSearcher;
 	private fetcher: WebFetcher;
+	private prompt: PromptTemplate;
 
 	constructor(config: EngineConfig) {
 		this.config = config;
@@ -22,6 +23,21 @@ export class ResearchEngine {
 		this.searcher = new GoogleSearcher();
 		// Scale max concurrency based on depth to avoid overwhelming systems but speed up deep searches
 		this.fetcher = new WebFetcher(Math.min(10, config.depth * 2));
+
+		this.prompt = PromptTemplate.fromTemplate(`
+You are an expert autonomous researcher.
+Conduct a deep-dive analysis on the following topic.
+You have successfully scraped multiple web sources related to the topic.
+
+Topic: {topic}
+
+Sources Data:
+{context}
+
+Format the output as a clean, highly structured markdown document.
+Include an executive summary, main findings, and a "References" section at the bottom citing the sources provided.
+Return ONLY the markdown document.
+        `);
 	}
 
 	private async initLLM(): Promise<ChatOpenAI> {
@@ -33,7 +49,7 @@ export class ResearchEngine {
 		return new ChatOpenAI({
 			modelName: (await this.configManager.get("OPENAI_MODEL")) || "gpt-4-turbo-preview",
 			temperature: 0.2,
-			openAIApiKey: apiKey,
+			apiKey: apiKey,
 		});
 	}
 
@@ -70,22 +86,7 @@ export class ResearchEngine {
 			i++;
 		}
 
-		const prompt = PromptTemplate.fromTemplate(`
-You are an expert autonomous researcher. 
-Conduct a deep-dive analysis on the following topic.
-You have successfully scraped multiple web sources related to the topic.
-
-Topic: {topic}
-
-Sources Data:
-{context}
-
-Format the output as a clean, highly structured markdown document.
-Include an executive summary, main findings, and a "References" section at the bottom citing the sources provided.
-Return ONLY the markdown document.
-        `);
-
-		const chain = prompt.pipe(llm);
+		const chain = this.prompt.pipe(llm);
 		const result = await chain.invoke({
 			topic,
 			context

@@ -29,3 +29,11 @@ When launching multiple concurrent network requests (e.g. `fetchBatch`), multipl
 
 Action:
 Implemented Promise Coalescing in `WebFetcher`'s `fetchSingle` method. By immediately caching the pending `Promise` instead of the awaited result, subsequent requests for the same URL reuse the exact same promise. This reduces duplicate network I/O and speeds up fetching duplicate sources.
+
+## 2024-05-26 — Optimize LCEL PromptTemplate Initialization
+
+Learning:
+Initializing LangChain LCEL pipelines (like `PromptTemplate.fromTemplate`) inside execution methods (like `run()`) causes unnecessary string parsing and object allocation overhead on every invocation.
+
+Action:
+Prefer initializing LangChain LCEL pipelines once in class constructors or outside of hot paths rather than repeatedly in execution methods to improve runtime performance and reduce memory overhead.
