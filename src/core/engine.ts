@@ -43,17 +43,23 @@ Return ONLY the markdown document.
 	private async initLLM(): Promise<ChatOpenAI> {
 		const apiKey = await this.configManager.get("OPENAI_API_KEY");
 		if (!apiKey) {
-			throw new Error("OPENAI_API_KEY is missing. Please run 'autoresearch auth' to configure it.");
+			throw new Error(
+				"OPENAI_API_KEY is missing. Please run 'autoresearch auth' to configure it.",
+			);
 		}
 
 		return new ChatOpenAI({
-			modelName: (await this.configManager.get("OPENAI_MODEL")) || "gpt-4-turbo-preview",
+			modelName:
+				(await this.configManager.get("OPENAI_MODEL")) || "gpt-4-turbo-preview",
 			temperature: 0.2,
 			apiKey: apiKey,
 		});
 	}
 
-	public async run(topic: string, onProgress?: StatusCallback): Promise<string> {
+	public async run(
+		topic: string,
+		onProgress?: StatusCallback,
+	): Promise<string> {
 		const updateStatus = (msg: string) => {
 			if (onProgress) onProgress(msg);
 		};
@@ -62,20 +68,27 @@ Return ONLY the markdown document.
 
 		// Phase 1: Search
 		updateStatus(`🔍 Searching Google for: "${topic}"...`);
-		const searchResults = await this.searcher.search(topic, this.config.depth * 2);
+		const searchResults = await this.searcher.search(
+			topic,
+			this.config.depth * 2,
+		);
 
 		if (searchResults.length === 0) {
 			return `No results found for "${topic}". The API key may be missing or the query was too niche.`;
 		}
 
 		// Phase 2: Fetch and Extract
-		updateStatus(`📄 Discovered ${searchResults.length} sources. Fetching content concurrently...`);
-		const urls = searchResults.map(r => r.link);
+		updateStatus(
+			`📄 Discovered ${searchResults.length} sources. Fetching content concurrently...`,
+		);
+		const urls = searchResults.map((r) => r.link);
 		const fetchResults = await this.fetcher.fetchBatch(urls);
 
 		// Phase 3: Synthesize
-		updateStatus(`🧠 Synthesizing ${fetchResults.size} sources into a final report...`);
-		
+		updateStatus(
+			`🧠 Synthesizing ${fetchResults.size} sources into a final report...`,
+		);
+
 		// Build context from results
 		let context = "";
 		let i = 1;
@@ -89,7 +102,7 @@ Return ONLY the markdown document.
 		const chain = this.prompt.pipe(llm);
 		const result = await chain.invoke({
 			topic,
-			context
+			context,
 		});
 
 		return String(result.content);
