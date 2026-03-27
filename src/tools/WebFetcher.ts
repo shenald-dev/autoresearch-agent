@@ -1,114 +1,121 @@
 import * as url from "url";
 
 export class WebFetcher {
-    private cache: Map<string, Promise<string>>;
-    private maxConcurrency: number;
+	private cache: Map<string, Promise<string>>;
+	private maxConcurrency: number;
 
-    constructor(maxConcurrency = 3) {
-        this.cache = new Map();
-        this.maxConcurrency = maxConcurrency;
-    }
+	constructor(maxConcurrency = 3) {
+		this.cache = new Map();
+		this.maxConcurrency = maxConcurrency;
+	}
 
-    /**
-     * Validates a URL to ensure it is safe (SSRF protection).
-     * Only allows http and https protocols.
-     */
-    private isValidUrl(targetUrl: string): boolean {
-        try {
-            const parsed = new url.URL(targetUrl);
-            
-            // Rejects file://, ftp://, gopher://, etc.
-            if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-                return false;
-            }
+	/**
+	 * Validates a URL to ensure it is safe (SSRF protection).
+	 * Only allows http and https protocols.
+	 */
+	private isValidUrl(targetUrl: string): boolean {
+		try {
+			const parsed = new url.URL(targetUrl);
 
-            // Reject potential internal IP ranges (basic SSRF protection filter)
-            const hostname = parsed.hostname;
-            if (
-                hostname === "localhost" ||
-                hostname === "127.0.0.1" ||
-                hostname === "::1" ||
-                hostname.startsWith("192.168.") ||
-                hostname.startsWith("10.") ||
-                hostname.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./)
-            ) {
-                return false;
-            }
-            return true;
-        } catch {
-            return false;
-        }
-    }
+			// Rejects file://, ftp://, gopher://, etc.
+			if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+				return false;
+			}
 
-    /**
-     * Internal generic fetcher handling a single URL with error catching.
-     */
-    private fetchSingle(targetUrl: string): Promise<string> {
-        if (!this.isValidUrl(targetUrl)) {
-            return Promise.resolve(`Error: Invalid or insecure URL provided (${targetUrl})`);
-        }
+			// Reject potential internal IP ranges (basic SSRF protection filter)
+			const hostname = parsed.hostname;
+			if (
+				hostname === "localhost" ||
+				hostname === "127.0.0.1" ||
+				hostname === "::1" ||
+				hostname === "0.0.0.0" ||
+				hostname.match(/^192\.168\.\d{1,3}\.\d{1,3}$/) ||
+				hostname.match(/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) ||
+				hostname.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\.\d{1,3}\.\d{1,3}$/) ||
+				hostname.match(/^169\.254\.\d{1,3}\.\d{1,3}$/)
+			) {
+				return false;
+			}
+			return true;
+		} catch {
+			return false;
+		}
+	}
 
-        if (this.cache.has(targetUrl)) {
-            return this.cache.get(targetUrl) as Promise<string>;
-        }
+	/**
+	 * Internal generic fetcher handling a single URL with error catching.
+	 */
+	private fetchSingle(targetUrl: string): Promise<string> {
+		if (!this.isValidUrl(targetUrl)) {
+			return Promise.resolve(
+				`Error: Invalid or insecure URL provided (${targetUrl})`,
+			);
+		}
 
-        const fetchPromise = (async () => {
-            try {
-                // Wait with a small timeout to simulate actual fetching
-                // In a real app, this would use fetch() or puppeteer.
-                // But since AutoResearch is an MVP, we will do a real fetch here!
-                const response = await fetch(targetUrl, {
-                    headers: { "User-Agent": "AutoResearchAgent/2.0" }
-                });
+		if (this.cache.has(targetUrl)) {
+			return this.cache.get(targetUrl) as Promise<string>;
+		}
 
-                if (!response.ok) {
-                    this.cache.delete(targetUrl);
-                    return `Error: HTTP ${response.status} from ${targetUrl}`;
-                }
+		const fetchPromise = (async () => {
+			try {
+				// Wait with a small timeout to simulate actual fetching
+				// In a real app, this would use fetch() or puppeteer.
+				// But since AutoResearch is an MVP, we will do a real fetch here!
+				const response = await fetch(targetUrl, {
+					headers: { "User-Agent": "AutoResearchAgent/2.0" },
+				});
 
-                const text = await response.text();
+				if (!response.ok) {
+					this.cache.delete(targetUrl);
+					return `Error: HTTP ${response.status} from ${targetUrl}`;
+				}
 
-                // Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
-                const strippedText = text.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
-                                         .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "")
-                                         .replace(/<[^>]+>/g, " ")
-                                         .replace(/\s+/g, " ")
-                                         .trim();
+				const text = await response.text();
 
-                const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
-                return truncated;
-            } catch (error: unknown) {
-                this.cache.delete(targetUrl);
-                return `Error: Failed to fetch ${targetUrl} - ${error instanceof Error ? error.message : String(error)}`;
-            }
-        })();
+				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
+				const strippedText = text
+					.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
+					.replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "")
+					.replace(/<[^>]+>/g, " ")
+					.replace(/\s+/g, " ")
+					.trim();
 
-        this.cache.set(targetUrl, fetchPromise);
-        return fetchPromise;
-    }
+				const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
+				return truncated;
+			} catch (error: unknown) {
+				this.cache.delete(targetUrl);
+				return `Error: Failed to fetch ${targetUrl} - ${error instanceof Error ? error.message : String(error)}`;
+			}
+		})();
 
-    /**
-     * Fetches multiple URLs with bounded concurrency.
-     */
-    public async fetchBatch(urls: string[]): Promise<Map<string, string>> {
-        const results = new Map<string, string>();
-        const executing = new Set<Promise<void>>();
+		this.cache.set(targetUrl, fetchPromise);
+		return fetchPromise;
+	}
 
-        for (const targetUrl of urls) {
-            const promise = this.fetchSingle(targetUrl).then(content => {
-                results.set(targetUrl, content);
-            }).finally(() => {
-                executing.delete(promise);
-            });
+	/**
+	 * Fetches multiple URLs with bounded concurrency.
+	 */
+	public async fetchBatch(urls: string[]): Promise<Map<string, string>> {
+		const results = new Map<string, string>();
+		const executing = new Set<Promise<void>>();
 
-            executing.add(promise);
+		for (const targetUrl of urls) {
+			const promise = this.fetchSingle(targetUrl)
+				.then((content) => {
+					results.set(targetUrl, content);
+				})
+				.finally(() => {
+					executing.delete(promise);
+				});
 
-            if (executing.size >= this.maxConcurrency) {
-                await Promise.race(executing);
-            }
-        }
+			executing.add(promise);
 
-        await Promise.all(executing);
-        return results;
-    }
+			if (executing.size >= this.maxConcurrency) {
+				await Promise.race(executing);
+			}
+		}
+
+		await Promise.all(executing);
+		return results;
+	}
 }

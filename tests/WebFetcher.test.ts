@@ -19,11 +19,23 @@ describe("WebFetcher", () => {
         
         const resultFile = await (fetcher as any).fetchSingle("file:///etc/passwd");
         expect(resultFile).toContain("Error: Invalid or insecure URL");
+
+        const resultAwsMeta = await (fetcher as any).fetchSingle("http://169.254.169.254/latest/meta-data/");
+        expect(resultAwsMeta).toContain("Error: Invalid or insecure URL");
+
+        const resultZero = await (fetcher as any).fetchSingle("http://0.0.0.0:8000/api");
+        expect(resultZero).toContain("Error: Invalid or insecure URL");
     });
 
-    it("should allow valid public HTTP/HTTPS URLs", async () => {
+    it("should allow valid public HTTP/HTTPS URLs including tricky ones", async () => {
         const isValid = (fetcher as any).isValidUrl("https://en.wikipedia.org/wiki/AI");
         expect(isValid).toBe(true);
+
+        const isValidTen = (fetcher as any).isValidUrl("http://10.example.com/foo");
+        expect(isValidTen).toBe(true);
+
+        const isValidInternalLooking = (fetcher as any).isValidUrl("https://192.168.example.com");
+        expect(isValidInternalLooking).toBe(true);
     });
 
     it("should cache results to avoid redundant fetching", async () => {
