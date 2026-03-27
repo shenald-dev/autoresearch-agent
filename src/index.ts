@@ -1,8 +1,21 @@
 import { Command } from "commander";
 import pc from "picocolors";
 import * as p from "@clack/prompts";
+import { z } from "zod";
 
 const program = new Command();
+
+const ResearchInputSchema = z.object({
+	topic: z
+		.string()
+		.min(1, "Topic cannot be empty")
+		.max(200, "Topic is too long"),
+	depth: z.coerce
+		.number()
+		.int()
+		.min(1, "Depth must be at least 1")
+		.max(5, "Depth cannot exceed 5"),
+});
 
 program
 	.name("autoresearch")
@@ -22,7 +35,7 @@ program
 			message: "Enter your OpenAI API key:",
 			validate: (value) => {
 				if (!value) return "API key cannot be empty.";
-			}
+			},
 		});
 
 		if (p.isCancel(openAiKey)) {
@@ -34,7 +47,7 @@ program
 			message: "Enter your Serper API key (for Google Search):",
 			validate: (value) => {
 				if (!value) return "API key cannot be empty.";
-			}
+			},
 		});
 
 		if (p.isCancel(serperKey)) {
@@ -68,8 +81,11 @@ program
 				message: "What topic would you like to research?",
 				placeholder: "e.g., Quantum Computing advancements in 2026",
 				validate: (value) => {
-					if (!value || typeof value !== "string" || !value.trim()) return "Topic cannot be empty";
-				}
+					if (!value || typeof value !== "string" || !value.trim())
+						return "Topic cannot be empty";
+					if (value.length > 200)
+						return "Topic is too long (max 200 characters).";
+				},
 			});
 			if (p.isCancel(topic)) {
 				p.cancel("Operation cancelled.");
@@ -88,7 +104,7 @@ program
 					{ value: 4, label: "4 - Deep Dive" },
 					{ value: 5, label: "5 - Exhaustive Study" },
 				],
-				initialValue: 3
+				initialValue: 3,
 			});
 			if (p.isCancel(depthSelection)) {
 				p.cancel("Operation cancelled.");
@@ -97,23 +113,38 @@ program
 			depth = depthSelection as number;
 		}
 
-		p.log.step(pc.cyan(`Initializing agents for: ${pc.bold(topic)}`));
+		const parseResult = ResearchInputSchema.safeParse({ topic, depth });
+		if (!parseResult.success) {
+			p.log.error(
+				pc.red(
+					`Validation Error: ${parseResult.error.errors.map((e) => e.message).join(", ")}`,
+				),
+			);
+			process.exit(1);
+		}
+		const validatedInput = parseResult.data;
+
+		p.log.step(
+			pc.cyan(`Initializing agents for: ${pc.bold(validatedInput.topic)}`),
+		);
 
 		const s = p.spinner();
-		s.start(`Researching depth level ${depth}...`);
+		s.start(`Researching depth level ${validatedInput.depth}...`);
 
 		try {
 			const { ResearchEngine } = await import("./core/engine");
-			const engine = new ResearchEngine({ depth });
-			const result = await engine.run(topic as string);
+			const engine = new ResearchEngine({ depth: validatedInput.depth });
+			const result = await engine.run(validatedInput.topic);
 
 			s.stop(pc.green("Research complete."));
-			
+
 			p.log.message(pc.white(result));
 			p.outro(pc.cyan("Research report generated successfully!"));
 		} catch (error: any) {
 			s.stop(pc.red("Research failed."));
-			p.log.error(pc.red(error.message || String(error)));
+			p.log.error(
+				pc.red(error instanceof Error ? error.message : String(error)),
+			);
 			process.exit(1);
 		}
 	});
