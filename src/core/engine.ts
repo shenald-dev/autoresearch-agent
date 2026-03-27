@@ -1,8 +1,8 @@
-import { ChatOpenAI } from "@langchain/openai";
 import { PromptTemplate } from "@langchain/core/prompts";
-import { ConfigManager } from "../utils/config";
+import { ChatOpenAI } from "@langchain/openai";
 import { GoogleSearcher } from "../tools/GoogleSearcher";
 import { WebFetcher } from "../tools/WebFetcher";
+import { ConfigManager } from "../utils/config";
 
 export interface EngineConfig {
 	depth: number;

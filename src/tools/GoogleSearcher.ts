@@ -1,5 +1,5 @@
-import pc from "picocolors";
 import * as p from "@clack/prompts";
+import pc from "picocolors";
 import { ConfigManager } from "../utils/config";
 
 export interface SearchResult {
@@ -33,7 +33,7 @@ export class GoogleSearcher {
 				}
 
 				// Exponential backoff: 1s, 2s, 4s
-				const delayMs = Math.pow(2, attempt - 1) * 1000;
+				const delayMs = 2 ** (attempt - 1) * 1000;
 				await new Promise((resolve) => setTimeout(resolve, delayMs));
 			}
 		}
@@ -49,7 +49,7 @@ export class GoogleSearcher {
 		if (!apiKey) {
 			p.log.warn(
 				pc.yellow(
-					`[Search] SERPER_API_KEY not found. Skipping web search phase.`,
+					"[Search] SERPER_API_KEY not found. Skipping web search phase.",
 				),
 			);
 			return [];

@@ -1,6 +1,6 @@
+import * as p from "@clack/prompts";
 import { Command } from "commander";
 import pc from "picocolors";
-import * as p from "@clack/prompts";
 import { z } from "zod";
 
 const program = new Command();
@@ -93,7 +93,7 @@ program
 			}
 		}
 
-		let depth = options.depth ? parseInt(options.depth, 10) : null;
+		let depth = options.depth ? Number.parseInt(options.depth, 10) : null;
 		if (!depth) {
 			const depthSelection = await p.select({
 				message: "Select research depth (1=Surface, 5=Deep Analysis):",
