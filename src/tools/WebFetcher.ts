@@ -69,8 +69,8 @@ export class WebFetcher {
                 const text = await response.text();
 
                 // Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
-                const strippedText = text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-                                         .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
+                const strippedText = text.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
+                                         .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "")
                                          .replace(/<[^>]+>/g, " ")
                                          .replace(/\s+/g, " ")
                                          .trim();
