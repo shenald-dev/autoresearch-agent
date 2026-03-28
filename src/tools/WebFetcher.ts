@@ -26,8 +26,9 @@ export class WebFetcher {
 			const hostname = parsed.hostname;
 			if (
 				hostname === "localhost" ||
-				hostname === "127.0.0.1" ||
+				hostname.match(/^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) ||
 				hostname === "::1" ||
+				hostname === "[::1]" ||
 				hostname === "0.0.0.0" ||
 				hostname.match(/^192\.168\.\d{1,3}\.\d{1,3}$/) ||
 				hostname.match(/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) ||

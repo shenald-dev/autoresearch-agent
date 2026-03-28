@@ -25,6 +25,12 @@ describe("WebFetcher", () => {
 
         const resultZero = await (fetcher as any).fetchSingle("http://0.0.0.0:8000/api");
         expect(resultZero).toContain("Error: Invalid or insecure URL");
+
+        const resultLoopback = await (fetcher as any).fetchSingle("http://127.0.1.1/admin");
+        expect(resultLoopback).toContain("Error: Invalid or insecure URL");
+
+        const resultIpv6 = await (fetcher as any).fetchSingle("http://[::1]:8080/admin");
+        expect(resultIpv6).toContain("Error: Invalid or insecure URL");
     });
 
     it("should allow valid public HTTP/HTTPS URLs including tricky ones", async () => {
