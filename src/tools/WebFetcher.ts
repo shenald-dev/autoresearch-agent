@@ -1,3 +1,4 @@
+import * as dns from "node:dns/promises";
 import * as url from "node:url";
 
 export class WebFetcher {
@@ -12,8 +13,9 @@ export class WebFetcher {
 	/**
 	 * Validates a URL to ensure it is safe (SSRF protection).
 	 * Only allows http and https protocols.
+	 * Performs DNS resolution to prevent DNS rebinding and loopback variants.
 	 */
-	private isValidUrl(targetUrl: string): boolean {
+	private async isValidUrl(targetUrl: string): Promise<boolean> {
 		try {
 			const parsed = new url.URL(targetUrl);
 
@@ -22,21 +24,52 @@ export class WebFetcher {
 				return false;
 			}
 
-			// Reject potential internal IP ranges (basic SSRF protection filter)
 			const hostname = parsed.hostname;
-			if (
-				hostname === "localhost" ||
-				hostname.match(/^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) ||
-				hostname === "::1" ||
-				hostname === "[::1]" ||
-				hostname === "0.0.0.0" ||
-				hostname.match(/^192\.168\.\d{1,3}\.\d{1,3}$/) ||
-				hostname.match(/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) ||
-				hostname.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\.\d{1,3}\.\d{1,3}$/) ||
-				hostname.match(/^169\.254\.\d{1,3}\.\d{1,3}$/)
-			) {
+
+			// Resolve the hostname to prevent DNS rebinding or obfuscated IP representations
+			let addresses: dns.LookupAddress[];
+			try {
+				addresses = await dns.lookup(hostname, { all: true });
+			} catch {
+				// If DNS lookup fails (e.g., domain doesn't exist), we can't fetch it anyway
 				return false;
 			}
+
+			for (const { address } of addresses) {
+				// Reject IPv4 private, loopback, metadata, and broadcast ranges
+				if (
+					address.match(/^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) ||
+					address.match(/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) ||
+					address.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\.\d{1,3}\.\d{1,3}$/) ||
+					address.match(/^192\.168\.\d{1,3}\.\d{1,3}$/) ||
+					address.match(/^169\.254\.\d{1,3}\.\d{1,3}$/) ||
+					address === "0.0.0.0" ||
+					address === "255.255.255.255"
+				) {
+					return false;
+				}
+
+				// Reject IPv6 loopback, unspecified, unique local, and link local ranges
+				const ipv6 = address.toLowerCase();
+				if (
+					ipv6 === "::1" ||
+					ipv6 === "::" ||
+					ipv6.startsWith("fc") ||
+					ipv6.startsWith("fd") ||
+					ipv6.startsWith("fe8") ||
+					ipv6.startsWith("fe9") ||
+					ipv6.startsWith("fea") ||
+					ipv6.startsWith("feb") ||
+					ipv6.startsWith("::ffff:127.") ||
+					ipv6.startsWith("::ffff:10.") ||
+					ipv6.startsWith("::ffff:192.168.") ||
+					ipv6.startsWith("::ffff:169.254.") ||
+					ipv6.startsWith("::ffff:172.")
+				) {
+					return false;
+				}
+			}
+
 			return true;
 		} catch {
 			return false;
@@ -47,17 +80,15 @@ export class WebFetcher {
 	 * Internal generic fetcher handling a single URL with error catching.
 	 */
 	private fetchSingle(targetUrl: string): Promise<string> {
-		if (!this.isValidUrl(targetUrl)) {
-			return Promise.resolve(
-				`Error: Invalid or insecure URL provided (${targetUrl})`,
-			);
-		}
-
 		if (this.cache.has(targetUrl)) {
 			return this.cache.get(targetUrl) as Promise<string>;
 		}
 
 		const fetchPromise = (async () => {
+			if (!(await this.isValidUrl(targetUrl))) {
+				return `Error: Invalid or insecure URL provided (${targetUrl})`;
+			}
+
 			try {
 				// Wait with a small timeout to simulate actual fetching
 				// In a real app, this would use fetch() or puppeteer.
