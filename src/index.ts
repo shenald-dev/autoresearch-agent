@@ -1,6 +1,6 @@
+import * as p from "@clack/prompts";
 import { Command } from "commander";
 import pc from "picocolors";
-import * as p from "@clack/prompts";
 import { z } from "zod";
 
 const program = new Command();
@@ -93,7 +93,7 @@ program
 			}
 		}
 
-		let depth = options.depth ? parseInt(options.depth, 10) : null;
+		let depth = options.depth ? Number.parseInt(options.depth, 10) : null;
 		if (!depth) {
 			const depthSelection = await p.select({
 				message: "Select research depth (1=Surface, 5=Deep Analysis):",
@@ -140,7 +140,7 @@ program
 
 			p.log.message(pc.white(result));
 			p.outro(pc.cyan("Research report generated successfully!"));
-		} catch (error: any) {
+		} catch (error: unknown) {
 			s.stop(pc.red("Research failed."));
 			p.log.error(
 				pc.red(error instanceof Error ? error.message : String(error)),

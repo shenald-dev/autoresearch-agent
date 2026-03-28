@@ -1,6 +1,6 @@
-import * as fs from "fs/promises";
-import * as path from "path";
-import * as os from "os";
+import * as fs from "node:fs/promises";
+import * as os from "node:os";
+import * as path from "node:path";
 
 export interface AutoResearchConfig {
 	OPENAI_API_KEY?: string;
