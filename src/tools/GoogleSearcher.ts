@@ -66,6 +66,7 @@ export class GoogleSearcher {
 					q: query,
 					num: numResults,
 				}),
+				signal: AbortSignal.timeout(10000),
 			});
 
 			if (!response.ok) {
