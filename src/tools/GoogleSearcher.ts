@@ -2,7 +2,7 @@ import * as p from "@clack/prompts";
 import pc from "picocolors";
 import { ConfigManager } from "../utils/config";
 
-export interface SearchResult {
+interface SearchResult {
 	title: string;
 	link: string;
 	snippet: string;
