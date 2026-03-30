@@ -27,7 +27,7 @@ export class WebFetcher {
 			const hostname = parsed.hostname;
 
 			// Resolve the hostname to prevent DNS rebinding or obfuscated IP representations
-			let addresses: dns.LookupAddress[];
+			let addresses: { address: string; family: number }[];
 			try {
 				addresses = await dns.lookup(hostname, { all: true });
 			} catch {

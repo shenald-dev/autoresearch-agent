@@ -1,3 +1,11 @@
+## 2026-03-28 — Assessment & Lifecycle (2)
+
+**Observation / Pruned:**
+Observed a TypeScript compilation issue (`LookupAddress` not exported) resulting from the DNS rebinding SSRF patch. Corrected it to use an inline type. Pruned an unused exported interface `SearchResult` from `GoogleSearcher.ts`.
+
+**Alignment / Deferred:**
+Aligned the code with TypeScript safety standards without changing the SSRF protection logic. Safe dependency minor/patch bumps were applied.
+
 ## 2026-03-28 — Assessment & Lifecycle
 
 **Observation / Pruned:**
