@@ -95,6 +95,7 @@ export class WebFetcher {
 				// But since AutoResearch is an MVP, we will do a real fetch here!
 				const response = await fetch(targetUrl, {
 					headers: { "User-Agent": "AutoResearchAgent/2.0" },
+					signal: AbortSignal.timeout(15000),
 				});
 
 				if (!response.ok) {
