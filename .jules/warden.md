@@ -1,3 +1,11 @@
+## 2026-03-31 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively fortified the SSRF mitigations by explicitly implementing manual HTTP redirect processing in `WebFetcher`. Node's native `fetch` auto-follows redirects by default, potentially bypassing validation; manual handling securely inspects the target `Location` header before each jump. Scanned for dead code via `ts-prune` but found none to eliminate.
+
+**Alignment / Deferred:**
+Validated the robustness of the updated module with `npm run test` and `npm run lint`. Deferred refactoring the redirect limit (MAX_REDIRECTS) to configuration since a hard-coded 5 limits infinite loops sufficiently. Safely bumped minor/patch dependencies via `npm update` and prepared the v1.0.5 release.
+
 ## 2026-03-30 — Assessment & Lifecycle
 
 **Observation / Pruned:**

@@ -5,6 +5,10 @@ All notable changes to autoresearch-agent will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2026-03-31
+* **[Security]:** Enhanced SSRF protection by explicitly handling HTTP redirects to prevent automatic Node.js native `fetch` bypasses into internal or malicious IP addresses.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 ## [1.0.4] - 2026-03-30
 * **[Optimized]:** Implemented dynamic concurrency bounds based on research depth to improve web scraping performance without overwhelming resources.
 * **[Security]:** Enhanced SSRF protection by adding rigorous IP bound and loopback validation, explicitly blocking AWS metadata endpoints and IPv6 edge-cases.
