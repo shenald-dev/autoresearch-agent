@@ -10,9 +10,11 @@ interface SearchResult {
 
 export class GoogleSearcher {
 	private configManager: ConfigManager;
+	private cache: Map<string, Promise<SearchResult[]>>;
 
 	constructor() {
 		this.configManager = new ConfigManager();
+		this.cache = new Map();
 	}
 
 	/**
@@ -44,46 +46,61 @@ export class GoogleSearcher {
 	 * Performs a Google search using Serper.dev API.
 	 */
 	public async search(query: string, numResults = 5): Promise<SearchResult[]> {
-		const apiKey = await this.configManager.get("SERPER_API_KEY");
-
-		if (!apiKey) {
-			p.log.warn(
-				pc.yellow(
-					"[Search] SERPER_API_KEY not found. Skipping web search phase.",
-				),
-			);
-			return [];
+		const cacheKey = `${query}:${numResults}`;
+		if (this.cache.has(cacheKey)) {
+			return this.cache.get(cacheKey) as Promise<SearchResult[]>;
 		}
 
-		return this.withRetries(async () => {
-			const response = await fetch("https://google.serper.dev/search", {
-				method: "POST",
-				headers: {
-					"X-API-KEY": apiKey,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					q: query,
-					num: numResults,
-				}),
-				signal: AbortSignal.timeout(10000),
-			});
+		const searchPromise = (async () => {
+			try {
+				const apiKey = await this.configManager.get("SERPER_API_KEY");
 
-			if (!response.ok) {
-				throw new Error(`Serper API HTTP error: ${response.status}`);
+				if (!apiKey) {
+					p.log.warn(
+						pc.yellow(
+							"[Search] SERPER_API_KEY not found. Skipping web search phase.",
+						),
+					);
+					return [];
+				}
+
+				return await this.withRetries(async () => {
+					const response = await fetch("https://google.serper.dev/search", {
+						method: "POST",
+						headers: {
+							"X-API-KEY": apiKey,
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							q: query,
+							num: numResults,
+						}),
+						signal: AbortSignal.timeout(10000),
+					});
+
+					if (!response.ok) {
+						throw new Error(`Serper API HTTP error: ${response.status}`);
+					}
+
+					const data = await response.json();
+
+					if (!data.organic || !Array.isArray(data.organic)) {
+						return [];
+					}
+
+					return data.organic.map((item: Record<string, unknown>) => ({
+						title: String(item.title),
+						link: String(item.link),
+						snippet: String(item.snippet),
+					}));
+				});
+			} catch (error) {
+				this.cache.delete(cacheKey);
+				throw error;
 			}
+		})();
 
-			const data = await response.json();
-
-			if (!data.organic || !Array.isArray(data.organic)) {
-				return [];
-			}
-
-			return data.organic.map((item: Record<string, unknown>) => ({
-				title: String(item.title),
-				link: String(item.link),
-				snippet: String(item.snippet),
-			}));
-		});
+		this.cache.set(cacheKey, searchPromise);
+		return searchPromise;
 	}
 }
