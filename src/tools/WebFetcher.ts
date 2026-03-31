@@ -90,17 +90,47 @@ export class WebFetcher {
 			}
 
 			try {
-				// Wait with a small timeout to simulate actual fetching
-				// In a real app, this would use fetch() or puppeteer.
-				// But since AutoResearch is an MVP, we will do a real fetch here!
-				const response = await fetch(targetUrl, {
-					headers: { "User-Agent": "AutoResearchAgent/2.0" },
-					signal: AbortSignal.timeout(15000),
-				});
+				let currentUrl = targetUrl;
+				let response: Response | null = null;
+				let redirects = 0;
+				const MAX_REDIRECTS = 5;
 
-				if (!response.ok) {
+				while (redirects <= MAX_REDIRECTS) {
+					response = await fetch(currentUrl, {
+						headers: { "User-Agent": "AutoResearchAgent/2.0" },
+						signal: AbortSignal.timeout(15000),
+						redirect: "manual",
+					});
+
+					// Handle redirects manually to prevent SSRF via 301/302 location headers
+					if (
+						response.status >= 300 &&
+						response.status < 400 &&
+						response.headers.has("location")
+					) {
+						redirects++;
+						if (redirects > MAX_REDIRECTS) {
+							this.cache.delete(targetUrl);
+							return `Error: Too many redirects for ${targetUrl}`;
+						}
+
+						const location = response.headers.get("location") as string;
+						const nextUrl = new url.URL(location, currentUrl).toString();
+
+						if (!(await this.isValidUrl(nextUrl))) {
+							this.cache.delete(targetUrl);
+							return `Error: Redirected to invalid or insecure URL (${nextUrl})`;
+						}
+
+						currentUrl = nextUrl;
+					} else {
+						break;
+					}
+				}
+
+				if (!response || !response.ok) {
 					this.cache.delete(targetUrl);
-					return `Error: HTTP ${response.status} from ${targetUrl}`;
+					return `Error: HTTP ${response?.status || "unknown"} from ${targetUrl}`;
 				}
 
 				const text = await response.text();

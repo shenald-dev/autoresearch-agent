@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { WebFetcher } from "../src/tools/WebFetcher";
 
 describe("WebFetcher", () => {
@@ -37,6 +37,30 @@ describe("WebFetcher", () => {
 
         const resultIpv4Mapped = await (fetcher as any).fetchSingle("http://[::ffff:127.0.0.1]:8080/admin");
         expect(resultIpv4Mapped).toContain("Error: Invalid or insecure URL");
+    });
+
+    it("should reject redirects to SSRF URLs", async () => {
+        // Mock global fetch to return a 302 redirect to an internal IP
+        const originalFetch = global.fetch;
+        global.fetch = vi.fn().mockImplementation(async (url, options) => {
+            if (url === "https://example.com/redirect-to-internal") {
+                return {
+                    status: 302,
+                    headers: new Headers({ location: "http://169.254.169.254/latest/meta-data/" }),
+                    ok: false
+                };
+            }
+            return {
+                status: 200,
+                ok: true,
+                text: async () => "Mock content"
+            };
+        });
+
+        const result = await (fetcher as any).fetchSingle("https://example.com/redirect-to-internal");
+        expect(result).toContain("Error: Redirected to invalid or insecure URL");
+
+        global.fetch = originalFetch;
     });
 
     it("should allow valid public HTTP/HTTPS URLs including tricky ones", async () => {
