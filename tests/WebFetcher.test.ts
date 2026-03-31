@@ -31,6 +31,12 @@ describe("WebFetcher", () => {
 
         const resultIpv6 = await (fetcher as any).fetchSingle("http://[::1]:8080/admin");
         expect(resultIpv6).toContain("Error: Invalid or insecure URL");
+
+        const resultIpv6Unspecified = await (fetcher as any).fetchSingle("http://[::]:8080/admin");
+        expect(resultIpv6Unspecified).toContain("Error: Invalid or insecure URL");
+
+        const resultIpv4Mapped = await (fetcher as any).fetchSingle("http://[::ffff:127.0.0.1]:8080/admin");
+        expect(resultIpv4Mapped).toContain("Error: Invalid or insecure URL");
     });
 
     it("should allow valid public HTTP/HTTPS URLs including tricky ones", async () => {
