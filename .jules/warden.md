@@ -1,3 +1,11 @@
+## 2026-03-30 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT successfully optimized the web scraper concurrency to scale dynamically based on research depth rather than a static integer. Also observed that robust SSRF bounds checking (preventing AWS metadata access and catching zero-length IPs) were successfully implemented.
+
+**Alignment / Deferred:**
+Aligned the `ARCHITECTURE.md` documentation to explicitly describe the dynamic concurrency limit. Verified that the test suite comprehensively covers the new loopback and metadata edge-cases by adding strict tests for `[::]` and `[::ffff:127.0.0.1]`. Minor/patch dependencies were safely updated via `npm update`.
+
 ## 2026-03-28 — Assessment & Lifecycle (2)
 
 **Observation / Pruned:**
