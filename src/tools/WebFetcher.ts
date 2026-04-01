@@ -110,6 +110,7 @@ export class WebFetcher {
 					) {
 						redirects++;
 						if (redirects > MAX_REDIRECTS) {
+							await response.body?.cancel().catch(() => {});
 							this.cache.delete(targetUrl);
 							return `Error: Too many redirects for ${targetUrl}`;
 						}
@@ -118,10 +119,12 @@ export class WebFetcher {
 						const nextUrl = new url.URL(location, currentUrl).toString();
 
 						if (!(await this.isValidUrl(nextUrl))) {
+							await response.body?.cancel().catch(() => {});
 							this.cache.delete(targetUrl);
 							return `Error: Redirected to invalid or insecure URL (${nextUrl})`;
 						}
 
+						await response.body?.cancel().catch(() => {});
 						currentUrl = nextUrl;
 					} else {
 						break;
@@ -129,6 +132,7 @@ export class WebFetcher {
 				}
 
 				if (!response || !response.ok) {
+					await response?.body?.cancel().catch(() => {});
 					this.cache.delete(targetUrl);
 					return `Error: HTTP ${response?.status || "unknown"} from ${targetUrl}`;
 				}

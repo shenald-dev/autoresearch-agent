@@ -79,6 +79,7 @@ export class GoogleSearcher {
 					});
 
 					if (!response.ok) {
+						await response.body?.cancel().catch(() => {});
 						throw new Error(`Serper API HTTP error: ${response.status}`);
 					}
 
