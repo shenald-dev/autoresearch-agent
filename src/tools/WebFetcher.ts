@@ -133,7 +133,30 @@ export class WebFetcher {
 					return `Error: HTTP ${response?.status || "unknown"} from ${targetUrl}`;
 				}
 
-				const text = await response.text();
+				let text = "";
+				if (response.body) {
+					const reader = response.body.getReader();
+					const decoder = new TextDecoder();
+					let totalBytes = 0;
+					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM
+
+					while (true) {
+						const { done, value } = await reader.read();
+						if (done) break;
+
+						totalBytes += value.length;
+						text += decoder.decode(value, { stream: true });
+
+						if (totalBytes >= MAX_BYTES) {
+							// Cancel the reader early to save bandwidth and memory
+							await reader.cancel();
+							break;
+						}
+					}
+					text += decoder.decode();
+				} else {
+					text = await response.text();
+				}
 
 				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
 				const strippedText = text
