@@ -5,3 +5,7 @@ When caching network-heavy API calls like `GoogleSearcher.search()`, caching the
 
 Action:
 Ensure rejected promises are caught and removed from the cache using `.catch()` or `try-catch` blocks within the async closure to prevent transient errors from being permanently cached. Do not commit temporary script files like `patch.js`.
+
+## 2026-04-01 — Streaming External Payloads to Prevent OOM
+Learning: Unbounded payloads from external sources using `await response.text()` represent a severe reliability and DoS risk.
+Action: To prevent Out-Of-Memory (OOM) vulnerabilities when fetching external URLs, never load unbounded response bodies into memory. Stream the response using `response.body`, a `TextDecoder`, and an `AbortController` to process chunks and cancel the request once a safe byte limit (e.g., 500KB) is reached.
