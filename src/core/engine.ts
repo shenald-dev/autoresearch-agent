@@ -90,14 +90,17 @@ Return ONLY the markdown document.
 		);
 
 		// Build context from results
-		let context = "";
+		const contextChunks: string[] = [];
 		let i = 1;
 		for (const [url, content] of fetchResults.entries()) {
 			if (!content.startsWith("Error:")) {
-				context += `[Source ${i} | ${url}]\n${content.substring(0, 1500)}\n\n`;
+				contextChunks.push(
+					`[Source ${i} | ${url}]\n${content.substring(0, 1500)}\n\n`,
+				);
 			}
 			i++;
 		}
+		const context = contextChunks.join("");
 
 		const chain = this.prompt.pipe(llm);
 		const result = await chain.invoke({
