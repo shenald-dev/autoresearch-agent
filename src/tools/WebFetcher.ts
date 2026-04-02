@@ -143,13 +143,14 @@ export class WebFetcher {
 					const decoder = new TextDecoder();
 					let totalBytes = 0;
 					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM
+					const chunks: string[] = [];
 
 					while (true) {
 						const { done, value } = await reader.read();
 						if (done) break;
 
 						totalBytes += value.length;
-						text += decoder.decode(value, { stream: true });
+						chunks.push(decoder.decode(value, { stream: true }));
 
 						if (totalBytes >= MAX_BYTES) {
 							// Cancel the reader early to save bandwidth and memory
@@ -157,7 +158,8 @@ export class WebFetcher {
 							break;
 						}
 					}
-					text += decoder.decode();
+					chunks.push(decoder.decode());
+					text = chunks.join("");
 				} else {
 					text = await response.text();
 				}
