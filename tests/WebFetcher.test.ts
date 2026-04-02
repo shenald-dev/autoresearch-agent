@@ -63,6 +63,27 @@ describe("WebFetcher", () => {
         global.fetch = originalFetch;
     });
 
+    it("should cancel unconsumed response bodies during redirect loops to prevent socket leaks", async () => {
+        const originalFetch = global.fetch;
+        const mockCancel = vi.fn().mockResolvedValue(undefined);
+
+        global.fetch = vi.fn().mockImplementation(async (url) => {
+            // Force an invalid redirect loop to trigger the body.cancel() behavior
+            return {
+                status: 302,
+                headers: new Headers({ location: "http://169.254.169.254/latest/meta-data/" }),
+                ok: false,
+                body: { cancel: mockCancel }
+            };
+        });
+
+        const result = await (fetcher as any).fetchSingle("https://example.com/loop");
+        expect(result).toContain("Error: Redirected to invalid or insecure URL");
+        expect(mockCancel).toHaveBeenCalled();
+
+        global.fetch = originalFetch;
+    });
+
     it("should allow valid public HTTP/HTTPS URLs including tricky ones", async () => {
         const isValid = await (fetcher as any).isValidUrl("https://en.wikipedia.org/wiki/AI");
         expect(isValid).toBe(true);

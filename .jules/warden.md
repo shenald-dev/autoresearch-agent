@@ -1,3 +1,11 @@
+## 2026-04-01 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT successfully identified and patched a socket exhaustion memory leak issue. By explicitly invoking `await response.body?.cancel().catch(() => {});` on discarded response streams (e.g., during error handling and manual redirect loops), it ensures unconsumed `fetch` sockets are closed efficiently. Ran `ts-prune` to check for orphaned logic, but found no further dead code to eliminate.
+
+**Alignment / Deferred:**
+Aligned the test suite by authoring an adversarial redirect loop test in `WebFetcher.test.ts` to actively verify `.cancel()` is triggered during manual redirect failures. Deferred any systemic shift documentation, as this is an explicit bug fix optimization. Cut the `1.0.6` patch release securely after syncing docs and performing safe dependency updates.
+
 ## 2026-03-31 — Assessment & Lifecycle
 
 **Observation / Pruned:**
