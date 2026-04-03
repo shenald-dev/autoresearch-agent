@@ -37,6 +37,12 @@ describe("WebFetcher", () => {
 
         const resultIpv4Mapped = await (fetcher as any).fetchSingle("http://[::ffff:127.0.0.1]:8080/admin");
         expect(resultIpv4Mapped).toContain("Error: Invalid or insecure URL");
+
+        const resultHexIpv4Mapped = await (fetcher as any).fetchSingle("http://[::ffff:7f00:1]:8080/admin");
+        expect(resultHexIpv4Mapped).toContain("Error: Invalid or insecure URL");
+
+        const resultHexIpv4Mapped10 = await (fetcher as any).fetchSingle("http://[::ffff:a00:1]:8080/admin");
+        expect(resultHexIpv4Mapped10).toContain("Error: Invalid or insecure URL");
     });
 
     it("should reject redirects to SSRF URLs", async () => {
