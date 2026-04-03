@@ -5,6 +5,10 @@ All notable changes to autoresearch-agent will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.7] - 2026-04-02
+* **[Optimized]:** Implemented array-based chunk buffering strategy in `WebFetcher` to optimize string concatenation of large streaming network responses, significantly reducing memory thrashing and O(N^2) allocations.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 ## [1.0.6] - 2026-04-01
 * **[Fixed]:** Fixed TCP socket connection pooling exhaustion and memory leaks by explicitly invoking `.cancel()` on unconsumed Node.js `fetch` response streams in both `WebFetcher` and `GoogleSearcher`.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
