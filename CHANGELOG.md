@@ -5,6 +5,10 @@ All notable changes to autoresearch-agent will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] - 2026-04-03
+* **[Optimized]:** Replaced simple string concatenation (`+=`) with an array-based string buffer (`push` and `join`) in `ResearchEngine.run` to prevent object allocation overhead and memory thrashing when aggregating context from scraped payloads.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 ## [1.0.7] - 2026-04-02
 * **[Optimized]:** Implemented array-based chunk buffering strategy in `WebFetcher` to optimize string concatenation of large streaming network responses, significantly reducing memory thrashing and O(N^2) allocations.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
