@@ -36,6 +36,7 @@ describe("WebFetcher", () => {
         expect(resultIpv6Unspecified).toContain("Error: Invalid or insecure URL");
 
         const resultIpv4Mapped = await (fetcher as any).fetchSingle("http://[::ffff:127.0.0.1]:8080/admin");
+        expect(await (fetcher as any).fetchSingle("http://[::ffff:7f00:1]:8080/admin")).toContain("Error: Invalid or insecure URL");
         expect(resultIpv4Mapped).toContain("Error: Invalid or insecure URL");
     });
 
@@ -96,6 +97,9 @@ describe("WebFetcher", () => {
 
         const isValidInternalLooking = await (fetcher as any).isValidUrl("https://example.org");
         expect(isValidInternalLooking).toBe(true);
+
+        const isValidPublicIpv6 = await (fetcher as any).isValidUrl("http://[2606:4700:4700::1111]/");
+        expect(isValidPublicIpv6).toBe(true);
     });
 
     it("should cache results to avoid redundant fetching", async () => {

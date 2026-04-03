@@ -29,7 +29,12 @@ export class WebFetcher {
 			// Resolve the hostname to prevent DNS rebinding or obfuscated IP representations
 			let addresses: { address: string; family: number }[];
 			try {
-				addresses = await dns.lookup(hostname, { all: true });
+				// Strip brackets for IPv6 addresses before lookup
+				let lookupHostname = hostname;
+				if (lookupHostname.startsWith("[") && lookupHostname.endsWith("]")) {
+					lookupHostname = lookupHostname.slice(1, -1);
+				}
+				addresses = await dns.lookup(lookupHostname, { all: true });
 			} catch {
 				// If DNS lookup fails (e.g., domain doesn't exist), we can't fetch it anyway
 				return false;
@@ -64,7 +69,12 @@ export class WebFetcher {
 					ipv6.startsWith("::ffff:10.") ||
 					ipv6.startsWith("::ffff:192.168.") ||
 					ipv6.startsWith("::ffff:169.254.") ||
-					ipv6.startsWith("::ffff:172.")
+					ipv6.startsWith("::ffff:172.") ||
+					ipv6.startsWith("::ffff:7f") ||
+					ipv6.startsWith("::ffff:a") ||
+					ipv6.startsWith("::ffff:c0a8:") ||
+					ipv6.startsWith("::ffff:a9fe:") ||
+					ipv6.startsWith("::ffff:ac")
 				) {
 					return false;
 				}
