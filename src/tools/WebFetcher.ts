@@ -1,5 +1,6 @@
 import * as dns from "node:dns/promises";
 import * as url from "node:url";
+import * as ipaddr from "ipaddr.js";
 
 export class WebFetcher {
 	private cache: Map<string, Promise<string>>;
@@ -24,7 +25,12 @@ export class WebFetcher {
 				return false;
 			}
 
-			const hostname = parsed.hostname;
+			let hostname = parsed.hostname;
+
+			// Strip IPv6 brackets if present for dns.lookup
+			if (hostname.startsWith("[") && hostname.endsWith("]")) {
+				hostname = hostname.slice(1, -1);
+			}
 
 			// Resolve the hostname to prevent DNS rebinding or obfuscated IP representations
 			let addresses: { address: string; family: number }[];
@@ -36,36 +42,34 @@ export class WebFetcher {
 			}
 
 			for (const { address } of addresses) {
-				// Reject IPv4 private, loopback, metadata, and broadcast ranges
-				if (
-					address.match(/^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) ||
-					address.match(/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) ||
-					address.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\.\d{1,3}\.\d{1,3}$/) ||
-					address.match(/^192\.168\.\d{1,3}\.\d{1,3}$/) ||
-					address.match(/^169\.254\.\d{1,3}\.\d{1,3}$/) ||
-					address === "0.0.0.0" ||
-					address === "255.255.255.255"
-				) {
-					return false;
-				}
+				try {
+					let addr = ipaddr.parse(address);
 
-				// Reject IPv6 loopback, unspecified, unique local, and link local ranges
-				const ipv6 = address.toLowerCase();
-				if (
-					ipv6 === "::1" ||
-					ipv6 === "::" ||
-					ipv6.startsWith("fc") ||
-					ipv6.startsWith("fd") ||
-					ipv6.startsWith("fe8") ||
-					ipv6.startsWith("fe9") ||
-					ipv6.startsWith("fea") ||
-					ipv6.startsWith("feb") ||
-					ipv6.startsWith("::ffff:127.") ||
-					ipv6.startsWith("::ffff:10.") ||
-					ipv6.startsWith("::ffff:192.168.") ||
-					ipv6.startsWith("::ffff:169.254.") ||
-					ipv6.startsWith("::ffff:172.")
-				) {
+					// Handle IPv4-mapped IPv6 addresses (e.g. ::ffff:127.0.0.1)
+					if (
+						addr.kind() === "ipv6" &&
+						(addr as ipaddr.IPv6).isIPv4MappedAddress()
+					) {
+						addr = (addr as ipaddr.IPv6).toIPv4Address();
+					}
+
+					const range = addr.range();
+
+					// Reject unsafe IP ranges
+					if (
+						range === "private" ||
+						range === "loopback" ||
+						range === "uniqueLocal" ||
+						range === "linkLocal" ||
+						range === "broadcast" ||
+						range === "multicast" ||
+						range === "reserved" ||
+						range === "unspecified"
+					) {
+						return false;
+					}
+				} catch {
+					// If we can't parse the address, reject it
 					return false;
 				}
 			}
