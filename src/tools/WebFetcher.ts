@@ -1,5 +1,6 @@
 import * as dns from "node:dns/promises";
 import * as url from "node:url";
+import * as ipaddr from "ipaddr.js";
 
 export class WebFetcher {
 	private cache: Map<string, Promise<string>>;
@@ -24,7 +25,10 @@ export class WebFetcher {
 				return false;
 			}
 
-			const hostname = parsed.hostname;
+			let hostname = parsed.hostname;
+			if (hostname.startsWith("[") && hostname.endsWith("]")) {
+				hostname = hostname.slice(1, -1);
+			}
 
 			// Resolve the hostname to prevent DNS rebinding or obfuscated IP representations
 			let addresses: { address: string; family: number }[];
@@ -35,43 +39,34 @@ export class WebFetcher {
 				return false;
 			}
 
-			for (const { address } of addresses) {
-				// Reject IPv4 private, loopback, metadata, and broadcast ranges
-				if (
-					address.match(/^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) ||
-					address.match(/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) ||
-					address.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\.\d{1,3}\.\d{1,3}$/) ||
-					address.match(/^192\.168\.\d{1,3}\.\d{1,3}$/) ||
-					address.match(/^169\.254\.\d{1,3}\.\d{1,3}$/) ||
-					address === "0.0.0.0" ||
-					address === "255.255.255.255"
-				) {
-					return false;
-				}
+			const rejectedRanges = [
+				"private",
+				"loopback",
+				"linkLocal",
+				"broadcast",
+				"unspecified",
+				"uniqueLocal",
+				"carrierGradeNat",
+				"reserved",
+				"multicast",
+			];
 
-				// Reject IPv6 loopback, unspecified, unique local, and link local ranges
-				const ipv6 = address.toLowerCase();
-				if (
-					ipv6 === "::1" ||
-					ipv6 === "::" ||
-					ipv6.startsWith("fc") ||
-					ipv6.startsWith("fd") ||
-					ipv6.startsWith("fe8") ||
-					ipv6.startsWith("fe9") ||
-					ipv6.startsWith("fea") ||
-					ipv6.startsWith("feb") ||
-					ipv6.startsWith("::ffff:127.") ||
-					ipv6.startsWith("::ffff:10.") ||
-					ipv6.startsWith("::ffff:192.168.") ||
-					ipv6.startsWith("::ffff:169.254.") ||
-					ipv6.startsWith("::ffff:172.")
-				) {
+			for (const { address } of addresses) {
+				try {
+					const parsedIp = ipaddr.process(address);
+					const range = parsedIp.range();
+
+					if (rejectedRanges.includes(range)) {
+						return false;
+					}
+				} catch {
+					// Invalid IP format
 					return false;
 				}
 			}
 
 			return true;
-		} catch {
+		} catch (error) {
 			return false;
 		}
 	}
