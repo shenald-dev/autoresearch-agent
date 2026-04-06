@@ -96,6 +96,9 @@ describe("WebFetcher", () => {
 
         const isValidInternalLooking = await (fetcher as any).isValidUrl("https://example.org");
         expect(isValidInternalLooking).toBe(true);
+
+        const isValidPublicIpv6 = await (fetcher as any).isValidUrl("http://[2606:4700:4700::1111]/");
+        expect(isValidPublicIpv6).toBe(true);
     });
 
     it("should cache results to avoid redundant fetching", async () => {

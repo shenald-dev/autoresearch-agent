@@ -24,7 +24,10 @@ export class WebFetcher {
 				return false;
 			}
 
-			const hostname = parsed.hostname;
+			let hostname = parsed.hostname;
+			if (hostname.startsWith("[") && hostname.endsWith("]")) {
+				hostname = hostname.slice(1, -1);
+			}
 
 			// Resolve the hostname to prevent DNS rebinding or obfuscated IP representations
 			let addresses: { address: string; family: number }[];
@@ -64,7 +67,8 @@ export class WebFetcher {
 					ipv6.startsWith("::ffff:10.") ||
 					ipv6.startsWith("::ffff:192.168.") ||
 					ipv6.startsWith("::ffff:169.254.") ||
-					ipv6.startsWith("::ffff:172.")
+					ipv6.startsWith("::ffff:172.") ||
+					ipv6.startsWith("::ffff:7f00:") // Handle node's hex-encoded IPv4-mapped IPv6 for 127.0.x.x
 				) {
 					return false;
 				}
