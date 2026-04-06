@@ -12,3 +12,11 @@ Action: To prevent Out-Of-Memory (OOM) vulnerabilities when fetching external UR
 ## 2024-04-02 — String Concatenation Bottleneck
 Learning: While V8 optimizes standard string `+=` operations internally using ConsStrings for a small number of chunks, building strings iteratively inside loops that process numerous small chunks from network streams (e.g., `TextDecoder` over `response.body.getReader()`) causes memory thrashing and O(N^2) allocations for large payloads (e.g., ~500KB limits).
 Action: Always use array buffering (`chunks.push(...)` and `chunks.join("")`) when reading and accumulating unbounded or large chunks from streams.
+
+## 2024-04-06 — Hardened SSRF Protection with ipaddr.js
+
+Learning:
+Regex-based SSRF protection is inherently fragile against edge cases like IPv4-mapped IPv6 loopbacks (e.g., `::ffff:7f00:1` or `[::1]`) because `url.URL` and `dns.lookup` behave differently depending on brackets, and mapping logic requires dedicated handling.
+
+Action:
+Always use `ipaddr.js` for IP validation in Node.js instead of regular expressions. Remember to strip square brackets from IPv6 hostnames before passing them to `dns.lookup()`, and convert IPv4-mapped IPv6 addresses to standard IPv4 using `.isIPv4MappedAddress()` before checking their `.range()`.
