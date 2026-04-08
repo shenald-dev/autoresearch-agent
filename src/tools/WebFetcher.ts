@@ -1,6 +1,10 @@
 import * as dns from "node:dns/promises";
 import * as url from "node:url";
+<<<<<<< HEAD
+import * as ipaddr from "ipaddr.js";
+=======
 import ipaddr from "ipaddr.js";
+>>>>>>> b3b816e (chore: save work before rebase)
 
 export class WebFetcher {
 	private cache: Map<string, Promise<string>>;
@@ -27,6 +31,10 @@ export class WebFetcher {
 
 			let hostname = parsed.hostname;
 
+<<<<<<< HEAD
+			// dns.lookup does not support bracketed IPv6 literals, so we must strip them.
+=======
+>>>>>>> b3b816e (chore: save work before rebase)
 			if (hostname.startsWith("[") && hostname.endsWith("]")) {
 				hostname = hostname.slice(1, -1);
 			}
@@ -42,6 +50,37 @@ export class WebFetcher {
 
 			for (const { address } of addresses) {
 				try {
+<<<<<<< HEAD
+					const parsedIp = ipaddr.parse(address);
+					let range = parsedIp.range();
+
+					// Handle IPv4-mapped IPv6 addresses specifically
+					if (
+						parsedIp.kind() === "ipv6" &&
+						(parsedIp as ipaddr.IPv6).isIPv4MappedAddress()
+					) {
+						range = (parsedIp as ipaddr.IPv6).toIPv4Address().range();
+					}
+
+					// Reject private, loopback, linkLocal, uniqueLocal, reserved, unspecified, broadcast
+					if (
+						[
+							"private",
+							"loopback",
+							"linkLocal",
+							"uniqueLocal",
+							"reserved",
+							"unspecified",
+							"broadcast",
+						].includes(range) ||
+						address === "0.0.0.0" ||
+						address === "255.255.255.255"
+					) {
+						return false;
+					}
+				} catch {
+					// Invalid IP format
+=======
 					let ip = ipaddr.parse(address);
 					let range = ip.range();
 
@@ -54,6 +93,7 @@ export class WebFetcher {
 						return false;
 					}
 				} catch {
+>>>>>>> b3b816e (chore: save work before rebase)
 					return false;
 				}
 			}
