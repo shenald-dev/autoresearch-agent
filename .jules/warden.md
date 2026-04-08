@@ -1,3 +1,11 @@
+## 2026-04-08 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the HTML stripping logic in `WebFetcher.fetchSingle` and fortified the cache by immediately deleting cached entries for URLs that fail SSRF validations or experience fetch errors, preventing invalid state from being permanently cached. Codebase remains clean; ran `npx ts-prune` which confirmed no dead code or orphaned exports.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. No regressions from the Bolt optimization. Tagging release v1.0.9 to deploy these optimizations and updates.
+
 ## 2026-04-06 — Assessment & Lifecycle
 
 **Observation / Pruned:**
