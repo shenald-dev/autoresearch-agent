@@ -4,10 +4,12 @@ import * as ipaddr from "ipaddr.js";
 
 export class WebFetcher {
 	private cache: Map<string, Promise<string>>;
+	private hostValidationCache: Map<string, Promise<boolean>>;
 	private maxConcurrency: number;
 
 	constructor(maxConcurrency = 3) {
 		this.cache = new Map();
+		this.hostValidationCache = new Map();
 		this.maxConcurrency = maxConcurrency;
 	}
 
@@ -32,51 +34,65 @@ export class WebFetcher {
 				hostname = hostname.slice(1, -1);
 			}
 
-			// Resolve the hostname to prevent DNS rebinding or obfuscated IP representations
-			let addresses: { address: string; family: number }[];
-			try {
-				addresses = await dns.lookup(hostname, { all: true });
-			} catch {
-				// If DNS lookup fails (e.g., domain doesn't exist), we can't fetch it anyway
-				return false;
+			if (this.hostValidationCache.has(hostname)) {
+				return this.hostValidationCache.get(hostname) as Promise<boolean>;
 			}
 
-			for (const { address } of addresses) {
+			const validationPromise = (async () => {
+				// Resolve the hostname to prevent DNS rebinding or obfuscated IP representations
+				let addresses: { address: string; family: number }[];
 				try {
-					const parsedIp = ipaddr.parse(address);
-					let range = parsedIp.range();
-
-					// Handle IPv4-mapped IPv6 addresses specifically
-					if (
-						parsedIp.kind() === "ipv6" &&
-						(parsedIp as ipaddr.IPv6).isIPv4MappedAddress()
-					) {
-						range = (parsedIp as ipaddr.IPv6).toIPv4Address().range();
-					}
-
-					// Reject private, loopback, linkLocal, uniqueLocal, reserved, unspecified, broadcast
-					if (
-						[
-							"private",
-							"loopback",
-							"linkLocal",
-							"uniqueLocal",
-							"reserved",
-							"unspecified",
-							"broadcast",
-						].includes(range) ||
-						address === "0.0.0.0" ||
-						address === "255.255.255.255"
-					) {
-						return false;
-					}
+					addresses = await dns.lookup(hostname, { all: true });
 				} catch {
-					// Invalid IP format
+					// If DNS lookup fails (e.g., domain doesn't exist), we can't fetch it anyway
 					return false;
 				}
-			}
 
-			return true;
+				for (const { address } of addresses) {
+					try {
+						const parsedIp = ipaddr.parse(address);
+						let range = parsedIp.range();
+
+						// Handle IPv4-mapped IPv6 addresses specifically
+						if (
+							parsedIp.kind() === "ipv6" &&
+							(parsedIp as ipaddr.IPv6).isIPv4MappedAddress()
+						) {
+							range = (parsedIp as ipaddr.IPv6).toIPv4Address().range();
+						}
+
+						// Reject private, loopback, linkLocal, uniqueLocal, reserved, unspecified, broadcast
+						if (
+							[
+								"private",
+								"loopback",
+								"linkLocal",
+								"uniqueLocal",
+								"reserved",
+								"unspecified",
+								"broadcast",
+							].includes(range) ||
+							address === "0.0.0.0" ||
+							address === "255.255.255.255"
+						) {
+							return false;
+						}
+					} catch {
+						// Invalid IP format
+						return false;
+					}
+				}
+
+				return true;
+			})();
+
+			this.hostValidationCache.set(hostname, validationPromise);
+
+			validationPromise.finally(() => {
+				this.hostValidationCache.delete(hostname);
+			});
+
+			return validationPromise;
 		} catch {
 			return false;
 		}
@@ -197,7 +213,9 @@ export class WebFetcher {
 		const results = new Map<string, string>();
 		const executing = new Set<Promise<void>>();
 
-		for (const targetUrl of urls) {
+		const uniqueUrls = Array.from(new Set(urls));
+
+		for (const targetUrl of uniqueUrls) {
 			const promise = this.fetchSingle(targetUrl)
 				.then((content) => {
 					results.set(targetUrl, content);
