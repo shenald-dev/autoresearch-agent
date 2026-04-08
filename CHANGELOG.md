@@ -5,6 +5,10 @@ All notable changes to autoresearch-agent will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.9] - 2026-04-08
+* **[Optimized]:** Improved HTML stripping regex in `WebFetcher.fetchSingle` and fortified the cache by immediately deleting cached entries for URLs that fail SSRF validations or experience fetch errors, preventing invalid state from being permanently cached.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 ## [1.0.8] - 2026-04-06
 * **[Optimized]:** Replaced simple string concatenation (`+=`) with an array-based string buffer (`push` and `join`) in `ResearchEngine.run` to prevent potential object allocation overhead and memory thrashing when aggregating context from a large number of scraped network payloads.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
