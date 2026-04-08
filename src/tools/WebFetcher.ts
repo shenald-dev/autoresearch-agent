@@ -92,6 +92,7 @@ export class WebFetcher {
 
 		const fetchPromise = (async () => {
 			if (!(await this.isValidUrl(targetUrl))) {
+				this.cache.delete(targetUrl);
 				return `Error: Invalid or insecure URL provided (${targetUrl})`;
 			}
 
@@ -172,8 +173,7 @@ export class WebFetcher {
 
 				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
 				const strippedText = text
-					.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
-					.replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "")
+					.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, "")
 					.replace(/<[^>]+>/g, " ")
 					.replace(/\s+/g, " ")
 					.trim();
