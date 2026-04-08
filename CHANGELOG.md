@@ -5,10 +5,15 @@ All notable changes to autoresearch-agent will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
 ## [1.0.8] - 2026-04-03
 * **[Lifecycle]:** Conducted autonomous QA and validated that the `WebFetcher` string buffering optimization is functionally correct and structurally sound with no regressions.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
+>>>>>>> 44fe61b (chore(lifecycle): assure, prune, and sync docs)
 ## [1.0.7] - 2026-04-02
 * **[Optimized]:** Implemented array-based chunk buffering strategy in `WebFetcher` to optimize string concatenation of large streaming network responses, significantly reducing memory thrashing and O(N^2) allocations.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
@@ -41,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **[Fixed]:** Resolved Biome linter warnings by strictly organizing imports and using `node:` protocol for built-in modules.
 * **[Changed]:** Bumped minor/patch versions of dependencies (`npm update`).
 
+>>>>>>> e1d6a9b (perf(engine): optimize context string buffering (#32))
 ## [0.1.0] - YYYY-MM-DD
 
 ### Added

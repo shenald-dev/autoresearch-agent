@@ -2,6 +2,40 @@ name: CI
 
 on:
   push:
+<<<<<<< HEAD
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Test
+        run: npm test
+=======
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
@@ -22,3 +56,4 @@ jobs:
       continue-on-error: true
     - name: Build TypeScript
       run: npm run build
+>>>>>>> e1d6a9b (perf(engine): optimize context string buffering (#32))

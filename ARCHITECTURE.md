@@ -59,7 +59,11 @@ AutoResearch Agent is a modular, agent-based system for autonomous research and 
 - **Input:** Topic string
 - **Process:**
   1. Call `web_search(topic)` → list of URLs
+<<<<<<< HEAD
+  2. For each URL: `web_scrape(url)` → text content
+=======
   2. For each URL: `web_scrape(url)` → text content (Note: concurrent web scraping concurrency is now dynamically bound based on the requested research `depth` configuration parameter).
+>>>>>>> e1d6a9b (perf(engine): optimize context string buffering (#32))
   3. Collect successful scrapes
 - **Output:** `{ topic, sources: [{title, link, content, snippet}], totalSources }`
 
