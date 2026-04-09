@@ -11,6 +11,7 @@ export interface AutoResearchConfig {
 export class ConfigManager {
 	private readonly configDir: string;
 	private readonly configPath: string;
+	private configCache: Promise<AutoResearchConfig> | null = null;
 
 	constructor() {
 		this.configDir = path.join(os.homedir(), ".autoresearch");
@@ -21,12 +22,20 @@ export class ConfigManager {
 	 * Retrieves the current configuration.
 	 */
 	async getConfig(): Promise<AutoResearchConfig> {
-		try {
-			const data = await fs.readFile(this.configPath, "utf-8");
-			return JSON.parse(data);
-		} catch {
-			return {};
+		if (this.configCache) {
+			return this.configCache;
 		}
+
+		this.configCache = (async () => {
+			try {
+				const data = await fs.readFile(this.configPath, "utf-8");
+				return JSON.parse(data);
+			} catch {
+				return {};
+			}
+		})();
+
+		return this.configCache;
 	}
 
 	/**
@@ -36,9 +45,10 @@ export class ConfigManager {
 		const current = await this.getConfig();
 		const merged = { ...current, ...newConfig };
 
-		try {
-			await fs.mkdir(this.configDir, { recursive: true });
-		} catch {}
+		// Update cache synchronously to prevent stale reads
+		this.configCache = Promise.resolve(merged);
+
+		await fs.mkdir(this.configDir, { recursive: true });
 
 		await fs.writeFile(this.configPath, JSON.stringify(merged, null, 2), {
 			encoding: "utf-8",
