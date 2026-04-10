@@ -1,3 +1,11 @@
+## 2026-04-10 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the `hostValidationCache` in `WebFetcher.ts` by implementing strict Promise coalescing. By immediately removing resolved or rejected promises from the cache, the application is protected against SSRF DNS rebinding attacks while still preventing cache stampedes. Further, the URL deduplication via `new Set(urls)` in `fetchBatch` effectively limits redundant checks. Cleaned up code logic with no dead code found via `ts-prune`.
+
+**Alignment / Deferred:**
+Validated the optimization via tests. Safe dependency minor/patch bumps were applied using `npm update`. No functional regressions detected. Cut the `v1.0.10` patch release cleanly.
+
 ## 2026-04-08 — Assessment & Lifecycle
 
 **Observation / Pruned:**
