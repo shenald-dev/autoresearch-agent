@@ -20,3 +20,10 @@ When applying Promise coalescing to cache DNS lookup and IP validation checks (e
 
 Action:
 Ensure `hostValidationCache` uses strict Promise coalescing. The cache should only store the pending promise while the lookup is in flight, and the cache entry must be deleted immediately upon resolution (using `.finally()`) regardless of success or failure. This prevents redundant concurrent lookups without exposing the application to DNS rebinding attacks. Additionally, preemptively deduplicate batch URLs using `new Set(urls)` to reduce initial overhead.
+## 2025-04-10 — Improved Error Handling for Configuration Saving
+
+Learning:
+The `ConfigManager.setConfig()` method was silently swallowing `fs.mkdir` filesystem errors using an empty `catch` block, which could lead to obscure errors down the line during `fs.writeFile`. Also, the caller (`src/index.ts`) wasn't handling potential failures gracefully.
+
+Action:
+Removed the empty catch block in `ConfigManager.setConfig()` to allow filesystem errors (e.g., permissions) to propagate naturally. Also wrapped the `configManager.setConfig()` call in `src/index.ts` with a `try...catch` block. This ensures that when saving the config fails, the CLI spinner is properly stopped with a user-friendly error message, and the process exits with a non-zero status code (`process.exit(1)`).
