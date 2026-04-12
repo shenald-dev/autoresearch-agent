@@ -20,3 +20,11 @@ When applying Promise coalescing to cache DNS lookup and IP validation checks (e
 
 Action:
 Ensure `hostValidationCache` uses strict Promise coalescing. The cache should only store the pending promise while the lookup is in flight, and the cache entry must be deleted immediately upon resolution (using `.finally()`) regardless of success or failure. This prevents redundant concurrent lookups without exposing the application to DNS rebinding attacks. Additionally, preemptively deduplicate batch URLs using `new Set(urls)` to reduce initial overhead.
+
+## 2024-04-12 — CLI Error Propagation
+
+Learning:
+Empty `catch` blocks around file system operations (like `fs.mkdir(..., { recursive: true })`) silently swallow permission errors, causing subsequent dependent operations (like `fs.writeFile()`) to throw unhandled rejections, potentially crashing the CLI without user-friendly feedback.
+
+Action:
+Remove empty `catch` blocks around directory creation. Allow the error to propagate to the caller (e.g., CLI entry points like `src/index.ts`) where it can be properly handled inside a `try...catch` block. Ensure interactive elements like spinners are explicitly stopped (`s.stop()`) with an error message and the process is safely exited (`process.exit(1)`).

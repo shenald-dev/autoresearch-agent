@@ -57,11 +57,22 @@ program
 
 		const s = p.spinner();
 		s.start("Saving API keys securely...");
-		await configManager.setConfig({
-			OPENAI_API_KEY: openAiKey as string,
-			SERPER_API_KEY: serperKey as string,
-		});
-		s.stop(pc.green("API keys saved securely to ~/.autoresearch/config.json"));
+
+		try {
+			await configManager.setConfig({
+				OPENAI_API_KEY: openAiKey as string,
+				SERPER_API_KEY: serperKey as string,
+			});
+			s.stop(
+				pc.green("API keys saved securely to ~/.autoresearch/config.json"),
+			);
+		} catch (error: unknown) {
+			s.stop(pc.red("Failed to save API keys."));
+			p.log.error(
+				pc.red(error instanceof Error ? error.message : String(error)),
+			);
+			process.exit(1);
+		}
 
 		p.outro(pc.cyan("You're ready to research!"));
 	});
