@@ -5,6 +5,10 @@ All notable changes to autoresearch-agent will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.10] - 2026-04-12
+* **[Fixed]:** Propagated configuration directory creation errors from `ConfigManager.setConfig()` and correctly handled them in the CLI, gracefully stopping the loading spinner and logging the error message.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 ## [1.0.9] - 2026-04-08
 * **[Optimized]:** Improved HTML stripping regex in `WebFetcher.fetchSingle` and fortified the cache by immediately deleting cached entries for URLs that fail SSRF validations or experience fetch errors, preventing invalid state from being permanently cached.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
