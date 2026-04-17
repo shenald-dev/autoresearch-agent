@@ -112,16 +112,17 @@ export class WebFetcher {
 				return `Error: Invalid or insecure URL provided (${targetUrl})`;
 			}
 
+			let response: Response | null = null;
 			try {
 				let currentUrl = targetUrl;
-				let response: Response | null = null;
 				let redirects = 0;
 				const MAX_REDIRECTS = 5;
+				const abortSignal = AbortSignal.timeout(15000);
 
 				while (redirects <= MAX_REDIRECTS) {
 					response = await fetch(currentUrl, {
 						headers: { "User-Agent": "AutoResearchAgent/2.0" },
-						signal: AbortSignal.timeout(15000),
+						signal: abortSignal,
 						redirect: "manual",
 					});
 
@@ -197,6 +198,7 @@ export class WebFetcher {
 				const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
 				return truncated;
 			} catch (error: unknown) {
+				await response?.body?.cancel().catch(() => {});
 				this.cache.delete(targetUrl);
 				return `Error: Failed to fetch ${targetUrl} - ${error instanceof Error ? error.message : String(error)}`;
 			}

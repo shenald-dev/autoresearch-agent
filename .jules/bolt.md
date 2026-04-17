@@ -20,3 +20,11 @@ When applying Promise coalescing to cache DNS lookup and IP validation checks (e
 
 Action:
 Ensure `hostValidationCache` uses strict Promise coalescing. The cache should only store the pending promise while the lookup is in flight, and the cache entry must be deleted immediately upon resolution (using `.finally()`) regardless of success or failure. This prevents redundant concurrent lookups without exposing the application to DNS rebinding attacks. Additionally, preemptively deduplicate batch URLs using `new Set(urls)` to reduce initial overhead.
+
+## 2026-04-17 — Fetch Network Calls Timeout Optimization
+
+Learning:
+When handling manual redirects in a loop with Node's native `fetch` and an `AbortSignal.timeout(ms)`, recreating the signal inside the loop resets the timeout on each iteration. Furthermore, errors thrown during the fetch (such as timeouts or parsing errors) leave unconsumed response streams if the `response` variable is scoped tightly within the `try` block.
+
+Action:
+Initialize the `AbortSignal` once outside the redirect loop to ensure the timeout strictly covers the entire request chain (DNS lookup, TCP, SSL, all redirects, and body streaming). Declare the `Response` variable outside the `try` block so it is accessible in the `catch` block, and always explicitly cancel the unconsumed response stream (e.g., `await response?.body?.cancel().catch(() => {});`) during exceptions to prevent socket leaks and memory thrashing.
