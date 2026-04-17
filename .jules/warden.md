@@ -84,3 +84,11 @@ Observed the introduction of an array-based chunk buffering strategy in `src/cor
 
 **Alignment / Deferred:**
 Applied safe minor/patch dependency bumps via `npm update`. Verified the integrity of the string optimization via the test suite (`npm run test`) and linter (`npm run lint`), which all passed perfectly. Prepared version 1.0.8 release with no deferred items.
+
+## 2026-04-17 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the fetch network calls timeout mechanism in `WebFetcher`. By hoisting the `AbortSignal.timeout(15000)` outside the redirect loop, it ensures the timeout correctly bounds the entire request chain rather than resetting per redirect. Additionally, ensuring `response` is accessible in the `catch` block allows `response?.body?.cancel()` to run on network errors, preventing socket exhaustion. Codebase remains clean; ran `npx ts-prune` which confirmed no dead code or orphaned exports.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. All tests pass safely, confirming no regressions. Prepared version 1.0.11 release with no deferred items.
