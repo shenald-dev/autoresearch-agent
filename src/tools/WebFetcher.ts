@@ -161,6 +161,19 @@ export class WebFetcher {
 					return `Error: HTTP ${response?.status || "unknown"} from ${targetUrl}`;
 				}
 
+				const contentType = (
+					response.headers.get("content-type") || ""
+				).toLowerCase();
+				if (
+					contentType.includes("application/pdf") ||
+					contentType.includes("image/") ||
+					contentType.includes("video/")
+				) {
+					await response.body?.cancel().catch(() => {});
+					this.cache.delete(targetUrl);
+					return `Error: Unsupported content type (${contentType}) from ${targetUrl}`;
+				}
+
 				let text = "";
 				if (response.body) {
 					const reader = response.body.getReader();
