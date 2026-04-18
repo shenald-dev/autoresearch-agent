@@ -53,7 +53,8 @@ describe("WebFetcher", () => {
             return {
                 status: 200,
                 ok: true,
-                text: async () => "Mock content"
+                text: async () => "Mock content",
+                headers: new Headers({ "content-type": "text/html" })
             };
         });
 
@@ -107,5 +108,22 @@ describe("WebFetcher", () => {
         // Should return from cache without fetching
         const result = await (fetcher as any).fetchSingle(targetUrl);
         expect(result).toBe("Cached Data Content");
+    });
+
+    it("should reject non-text content types", async () => {
+        const originalFetch = global.fetch;
+        global.fetch = vi.fn().mockImplementation(async () => {
+            return {
+                status: 200,
+                ok: true,
+                headers: new Headers({ "content-type": "application/pdf" }),
+                body: { cancel: vi.fn().mockResolvedValue(undefined) }
+            };
+        });
+
+        const result = await (fetcher as any).fetchSingle("https://example.com/doc.pdf");
+        expect(result).toContain("Error: Unsupported content type (application/pdf)");
+
+        global.fetch = originalFetch;
     });
 });
