@@ -169,6 +169,9 @@ export class WebFetcher {
 					contentType.includes("image/") ||
 					contentType.includes("video/")
 				) {
+					console.warn(
+						`[WebFetcher] Aborted fetch for ${targetUrl} due to unsupported content type: ${contentType}`,
+					);
 					await response.body?.cancel().catch(() => {});
 					this.cache.delete(targetUrl);
 					return `Error: Unsupported content type (${contentType}) from ${targetUrl}`;
