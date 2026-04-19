@@ -28,3 +28,10 @@ When handling manual redirects in a loop with Node's native `fetch` and an `Abor
 
 Action:
 Initialize the `AbortSignal` once outside the redirect loop to ensure the timeout strictly covers the entire request chain (DNS lookup, TCP, SSL, all redirects, and body streaming). Declare the `Response` variable outside the `try` block so it is accessible in the `catch` block, and always explicitly cancel the unconsumed response stream (e.g., `await response?.body?.cancel().catch(() => {});`) during exceptions to prevent socket leaks and memory thrashing.
+## 2026-04-18 — Early Stream Abort for Unwanted Content Types
+
+Learning:
+Unbounded payloads from external sources using `await response.text()` represent a severe reliability and DoS risk, but even when streaming in chunks, downloading non-text content (e.g., PDFs, images, videos) wastes bandwidth and can lead to OOM errors since this agent processes only text.
+
+Action:
+To further prevent OOM vulnerabilities and performance bottlenecks, validate the `Content-Type` header immediately after a successful response. Cleanly abort the response stream (`response.body.cancel()`) if it indicates a known non-text/large binary format unless explicitly required. Ensure tests mocking native `fetch` include a properly instantiated `Headers` object.
