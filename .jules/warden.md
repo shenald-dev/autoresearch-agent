@@ -100,3 +100,11 @@ Observed that BOLT effectively optimized the fetch network calls timeout mechani
 
 **Alignment / Deferred:**
 Aligned the test suite execution. All tests pass safely, confirming no regressions. Prepared version 1.0.11 release with no deferred items.
+
+## 2026-04-20 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively fixed the unhandled exception error when safely cancelling locked `fetch` streams by keeping track of active `reader`s and cancelling those instead. Checked for dead code using `ts-prune` and verified the project remains clean.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.13 to deploy these updates.
