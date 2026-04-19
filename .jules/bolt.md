@@ -35,3 +35,11 @@ Unbounded payloads from external sources using `await response.text()` represent
 
 Action:
 To further prevent OOM vulnerabilities and performance bottlenecks, validate the `Content-Type` header immediately after a successful response. Cleanly abort the response stream (`response.body.cancel()`) if it indicates a known non-text/large binary format unless explicitly required. Ensure tests mocking native `fetch` include a properly instantiated `Headers` object.
+
+## 2026-04-19 — ReadableStream Locked Cancellation
+
+Learning:
+When cancelling a native fetch `Response` stream in Node.js, calling `response.body.cancel()` will throw a `TypeError: Cannot cancel a locked stream` if a reader (e.g., `response.body.getReader()`) is actively locked. Because this throw is synchronous, it can bypass catch blocks that attempt to silence it with `.catch(() => {})`, causing an unhandled exception to bubble up and break reliability.
+
+Action:
+Always maintain a reference to the reader (`let reader = response.body.getReader()`). When handling explicit stream cleanup in error or early-return paths, check if the reader exists and call `await reader.cancel().catch(() => {})` instead of `response.body.cancel()`.
