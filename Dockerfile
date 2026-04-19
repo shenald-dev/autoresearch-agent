@@ -19,7 +19,7 @@ WORKDIR /app
 # Copy from builder
 COPY --from=builder --chown=node:node /app /app
 
-# Create output directories
+# Create output directories and set ownership
 RUN mkdir -p outputs/markdown outputs/json && \
     chown -R node:node /app/outputs
 
