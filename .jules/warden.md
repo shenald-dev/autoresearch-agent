@@ -1,3 +1,11 @@
+## 2026-04-19 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT improved Dockerfile security by configuring the runtime container to operate under the non-root `node` user and setting explicit ownership on output directories.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.13 to deploy these updates.
+
 ## 2026-04-18 — Assessment & Lifecycle
 
 **Observation / Pruned:**
