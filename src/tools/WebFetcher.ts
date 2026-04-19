@@ -113,6 +113,7 @@ export class WebFetcher {
 			}
 
 			let response: Response | null = null;
+			let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
 			try {
 				let currentUrl = targetUrl;
 				let redirects = 0;
@@ -176,7 +177,7 @@ export class WebFetcher {
 
 				let text = "";
 				if (response.body) {
-					const reader = response.body.getReader();
+					reader = response.body.getReader();
 					const decoder = new TextDecoder();
 					let totalBytes = 0;
 					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM
@@ -211,7 +212,11 @@ export class WebFetcher {
 				const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
 				return truncated;
 			} catch (error: unknown) {
-				await response?.body?.cancel().catch(() => {});
+				if (reader) {
+					await reader.cancel().catch(() => {});
+				} else {
+					await response?.body?.cancel().catch(() => {});
+				}
 				this.cache.delete(targetUrl);
 				return `Error: Failed to fetch ${targetUrl} - ${error instanceof Error ? error.message : String(error)}`;
 			}
