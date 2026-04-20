@@ -62,7 +62,8 @@ export class WebFetcher {
 						}
 
 						// Strict whitelist: Only allow regular public unicast addresses.
-						// This implicitly rejects private, loopback, multicast, broadcast, and metadata ranges.
+						// This implicitly rejects private, loopback, multicast, broadcast, and metadata ranges,
+						// providing robust SSRF protection without relying on an exhaustive blacklist.
 						if (range !== "unicast") {
 							return false;
 						}
