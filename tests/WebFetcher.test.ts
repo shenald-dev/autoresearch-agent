@@ -163,4 +163,39 @@ describe("WebFetcher", () => {
 		const result = await (fetcher as any).fetchSingle(targetUrl);
 		expect(result).toBe("Cached Data Content");
 	});
+
+	it("should deduplicate batch fetches with different hash fragments", async () => {
+		const originalFetch = global.fetch;
+		const fetchMock = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "Mocked content",
+			};
+		});
+		global.fetch = fetchMock;
+
+		// Since dns.lookup cannot be easily redefined, we can just spy on fetchSingle instead,
+		// but since it's private we can just use the global fetch mock.
+		// Real dns.lookup for example.com works and returns a public IP, so it passes SSRF checks.
+
+		const urls = [
+			"https://example.com/docs#section1",
+			"https://example.com/docs#section2",
+			"https://example.com/docs"
+		];
+
+		const results = await fetcher.fetchBatch(urls);
+
+		// Global fetch should only be called once because all three URLs map to the same resource
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+
+		// The original URLs should all map to the mocked content
+		expect(results.get("https://example.com/docs#section1")).toBe("Mocked content");
+		expect(results.get("https://example.com/docs#section2")).toBe("Mocked content");
+		expect(results.get("https://example.com/docs")).toBe("Mocked content");
+
+		global.fetch = originalFetch;
+	});
 });
