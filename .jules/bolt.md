@@ -43,3 +43,10 @@ When cancelling a native fetch `Response` stream in Node.js, calling `response.b
 
 Action:
 Always maintain a reference to the reader (`let reader = response.body.getReader()`). When handling explicit stream cleanup in error or early-return paths, check if the reader exists and call `await reader.cancel().catch(() => {})` instead of `response.body.cancel()`.
+## 2026-04-20 — URL Deduplication & Strict SSRF Whitelisting
+
+Learning:
+Deduplicating requested URLs with `new Set(urls)` is ineffective if the caller requests multiple sections of the same page using different `#hash` fragments, resulting in redundant network and DNS calls. Additionally, relying on an IP blacklist for SSRF (e.g., matching "private", "loopback") is fragile as new reserved ranges might not be covered.
+
+Action:
+To optimize concurrent batch operations (e.g., fetching multiple URLs), normalize the targets (e.g., stripping `#hash` fragments from URLs) and preemptively deduplicate the input array before processing. To strengthen SSRF protection, use a strict whitelist approach where `ipaddr.parse(ip).range() === 'unicast'` to inherently block all private, loopback, and metadata ranges securely. Always ensure temporary execution scripts or patch files (e.g., `test-dedup.js`) used for modifying code during runs are deleted before committing.

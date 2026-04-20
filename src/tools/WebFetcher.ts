@@ -61,20 +61,9 @@ export class WebFetcher {
 							range = (parsedIp as ipaddr.IPv6).toIPv4Address().range();
 						}
 
-						// Reject private, loopback, linkLocal, uniqueLocal, reserved, unspecified, broadcast
-						if (
-							[
-								"private",
-								"loopback",
-								"linkLocal",
-								"uniqueLocal",
-								"reserved",
-								"unspecified",
-								"broadcast",
-							].includes(range) ||
-							address === "0.0.0.0" ||
-							address === "255.255.255.255"
-						) {
+						// Strict whitelist: Only allow regular public unicast addresses.
+						// This implicitly rejects private, loopback, multicast, broadcast, and metadata ranges.
+						if (range !== "unicast") {
 							return false;
 						}
 					} catch {
@@ -233,12 +222,36 @@ export class WebFetcher {
 		const results = new Map<string, string>();
 		const executing = new Set<Promise<void>>();
 
-		const uniqueUrls = Array.from(new Set(urls));
+		// Map normalized URL (no hash) to an array of original URLs that requested it
+		const normalizedToOriginals = new Map<string, string[]>();
+		for (const u of urls) {
+			try {
+				const parsed = new URL(u);
+				parsed.hash = "";
+				const normalized = parsed.toString();
+				if (!normalizedToOriginals.has(normalized)) {
+					normalizedToOriginals.set(normalized, []);
+				}
+				normalizedToOriginals.get(normalized)?.push(u);
+			} catch {
+				// If URL is completely invalid, treat it as its own unique target so it hits the error path
+				if (!normalizedToOriginals.has(u)) {
+					normalizedToOriginals.set(u, []);
+				}
+				normalizedToOriginals.get(u)?.push(u);
+			}
+		}
 
-		for (const targetUrl of uniqueUrls) {
-			const promise = this.fetchSingle(targetUrl)
+		for (const [
+			normalizedUrl,
+			originalUrls,
+		] of normalizedToOriginals.entries()) {
+			const promise = this.fetchSingle(normalizedUrl)
 				.then((content) => {
-					results.set(targetUrl, content);
+					// Map the result back to all original requested URLs
+					for (const orig of originalUrls) {
+						results.set(orig, content);
+					}
 				})
 				.finally(() => {
 					executing.delete(promise);
