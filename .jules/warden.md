@@ -1,3 +1,11 @@
+## 2026-04-20 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively hardened the Dockerfile to build and run the container as the non-root `node` user, applying explicit `chown` instructions to prevent runtime volume permission issues and correctly configuring the CLI entrypoint. Codebase remains clean; ran `npx ts-prune` which confirmed no dead code or orphaned exports.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing safely, confirming no regressions. Tagging release v1.0.14 to deploy these updates.
+
 ## 2026-04-18 — Assessment & Lifecycle
 
 **Observation / Pruned:**
