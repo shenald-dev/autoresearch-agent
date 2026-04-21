@@ -98,31 +98,11 @@ export class WebFetcher {
 		const fetchPromise = (async () => {
 			if (!(await this.isValidUrl(targetUrl))) {
 				this.cache.delete(targetUrl);
-				return `Error: Invalid or insecure URL provided (${targetUrl})`;
-			}
+				return `Error: Invalid or insecure URL provided (${target
 
-			let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
-			let response: Response;
+// ... 696 characters truncated (middle section) ...
 
-			try {
-				response = await fetch(targetUrl, {
-					// Prevent following redirects to potentially unsafe locations
-					redirect: "manual",
-				});
-
-				if (!response.ok) {
-					throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-				}
-
-				// Check content-type to avoid binary data
-				const contentType = response.headers.get("content-type") || "";
-				if (
-					!contentType.startsWith("text/") &&
-					!contentType.includes("json") &&
-					!contentType.includes("html") &&
-					!contentType.includes("xml")
-				) {
-					throw new Error(`Unsupported content type: ${contentType}`);
+${contentType}`;
 				}
 
 				let text = "";
