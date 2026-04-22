@@ -50,3 +50,11 @@ Deduplicating requested URLs with `new Set(urls)` is ineffective if the caller r
 
 Action:
 To optimize concurrent batch operations (e.g., fetching multiple URLs), normalize the targets (e.g., stripping `#hash` fragments from URLs) and preemptively deduplicate the input array before processing. To strengthen SSRF protection, use a strict whitelist approach where `ipaddr.parse(ip).range() === 'unicast'` to inherently block all private, loopback, and metadata ranges securely. Always ensure temporary execution scripts or patch files (e.g., `test-dedup.js`) used for modifying code during runs are deleted before committing.
+
+## 2026-04-22 — Fetch Response stream cleanup
+
+Learning:
+When handling native `fetch` responses in Node.js, if `response.json()` throws an error (e.g., due to invalid JSON or an aborted request), the underlying stream has already been fully read, closed, or errored out. Manually calling `response.body.cancel()` in the specific catch block for `response.json()` is redundant and does not fix socket leaks. Additionally, wrapping `fetch` explicitly just to add a `.catch()` for `body.cancel()` is often unnecessary when `response.ok` checks are already cancelling unconsumed streams.
+
+Action:
+Focus on addressing real issues like missing normalized cache lookups, handling unclosed HTML tags from stream truncation, or unhandled promise rejections, rather than redundant manual body cleanup on consumed streams.

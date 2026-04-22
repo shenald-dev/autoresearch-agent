@@ -91,12 +91,26 @@ export class WebFetcher {
 	 * Internal generic fetcher handling a single URL with error catching.
 	 */
 	private fetchSingle(targetUrl: string): Promise<string> {
-		if (this.cache.has(targetUrl)) {
-			return this.cache.get(targetUrl) as Promise<string>;
+		// Normalize the target URL early to avoid redundant network requests and duplicate cache entries
+		let normalizedUrl = targetUrl;
+		try {
+			const parsed = new URL(targetUrl);
+			parsed.hash = "";
+			normalizedUrl = parsed.toString();
+		} catch {}
+
+		if (this.cache.has(normalizedUrl)) {
+			const cached = this.cache.get(normalizedUrl) as Promise<string>;
+			// Also ensure the original URL is mapped to the same promise
+			if (normalizedUrl !== targetUrl) {
+				this.cache.set(targetUrl, cached);
+			}
+			return cached;
 		}
 
 		const fetchPromise = (async () => {
-			if (!(await this.isValidUrl(targetUrl))) {
+			if (!(await this.isValidUrl(normalizedUrl))) {
+				this.cache.delete(normalizedUrl);
 				this.cache.delete(targetUrl);
 				return `Error: Invalid or insecure URL provided (${targetUrl})`;
 			}
@@ -193,8 +207,10 @@ export class WebFetcher {
 
 				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
 				const strippedText = text
-					.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, "")
-					.replace(/<[^>]+>/g, " ")
+					.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, "") // Remove complete script/style blocks
+					.replace(/<(script|style)\b[^>]*>[\s\S]*$/gi, "") // Remove unclosed script/style blocks (e.g., due to stream truncation)
+					.replace(/<[^>]+>/g, " ") // Remove complete HTML tags
+					.replace(/<[^>]*$/g, "") // Remove any trailing partial HTML tag
 					.replace(/\s+/g, " ")
 					.trim();
 
@@ -206,12 +222,17 @@ export class WebFetcher {
 				} else {
 					await response?.body?.cancel().catch(() => {});
 				}
+				this.cache.delete(normalizedUrl);
 				this.cache.delete(targetUrl);
 				return `Error: Failed to fetch ${targetUrl} - ${error instanceof Error ? error.message : String(error)}`;
 			}
 		})();
 
-		this.cache.set(targetUrl, fetchPromise);
+		this.cache.set(normalizedUrl, fetchPromise);
+		if (normalizedUrl !== targetUrl) {
+			this.cache.set(targetUrl, fetchPromise);
+		}
+
 		return fetchPromise;
 	}
 
