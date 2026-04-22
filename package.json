@@ -1,6 +1,6 @@
 {
   "name": "autoresearch-agent",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Enterprise-grade autonomous AI research framework.",
   "main": "dist/index.js",
   "scripts": {
@@ -32,7 +32,6 @@
     "@biomejs/biome": "1.9.4",
     "@types/node": "^22.19.15",
     "@vitest/coverage-v8": "^4.1.4",
-    "ts-prune": "^0.10.3",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.1.2"
