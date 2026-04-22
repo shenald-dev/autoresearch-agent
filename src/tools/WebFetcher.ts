@@ -222,9 +222,12 @@ export class WebFetcher {
 		const results = new Map<string, string>();
 		const executing = new Set<Promise<void>>();
 
+		// Deduplicate exact matching URLs upfront to save processing overhead
+		const uniqueUrls = [...new Set(urls)];
+
 		// Map normalized URL (no hash) to an array of original URLs that requested it
 		const normalizedToOriginals = new Map<string, string[]>();
-		for (const u of urls) {
+		for (const u of uniqueUrls) {
 			try {
 				const parsed = new URL(u);
 				parsed.hash = "";
