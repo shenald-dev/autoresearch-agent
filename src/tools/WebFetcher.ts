@@ -222,7 +222,9 @@ export class WebFetcher {
 		const results = new Map<string, string>();
 		const executing = new Set<Promise<void>>();
 
-		// Deduplicate exact matching URLs upfront to save processing overhead
+		// Deduplicate exact matching URLs upfront to save processing overhead.
+		// This is safe because identical URLs will ultimately be mapped back correctly,
+		// and the Set spread operator preserves the order of first occurrences.
 		const uniqueUrls = [...new Set(urls)];
 
 		// Map normalized URL (no hash) to an array of original URLs that requested it
