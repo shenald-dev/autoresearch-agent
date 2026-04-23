@@ -196,6 +196,7 @@ describe("WebFetcher", () => {
 		expect(results.get("https://example.com/docs")).toBe("Mocked content");
 
 		global.fetch = originalFetch;
+	});
 });
 
 	it("should evict normalizedUrl from cache on fetch error", async () => {
