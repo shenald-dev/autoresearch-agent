@@ -58,3 +58,10 @@ When handling native `fetch` responses in Node.js, if `response.json()` throws a
 
 Action:
 Focus on addressing real issues like missing normalized cache lookups, handling unclosed HTML tags from stream truncation, or unhandled promise rejections, rather than redundant manual body cleanup on consumed streams.
+## 2026-04-23 — Cache Cleanup Completeness
+
+Learning:
+When caching operations using a normalized key (e.g., `normalizedUrl`) but handling exceptions for the original input (e.g., `targetUrl`), ensure both keys are deleted from the cache upon failure to avoid permanently caching error states. Previous caching logic failed to clear the normalized entry during early returns for HTTP errors, unsupported content types, and redirects, leading to poisoned caches and memory leaks.
+
+Action:
+Always audit all early-return paths in cached methods to ensure symmetric cache cleanup for both normalized and raw keys.

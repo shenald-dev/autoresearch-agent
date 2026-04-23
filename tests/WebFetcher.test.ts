@@ -198,4 +198,28 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+
+	it("should remove both targetUrl and normalizedUrl from cache on failure", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 404,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: false,
+				body: { cancel: vi.fn().mockResolvedValue(undefined) },
+			};
+		});
+
+		const targetUrl = "https://example.com/not-found#section";
+		const normalizedUrl = "https://example.com/not-found";
+
+		const result = await (fetcher as any).fetchSingle(targetUrl);
+		expect(result).toContain("Error: HTTP 404 from https://example.com/not-found#section");
+
+		// Cache should not contain either URL
+		expect((fetcher as any).cache.has(targetUrl)).toBe(false);
+		expect((fetcher as any).cache.has(normalizedUrl)).toBe(false);
+
+		global.fetch = originalFetch;
+	});
 });

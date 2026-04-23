@@ -139,6 +139,7 @@ export class WebFetcher {
 						redirects++;
 						if (redirects > MAX_REDIRECTS) {
 							await response.body?.cancel().catch(() => {});
+							this.cache.delete(normalizedUrl);
 							this.cache.delete(targetUrl);
 							return `Error: Too many redirects for ${targetUrl}`;
 						}
@@ -148,6 +149,7 @@ export class WebFetcher {
 
 						if (!(await this.isValidUrl(nextUrl))) {
 							await response.body?.cancel().catch(() => {});
+							this.cache.delete(normalizedUrl);
 							this.cache.delete(targetUrl);
 							return `Error: Redirected to invalid or insecure URL (${nextUrl})`;
 						}
@@ -161,6 +163,7 @@ export class WebFetcher {
 
 				if (!response || !response.ok) {
 					await response?.body?.cancel().catch(() => {});
+					this.cache.delete(normalizedUrl);
 					this.cache.delete(targetUrl);
 					return `Error: HTTP ${response?.status || "unknown"} from ${targetUrl}`;
 				}
@@ -174,6 +177,7 @@ export class WebFetcher {
 					contentType.includes("video/")
 				) {
 					await response.body?.cancel().catch(() => {});
+					this.cache.delete(normalizedUrl);
 					this.cache.delete(targetUrl);
 					return `Error: Unsupported content type (${contentType}) from ${targetUrl}`;
 				}
