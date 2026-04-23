@@ -1,0 +1,16 @@
+--- src/utils/config.ts
++++ src/utils/config.ts
+@@ -36,8 +36,13 @@
+		const current = await this.getConfig();
+		const merged = { ...current, ...newConfig };
+
+-		await fs.mkdir(this.configDir, { recursive: true });
++		try {
++			await fs.mkdir(this.configDir, { recursive: true });
++		} catch (error: any) {
++			// Rethrow so it bubbles up gracefully
++			throw error;
++		}
+
+		await fs.writeFile(this.configPath, JSON.stringify(merged, null, 2), {
+			encoding: "utf-8",
