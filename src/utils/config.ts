@@ -2,7 +2,7 @@ import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
 
-export interface AutoResearchConfig {
+interface AutoResearchConfig {
 	OPENAI_API_KEY?: string;
 	OPENAI_MODEL?: string;
 	SERPER_API_KEY?: string;

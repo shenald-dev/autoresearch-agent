@@ -116,3 +116,11 @@ Observed that BOLT effectively fixed the unhandled exception error when safely c
 
 **Alignment / Deferred:**
 Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.13 to deploy these updates.
+
+## 2026-04-23 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the deduplication logic in `WebFetcher.fetchBatch` by preemptively deduplicating URLs using a `Set` before further processing, directly addressing a performance overhead on the hot path without altering behavior. Removed unused `EngineConfig`, `StatusCallback`, and `AutoResearchConfig` exports and `ts-prune` devDependency after running `npx knip`.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.15 to deploy these updates.

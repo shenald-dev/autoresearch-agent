@@ -4,11 +4,11 @@ import { GoogleSearcher } from "../tools/GoogleSearcher";
 import { WebFetcher } from "../tools/WebFetcher";
 import { ConfigManager } from "../utils/config";
 
-export interface EngineConfig {
+interface EngineConfig {
 	depth: number;
 }
 
-export type StatusCallback = (message: string) => void;
+type StatusCallback = (message: string) => void;
 
 export class ResearchEngine {
 	private config: EngineConfig;
