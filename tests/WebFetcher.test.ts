@@ -191,10 +191,30 @@ describe("WebFetcher", () => {
 		// Global fetch should only be called once because all three URLs map to the same resource
 		expect(fetchMock).toHaveBeenCalledTimes(1);
 
-		// The original URLs should all map to the mocked content
 		expect(results.get("https://example.com/docs#section1")).toBe("Mocked content");
 		expect(results.get("https://example.com/docs#section2")).toBe("Mocked content");
 		expect(results.get("https://example.com/docs")).toBe("Mocked content");
+
+		global.fetch = originalFetch;
+});
+
+	it("should evict normalizedUrl from cache on fetch error", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 500,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: false,
+				body: { cancel: vi.fn().mockResolvedValue(undefined) },
+			};
+		});
+
+		const targetUrl = "https://example.com/error-test#section";
+		const normalizedUrl = "https://example.com/error-test";
+		await fetcher["fetchSingle"](targetUrl);
+
+		expect((fetcher as any).cache.has(normalizedUrl)).toBe(false);
+		expect((fetcher as any).cache.has(targetUrl)).toBe(false);
 
 		global.fetch = originalFetch;
 	});
