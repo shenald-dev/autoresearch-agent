@@ -73,3 +73,11 @@ When writing tests for Node.js CLI entry points that parse `process.argv` or inv
 
 Action:
 Ensure temporary script files used to construct or patch tests are deleted before running test verifications to maintain a clean repository. Use dynamic imports (`await import("../src/index.ts")`) within test cases to execute top-level script logic under mock conditions.
+
+## 2026-04-25 — Unhandled Stream Cancel Errors
+
+Learning:
+When halting a `ReadableStreamDefaultReader` explicitly (e.g. hitting a payload size limit), calling `await reader.cancel()` can synchronously throw an unhandled error (like `TypeError: Cannot cancel a locked stream` or other underlying network exceptions) if the connection is already irregular. This error bubbles up and breaks the enclosing logic instead of safely aborting.
+
+Action:
+Always append `.catch(() => {})` when intentionally cancelling an active reader early (`await reader.cancel().catch(() => {})`) to silently absorb closure errors, as the system has already decided to discard the stream.
