@@ -199,7 +199,9 @@ export class WebFetcher {
 
 						if (totalBytes >= MAX_BYTES) {
 							// Cancel the reader early to save bandwidth and memory
-							await reader.cancel().catch(() => {});
+							await reader.cancel().catch((err) => {
+								console.warn("WebFetcher cancel error:", err);
+							});
 							break;
 						}
 					}
