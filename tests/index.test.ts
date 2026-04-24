@@ -1,7 +1,9 @@
-import { describe, expect, it, vi } from "vitest";
-import { Command } from "commander";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
-// Mock clack prompts to verify progress reporting
+const messageMock = vi.fn();
+const startMock = vi.fn();
+const stopMock = vi.fn();
+
 vi.mock("@clack/prompts", () => ({
 	intro: vi.fn(),
 	outro: vi.fn(),
@@ -10,9 +12,9 @@ vi.mock("@clack/prompts", () => ({
 	select: vi.fn(),
 	isCancel: vi.fn().mockReturnValue(false),
 	spinner: vi.fn().mockReturnValue({
-		start: vi.fn(),
-		stop: vi.fn(),
-		message: vi.fn(), // We check if this gets called!
+		start: startMock,
+		stop: stopMock,
+		message: messageMock,
 	}),
 	log: {
 		step: vi.fn(),
@@ -37,11 +39,28 @@ vi.mock("../src/core/engine", () => {
 });
 
 describe("CLI WebFetcher index", () => {
+    let originalArgv;
+    let originalExit;
+
+    beforeEach(() => {
+        vi.resetModules();
+        originalArgv = process.argv;
+        originalExit = process.exit;
+        process.exit = vi.fn();
+    });
+
+    afterEach(() => {
+        process.argv = originalArgv;
+        process.exit = originalExit;
+    });
+
 	it("should pass progress callback to engine.run that calls spinner.message", async () => {
-        // Run the cli command "research -t 'foo' -d 1" and verify spinner.message is called.
-        // We can just verify it by importing and executing via commander
-        // However, testing CLI logic without side effects can be tricky since commander calls process.exit
-        // Here we just test the code is syntactically sound and doesn't break basic functionality.
-		expect(true).toBe(true);
+        process.argv = ['node', 'index.js', 'research', '-t', 'test-topic', '-d', '1'];
+        await import("../src/index.ts");
+
+        // Let event loop clear for async commander commands
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        expect(messageMock).toHaveBeenCalledWith("Test progress message");
 	});
 });

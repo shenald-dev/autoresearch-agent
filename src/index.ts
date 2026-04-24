@@ -144,7 +144,9 @@ program
 		try {
 			const { ResearchEngine } = await import("./core/engine");
 			const engine = new ResearchEngine({ depth: validatedInput.depth });
-			const result = await engine.run(validatedInput.topic);
+			const result = await engine.run(validatedInput.topic, (msg) => {
+				s.message(msg);
+			});
 
 			s.stop(pc.green("Research complete."));
 

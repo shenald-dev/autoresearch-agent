@@ -65,3 +65,11 @@ When caching operations using a normalized key (e.g., `normalizedUrl`) but handl
 
 Action:
 Always audit all early-return paths in cached methods to ensure symmetric cache cleanup for both normalized and raw keys.
+
+## 2026-04-24 — Testing CLI Code
+
+Learning:
+When writing tests for Node.js CLI entry points that parse `process.argv` or invoke `process.exit()`, ensure `process.argv` and `process.exit` are properly mocked before dynamically importing the entry file. This prevents the test runner (e.g., Vitest) from consuming its own arguments or exiting prematurely.
+
+Action:
+Ensure temporary script files used to construct or patch tests are deleted before running test verifications to maintain a clean repository. Use dynamic imports (`await import("../src/index.ts")`) within test cases to execute top-level script logic under mock conditions.
