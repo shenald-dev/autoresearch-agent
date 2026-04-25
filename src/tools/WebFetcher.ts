@@ -48,6 +48,8 @@ export class WebFetcher {
 					return false;
 				}
 
+				// If DNS lookup resolves to an empty array (e.g. `{ all: true }` edge cases),
+				// we must explicitly reject it to prevent bypassing the validation loop.
 				if (!addresses || addresses.length === 0) {
 					return false;
 				}
