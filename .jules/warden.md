@@ -1,3 +1,11 @@
+## 2026-04-25 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT securely patched an SSRF bypass where `dns.lookup({ all: true })` could return an empty array, evading internal network filters. Checked for dead code using `ts-prune` and the codebase remains completely clean.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.17 to deploy these security updates.
+
 ## 2026-04-24 — Assessment & Lifecycle
 
 **Observation / Pruned:**
