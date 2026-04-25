@@ -73,3 +73,7 @@ When writing tests for Node.js CLI entry points that parse `process.argv` or inv
 
 Action:
 Ensure temporary script files used to construct or patch tests are deleted before running test verifications to maintain a clean repository. Use dynamic imports (`await import("../src/index.ts")`) within test cases to execute top-level script logic under mock conditions.
+
+## 2024-04-25 — DNS Lookup Empty Array SSRF Bypass
+Learning: `dns.lookup` with `{ all: true }` can return an empty array without throwing an error, which can bypass subsequent validation loops that expect at least one address to validate.
+Action: Always explicitly check if the returned addresses array is empty (`!addresses || addresses.length === 0`) and reject the input if so, rather than assuming the validation loop will catch it.
