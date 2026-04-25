@@ -224,7 +224,9 @@ export class WebFetcher {
 				return truncated;
 			} catch (error: unknown) {
 				if (reader) {
-					await reader.cancel().catch(() => {});
+					await reader.cancel().catch((err) => {
+						console.warn("WebFetcher cancel error:", err);
+					});
 				} else {
 					await response?.body?.cancel().catch(() => {});
 				}
