@@ -10,6 +10,19 @@ describe("WebFetcher", () => {
 		(fetcher as any).cache.clear();
 	});
 
+	it("should reject domains that resolve to empty address arrays", async () => {
+		const dnsPromises = require("node:dns/promises");
+		const originalLookup = dnsPromises.lookup;
+		dnsPromises.lookup = vi.fn().mockResolvedValue([]);
+
+		const result = await (fetcher as any).fetchSingle(
+			"http://empty-dns.example.com",
+		);
+		expect(result).toContain("Error: Invalid or insecure URL");
+
+		dnsPromises.lookup = originalLookup;
+	});
+
 	it("should reject SSRF URLs", async () => {
 		const resultLocal = await (fetcher as any).fetchSingle(
 			"http://localhost:8080/admin",

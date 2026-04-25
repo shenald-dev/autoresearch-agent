@@ -48,6 +48,10 @@ export class WebFetcher {
 					return false;
 				}
 
+				if (!addresses || addresses.length === 0) {
+					return false;
+				}
+
 				for (const { address } of addresses) {
 					try {
 						const parsedIp = ipaddr.parse(address);
