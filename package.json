@@ -1,6 +1,6 @@
 {
   "name": "autoresearch-agent",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Enterprise-grade autonomous AI research framework.",
   "main": "dist/index.js",
   "scripts": {
