@@ -215,10 +215,8 @@ export class WebFetcher {
 
 				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
 				const strippedText = text
-					.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, "") // Remove complete script/style blocks
-					.replace(/<(script|style)\b[^>]*>[\s\S]*$/gi, "") // Remove unclosed script/style blocks (e.g., due to stream truncation)
-					.replace(/<[^>]+>/g, " ") // Remove complete HTML tags
-					.replace(/<[^>]*$/g, "") // Remove any trailing partial HTML tag
+					.replace(/<(script|style)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi, "") // Remove complete and unclosed script/style blocks
+					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag
 					.replace(/\s+/g, " ")
 					.trim();
 
