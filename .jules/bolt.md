@@ -77,3 +77,7 @@ Ensure temporary script files used to construct or patch tests are deleted befor
 ## 2024-04-25 — DNS Lookup Empty Array SSRF Bypass
 Learning: `dns.lookup` with `{ all: true }` can return an empty array without throwing an error, which can bypass subsequent validation loops that expect at least one address to validate.
 Action: Always explicitly check if the returned addresses array is empty (`!addresses || addresses.length === 0`) and reject the input if so, rather than assuming the validation loop will catch it.
+
+## 2026-04-26 — Symmetric Caching
+Learning: When caching operations using a normalized key (e.g., `normalizedUrl`), storing the result under both the normalized key and the un-normalized original input (e.g., `targetUrl`) creates a memory leak and redundancy. Subsequent fetches for the un-normalized URL will normalize it first anyway, making the `targetUrl` cache entry completely unreachable.
+Action: Cache exclusively under the normalized key. Ensure all cache insertions and deletions only target `normalizedUrl` to prevent duplicate entries and ensure correct eviction on errors.
