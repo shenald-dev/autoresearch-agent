@@ -169,8 +169,11 @@ describe("WebFetcher", () => {
 	it("should cache results to avoid redundant fetching", async () => {
 		const targetUrl = "https://example.com/unique-test";
 
-		// Pre-populate cache directly
-		(fetcher as any).cache.set(targetUrl, "Cached Data Content");
+		// Pre-populate cache directly using normalized URL
+		(fetcher as any).cache.set(
+			"https://example.com/unique-test",
+			"Cached Data Content",
+		);
 
 		// Should return from cache without fetching
 		const result = await (fetcher as any).fetchSingle(targetUrl);
@@ -196,7 +199,7 @@ describe("WebFetcher", () => {
 		const urls = [
 			"https://example.com/docs#section1",
 			"https://example.com/docs#section2",
-			"https://example.com/docs"
+			"https://example.com/docs",
 		];
 
 		const results = await fetcher.fetchBatch(urls);
@@ -204,12 +207,16 @@ describe("WebFetcher", () => {
 		// Global fetch should only be called once because all three URLs map to the same resource
 		expect(fetchMock).toHaveBeenCalledTimes(1);
 
-		expect(results.get("https://example.com/docs#section1")).toBe("Mocked content");
-		expect(results.get("https://example.com/docs#section2")).toBe("Mocked content");
+		expect(results.get("https://example.com/docs#section1")).toBe(
+			"Mocked content",
+		);
+		expect(results.get("https://example.com/docs#section2")).toBe(
+			"Mocked content",
+		);
 		expect(results.get("https://example.com/docs")).toBe("Mocked content");
 
 		global.fetch = originalFetch;
-});
+	});
 
 	it("should evict normalizedUrl from cache on fetch error", async () => {
 		const originalFetch = global.fetch;
@@ -227,7 +234,6 @@ describe("WebFetcher", () => {
 		await fetcher["fetchSingle"](targetUrl);
 
 		expect((fetcher as any).cache.has(normalizedUrl)).toBe(false);
-		expect((fetcher as any).cache.has(targetUrl)).toBe(false);
 
 		global.fetch = originalFetch;
 	});
@@ -247,10 +253,12 @@ describe("WebFetcher", () => {
 		const normalizedUrl = "https://example.com/not-found";
 
 		const result = await (fetcher as any).fetchSingle(targetUrl);
-		expect(result).toContain("Error: HTTP 404 from https://example.com/not-found#section");
+		expect(result).toContain(
+			"Error: HTTP 404 from https://example.com/not-found#section",
+		);
 
 		// Cache should not contain either URL
-		expect((fetcher as any).cache.has(targetUrl)).toBe(false);
+
 		expect((fetcher as any).cache.has(normalizedUrl)).toBe(false);
 
 		global.fetch = originalFetch;

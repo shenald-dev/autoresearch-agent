@@ -104,18 +104,13 @@ export class WebFetcher {
 		} catch {}
 
 		if (this.cache.has(normalizedUrl)) {
-			const cached = this.cache.get(normalizedUrl) as Promise<string>;
-			// Also ensure the original URL is mapped to the same promise
-			if (normalizedUrl !== targetUrl) {
-				this.cache.set(targetUrl, cached);
-			}
-			return cached;
+			return this.cache.get(normalizedUrl) as Promise<string>;
 		}
 
 		const fetchPromise = (async () => {
 			if (!(await this.isValidUrl(normalizedUrl))) {
 				this.cache.delete(normalizedUrl);
-				this.cache.delete(targetUrl);
+
 				return `Error: Invalid or insecure URL provided (${targetUrl})`;
 			}
 
@@ -146,7 +141,7 @@ export class WebFetcher {
 								console.warn("WebFetcher cancel error:", err);
 							});
 							this.cache.delete(normalizedUrl);
-							this.cache.delete(targetUrl);
+
 							return `Error: Too many redirects for ${targetUrl}`;
 						}
 
@@ -158,7 +153,7 @@ export class WebFetcher {
 								console.warn("WebFetcher cancel error:", err);
 							});
 							this.cache.delete(normalizedUrl);
-							this.cache.delete(targetUrl);
+
 							return `Error: Redirected to invalid or insecure URL (${nextUrl})`;
 						}
 
@@ -176,7 +171,7 @@ export class WebFetcher {
 						console.warn("WebFetcher cancel error:", err);
 					});
 					this.cache.delete(normalizedUrl);
-					this.cache.delete(targetUrl);
+
 					return `Error: HTTP ${response?.status || "unknown"} from ${targetUrl}`;
 				}
 
@@ -192,7 +187,7 @@ export class WebFetcher {
 						console.warn("WebFetcher cancel error:", err);
 					});
 					this.cache.delete(normalizedUrl);
-					this.cache.delete(targetUrl);
+
 					return `Error: Unsupported content type (${contentType}) from ${targetUrl}`;
 				}
 
@@ -245,15 +240,12 @@ export class WebFetcher {
 					});
 				}
 				this.cache.delete(normalizedUrl);
-				this.cache.delete(targetUrl);
+
 				return `Error: Failed to fetch ${targetUrl} - ${error instanceof Error ? error.message : String(error)}`;
 			}
 		})();
 
 		this.cache.set(normalizedUrl, fetchPromise);
-		if (normalizedUrl !== targetUrl) {
-			this.cache.set(targetUrl, fetchPromise);
-		}
 
 		return fetchPromise;
 	}
