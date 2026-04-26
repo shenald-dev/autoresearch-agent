@@ -142,7 +142,9 @@ export class WebFetcher {
 					) {
 						redirects++;
 						if (redirects > MAX_REDIRECTS) {
-							await response.body?.cancel().catch(() => {});
+							await response.body?.cancel().catch((err) => {
+								console.warn("WebFetcher cancel error:", err);
+							});
 							this.cache.delete(normalizedUrl);
 							this.cache.delete(targetUrl);
 							return `Error: Too many redirects for ${targetUrl}`;
@@ -152,13 +154,17 @@ export class WebFetcher {
 						const nextUrl = new url.URL(location, currentUrl).toString();
 
 						if (!(await this.isValidUrl(nextUrl))) {
-							await response.body?.cancel().catch(() => {});
+							await response.body?.cancel().catch((err) => {
+								console.warn("WebFetcher cancel error:", err);
+							});
 							this.cache.delete(normalizedUrl);
 							this.cache.delete(targetUrl);
 							return `Error: Redirected to invalid or insecure URL (${nextUrl})`;
 						}
 
-						await response.body?.cancel().catch(() => {});
+						await response.body?.cancel().catch((err) => {
+							console.warn("WebFetcher cancel error:", err);
+						});
 						currentUrl = nextUrl;
 					} else {
 						break;
@@ -166,7 +172,9 @@ export class WebFetcher {
 				}
 
 				if (!response || !response.ok) {
-					await response?.body?.cancel().catch(() => {});
+					await response?.body?.cancel().catch((err) => {
+						console.warn("WebFetcher cancel error:", err);
+					});
 					this.cache.delete(normalizedUrl);
 					this.cache.delete(targetUrl);
 					return `Error: HTTP ${response?.status || "unknown"} from ${targetUrl}`;
@@ -180,7 +188,9 @@ export class WebFetcher {
 					contentType.includes("image/") ||
 					contentType.includes("video/")
 				) {
-					await response.body?.cancel().catch(() => {});
+					await response.body?.cancel().catch((err) => {
+						console.warn("WebFetcher cancel error:", err);
+					});
 					this.cache.delete(normalizedUrl);
 					this.cache.delete(targetUrl);
 					return `Error: Unsupported content type (${contentType}) from ${targetUrl}`;
@@ -203,7 +213,9 @@ export class WebFetcher {
 
 						if (totalBytes >= MAX_BYTES) {
 							// Cancel the reader early to save bandwidth and memory
-							await reader.cancel();
+							await reader.cancel().catch((err) => {
+								console.warn("WebFetcher cancel error:", err);
+							});
 							break;
 						}
 					}
@@ -224,9 +236,13 @@ export class WebFetcher {
 				return truncated;
 			} catch (error: unknown) {
 				if (reader) {
-					await reader.cancel().catch(() => {});
+					await reader.cancel().catch((err) => {
+						console.warn("WebFetcher cancel error:", err);
+					});
 				} else {
-					await response?.body?.cancel().catch(() => {});
+					await response?.body?.cancel().catch((err) => {
+						console.warn("WebFetcher cancel error:", err);
+					});
 				}
 				this.cache.delete(normalizedUrl);
 				this.cache.delete(targetUrl);
