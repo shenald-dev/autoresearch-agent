@@ -81,3 +81,11 @@ Action: Always explicitly check if the returned addresses array is empty (`!addr
 ## 2026-04-26 — Symmetric Caching
 Learning: When caching operations using a normalized key (e.g., `normalizedUrl`), storing the result under both the normalized key and the un-normalized original input (e.g., `targetUrl`) creates a memory leak and redundancy. Subsequent fetches for the un-normalized URL will normalize it first anyway, making the `targetUrl` cache entry completely unreachable.
 Action: Cache exclusively under the normalized key. Ensure all cache insertions and deletions only target `normalizedUrl` to prevent duplicate entries and ensure correct eviction on errors.
+
+## 2026-04-28 — Engine Context Deduplication
+
+Learning:
+Identical content from different search result URLs can waste LLM tokens and slow down processing if not filtered.
+
+Action:
+Introduced a content-based deduplication mechanism in ResearchEngine using a Set to filter out duplicate context chunks, alongside an early return for empty context arrays.

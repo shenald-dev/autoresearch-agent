@@ -91,15 +91,23 @@ Return ONLY the markdown document.
 
 		// Build context from results
 		const contextChunks: string[] = [];
+		const seenContent = new Set<string>();
 		let i = 1;
 		for (const [url, content] of fetchResults.entries()) {
 			if (!content.startsWith("Error:")) {
-				contextChunks.push(
-					`[Source ${i} | ${url}]\n${content.substring(0, 1500)}\n\n`,
-				);
+				const truncatedContent = content.substring(0, 1500);
+				if (!seenContent.has(truncatedContent)) {
+					seenContent.add(truncatedContent);
+					contextChunks.push(`[Source ${i} | ${url}]\n${truncatedContent}\n\n`);
+				}
 			}
 			i++;
 		}
+
+		if (contextChunks.length === 0) {
+			return `No valid content could be extracted from the sources for "${topic}".`;
+		}
+
 		const context = contextChunks.join("");
 
 		const chain = this.prompt.pipe(llm);
