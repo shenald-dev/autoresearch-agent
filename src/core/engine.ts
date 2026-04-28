@@ -91,6 +91,7 @@ Return ONLY the markdown document.
 
 		// Build context from results
 		const contextChunks: string[] = [];
+		// Use a Set for O(1) deduplication of context chunks by content
 		const seenContent = new Set<string>();
 		let i = 1;
 		for (const [url, content] of fetchResults.entries()) {
@@ -104,6 +105,7 @@ Return ONLY the markdown document.
 			i++;
 		}
 
+		// Prevent unnecessary LLM calls when all sources fail
 		if (contextChunks.length === 0) {
 			return `No valid content could be extracted from the sources for "${topic}".`;
 		}
