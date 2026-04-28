@@ -5,6 +5,9 @@ All notable changes to autoresearch-agent will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.20] - 2026-04-28
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 ## [1.0.19] - 2026-04-27
 * **[Pruned]:** Observed that BOLT correctly optimized the WebFetcher deduplication cache key logic, which left no dead code.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
