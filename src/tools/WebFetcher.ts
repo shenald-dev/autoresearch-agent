@@ -257,26 +257,23 @@ export class WebFetcher {
 		const results = new Map<string, string>();
 		const executing = new Set<Promise<void>>();
 
-		// Deduplicate exact matching URLs upfront to save processing overhead
-		const uniqueUrls = [...new Set(urls)];
-
-		// Map normalized URL (no hash) to an array of original URLs that requested it
-		const normalizedToOriginals = new Map<string, string[]>();
-		for (const u of uniqueUrls) {
+		// Map normalized URL (no hash) to a set of original URLs that requested it
+		const normalizedToOriginals = new Map<string, Set<string>>();
+		for (const u of urls) {
 			try {
 				const parsed = new URL(u);
 				parsed.hash = "";
 				const normalized = parsed.toString();
 				if (!normalizedToOriginals.has(normalized)) {
-					normalizedToOriginals.set(normalized, []);
+					normalizedToOriginals.set(normalized, new Set());
 				}
-				normalizedToOriginals.get(normalized)?.push(u);
+				normalizedToOriginals.get(normalized)?.add(u);
 			} catch {
 				// If URL is completely invalid, treat it as its own unique target so it hits the error path
 				if (!normalizedToOriginals.has(u)) {
-					normalizedToOriginals.set(u, []);
+					normalizedToOriginals.set(u, new Set());
 				}
-				normalizedToOriginals.get(u)?.push(u);
+				normalizedToOriginals.get(u)?.add(u);
 			}
 		}
 
