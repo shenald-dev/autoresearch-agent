@@ -263,4 +263,40 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+
+	it("should deduplicate URL batches using Sets correctly", async () => {
+		const originalFetch = global.fetch;
+		const fetchMock = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "Mocked deduplicated content",
+			};
+		});
+		global.fetch = fetchMock;
+
+		const urls = [
+			"https://example.com/unique#1",
+			"https://example.com/unique#2",
+			"https://example.com/unique",
+		];
+
+		const results = await fetcher.fetchBatch(urls);
+
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+
+		expect(results.get("https://example.com/unique#1")).toBe(
+			"Mocked deduplicated content",
+		);
+		expect(results.get("https://example.com/unique#2")).toBe(
+			"Mocked deduplicated content",
+		);
+		expect(results.get("https://example.com/unique")).toBe(
+			"Mocked deduplicated content",
+		);
+
+		global.fetch = originalFetch;
+	});
+
 });
