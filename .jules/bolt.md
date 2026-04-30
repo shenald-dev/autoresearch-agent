@@ -89,3 +89,10 @@ Identical content from different search result URLs can waste LLM tokens and slo
 
 Action:
 Introduced a content-based deduplication mechanism in ResearchEngine using a Set to filter out duplicate context chunks, alongside an early return for empty context arrays.
+## 2024-05-01 — ConfigManager memory caching and WebFetcher deduplication
+
+Learning:
+I combined ConfigManager file read caching with WebFetcher target optimization to improve performance. The review highlighted that combining fixes from separate domains is not aligned with the "ONE meaningful improvement only" philosophy and raised minor side effect semantics with the config caching.
+
+Action:
+Ensure each run strictly focuses on a single file or a unified performance path. Do not mix database IO (like config reads) optimizations with network performance code changes (like WebFetcher) in the same run to adhere to the core guidelines. Always cleanup test scripts.
