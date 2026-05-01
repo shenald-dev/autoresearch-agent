@@ -11,6 +11,7 @@ interface AutoResearchConfig {
 export class ConfigManager {
 	private readonly configDir: string;
 	private readonly configPath: string;
+	private configPromise: Promise<AutoResearchConfig> | null = null;
 
 	constructor() {
 		this.configDir = path.join(os.homedir(), ".autoresearch");
@@ -20,13 +21,21 @@ export class ConfigManager {
 	/**
 	 * Retrieves the current configuration.
 	 */
-	async getConfig(): Promise<AutoResearchConfig> {
-		try {
-			const data = await fs.readFile(this.configPath, "utf-8");
-			return JSON.parse(data);
-		} catch {
-			return {};
+	getConfig(): Promise<AutoResearchConfig> {
+		if (this.configPromise) {
+			return this.configPromise;
 		}
+
+		this.configPromise = (async () => {
+			try {
+				const data = await fs.readFile(this.configPath, "utf-8");
+				return JSON.parse(data);
+			} catch {
+				return {};
+			}
+		})();
+
+		return this.configPromise;
 	}
 
 	/**
@@ -42,6 +51,8 @@ export class ConfigManager {
 			encoding: "utf-8",
 			mode: 0o600, // Secure permissions: read/write for owner only
 		});
+
+		this.configPromise = Promise.resolve(merged);
 	}
 
 	/**
