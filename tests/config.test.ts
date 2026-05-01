@@ -12,6 +12,7 @@ describe("ConfigManager", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         configManager = new ConfigManager();
+        configManager.clearCache();
     });
 
     it("should propagate directory creation error", async () => {

@@ -56,6 +56,13 @@ export class ConfigManager {
 	}
 
 	/**
+	 * Clears the configuration cache. Useful for testing isolation.
+	 */
+	clearCache(): void {
+		this.configPromise = null;
+	}
+
+	/**
 	 * Gets a specific API key, falling back to process.env if available (for CI/CD).
 	 */
 	async get(key: keyof AutoResearchConfig): Promise<string | undefined> {
