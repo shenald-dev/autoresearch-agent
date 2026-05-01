@@ -1,6 +1,7 @@
 import * as dns from "node:dns/promises";
 import * as url from "node:url";
 import * as ipaddr from "ipaddr.js";
+import pLimit from "p-limit";
 
 export class WebFetcher {
 	private cache: Map<string, Promise<string>>;
@@ -255,7 +256,6 @@ export class WebFetcher {
 	 */
 	public async fetchBatch(urls: string[]): Promise<Map<string, string>> {
 		const results = new Map<string, string>();
-		const executing = new Set<Promise<void>>();
 
 		// Map normalized URL (no hash) to a set of original URLs that requested it
 		const normalizedToOriginals = new Map<string, Set<string>>();
@@ -277,29 +277,19 @@ export class WebFetcher {
 			}
 		}
 
-		for (const [
-			normalizedUrl,
-			originalUrls,
-		] of normalizedToOriginals.entries()) {
-			const promise = this.fetchSingle(normalizedUrl)
-				.then((content) => {
-					// Map the result back to all original requested URLs
+		const limit = pLimit(this.maxConcurrency);
+		const tasks = Array.from(normalizedToOriginals.entries()).map(
+			([normalizedUrl, originalUrls]) => {
+				return limit(async () => {
+					const content = await this.fetchSingle(normalizedUrl);
 					for (const orig of originalUrls) {
 						results.set(orig, content);
 					}
-				})
-				.finally(() => {
-					executing.delete(promise);
 				});
+			},
+		);
 
-			executing.add(promise);
-
-			if (executing.size >= this.maxConcurrency) {
-				await Promise.race(executing);
-			}
-		}
-
-		await Promise.all(executing);
+		await Promise.all(tasks);
 		return results;
 	}
 }

@@ -25,6 +25,7 @@
     "@langchain/openai": "^0.3.17",
     "commander": "^12.1.0",
     "ipaddr.js": "^2.3.0",
+    "p-limit": "^7.3.0",
     "picocolors": "^1.1.1",
     "zod": "^3.25.76"
   },
