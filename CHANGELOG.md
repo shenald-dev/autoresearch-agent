@@ -4,6 +4,9 @@ All notable changes to autoresearch-agent will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.0.23] - 2026-05-02
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 
 ## [1.0.22] - 2026-05-02
 * **[Optimization]:** Implemented an instance-level `configPromise` cache in `ConfigManager` to eliminate redundant file system reads and JSON parsing.
