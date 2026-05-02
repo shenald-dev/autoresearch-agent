@@ -95,8 +95,8 @@ Return ONLY the markdown document.
 		let i = 1;
 		for (const [url, content] of fetchResults.entries()) {
 			if (!content.startsWith("Error:")) {
-				const truncatedContent = content.substring(0, 1500);
-				if (!seenContent.has(truncatedContent)) {
+				const truncatedContent = content.substring(0, 1500).trim();
+				if (truncatedContent && !seenContent.has(truncatedContent)) {
 					seenContent.add(truncatedContent);
 					contextChunks.push(`[Source ${i} | ${url}]\n${truncatedContent}\n\n`);
 				}
