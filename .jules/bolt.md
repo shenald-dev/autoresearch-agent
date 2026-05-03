@@ -96,3 +96,11 @@ I combined ConfigManager file read caching with WebFetcher target optimization t
 
 Action:
 Ensure each run strictly focuses on a single file or a unified performance path. Do not mix database IO (like config reads) optimizations with network performance code changes (like WebFetcher) in the same run to adhere to the core guidelines. Always cleanup test scripts.
+
+## 2026-05-03 — SVG Content Stripping
+
+Learning:
+SVG blocks in HTML payloads can be large and contain only graphical data, which is useless for a text-based LLM and wastes context window tokens and memory.
+
+Action:
+Updated the HTML stripping regex to include `<svg>` alongside `<script>` and `<style>` blocks to drop this unwanted content early.
