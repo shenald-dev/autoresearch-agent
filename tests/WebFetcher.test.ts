@@ -263,4 +263,21 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+
+	it("should strip SVG blocks correctly", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "<svg width='100' height='100'><circle cx='50' cy='50' r='40' stroke='green' stroke-width='4' fill='yellow' /></svg><p>Important text.</p>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/svg-test");
+		expect(result).toBe("Important text.");
+
+		global.fetch = originalFetch;
+	});
 });
