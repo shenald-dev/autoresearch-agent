@@ -106,3 +106,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Health check endpoint
 - Docker support
 
+
+## [1.0.24] - 2026-05-03
+* **[Optimization]:** Added unit tests for empty context chunk skipping in ResearchEngine.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.

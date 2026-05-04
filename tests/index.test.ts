@@ -25,42 +25,50 @@ vi.mock("@clack/prompts", () => ({
 }));
 
 vi.mock("../src/core/engine", () => {
-    return {
-        ResearchEngine: class {
-            constructor() {}
-            async run(topic: string, onProgress?: (msg: string) => void) {
-                if (onProgress) {
-                    onProgress("Test progress message");
-                }
-                return "Mock report";
-            }
-        }
-    };
+	return {
+		ResearchEngine: class {
+			constructor() {}
+			async run(topic: string, onProgress?: (msg: string) => void) {
+				if (onProgress) {
+					onProgress("Test progress message");
+				}
+				return "Mock report";
+			}
+		},
+	};
 });
 
 describe("CLI WebFetcher index", () => {
-    let originalArgv;
-    let originalExit;
+	let originalArgv;
+	let originalExit;
 
-    beforeEach(() => {
-        vi.resetModules();
-        originalArgv = process.argv;
-        originalExit = process.exit;
-        process.exit = vi.fn();
-    });
+	beforeEach(() => {
+		vi.resetModules();
+		originalArgv = process.argv;
+		originalExit = process.exit;
+		process.exit = vi.fn();
+	});
 
-    afterEach(() => {
-        process.argv = originalArgv;
-        process.exit = originalExit;
-    });
+	afterEach(() => {
+		process.argv = originalArgv;
+		process.exit = originalExit;
+	});
 
 	it("should pass progress callback to engine.run that calls spinner.message", async () => {
-        process.argv = ['node', 'index.js', 'research', '-t', 'test-topic', '-d', '1'];
-        await import("../src/index.ts");
+		process.argv = [
+			"node",
+			"index.js",
+			"research",
+			"-t",
+			"test-topic",
+			"-d",
+			"1",
+		];
+		await import("../src/index.ts");
 
-        // Let event loop clear for async commander commands
-        await new Promise(resolve => setTimeout(resolve, 50));
+		// Let event loop clear for async commander commands
+		await new Promise((resolve) => setTimeout(resolve, 50));
 
-        expect(messageMock).toHaveBeenCalledWith("Test progress message");
+		expect(messageMock).toHaveBeenCalledWith("Test progress message");
 	});
 });
