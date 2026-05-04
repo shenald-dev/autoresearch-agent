@@ -257,6 +257,11 @@ export class WebFetcher {
 	public async fetchBatch(urls: string[]): Promise<Map<string, string>> {
 		const results = new Map<string, string>();
 
+		// Pre-initialize to maintain exact input ranking order
+		for (const u of urls) {
+			results.set(u, "");
+		}
+
 		// Map normalized URL (no hash) to a set of original URLs that requested it
 		const normalizedToOriginals = new Map<string, Set<string>>();
 		for (const u of urls) {

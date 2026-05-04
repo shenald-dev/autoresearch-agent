@@ -104,3 +104,11 @@ SVG blocks in HTML payloads can be large and contain only graphical data, which 
 
 Action:
 Updated the HTML stripping regex to include `<svg>` alongside `<script>` and `<style>` blocks to drop this unwanted content early.
+
+## 2026-05-04 — Map Iteration Order in Concurrent Asynchronous Tasks
+
+Learning:
+In JavaScript/TypeScript, `Map` iteration strictly follows insertion order. When running concurrent asynchronous tasks (like `Promise.all` fetching multiple URLs) and dynamically calling `Map.set()` as each task completes, the iteration order of the final Map will randomly reflect task completion times rather than the original input order. This breaks downstream logic that relies on the sequence (e.g., maintaining search result ranking relevance for LLM context).
+
+Action:
+To ensure deterministic ordering and prevent race conditions from scrambling context relevance, always pre-initialize the `Map` keys with empty values in the desired sequence before executing concurrent async tasks. Subsequent `Map.set()` calls during task completion will update the values in place without altering the established insertion order.
