@@ -24,6 +24,14 @@ vi.mock("@clack/prompts", () => ({
 	},
 }));
 
+vi.mock("../src/utils/config", () => ({
+	ConfigManager: class {
+		getConfig = vi.fn().mockResolvedValue({});
+		setConfig = vi.fn();
+		get = vi.fn();
+	},
+}));
+
 vi.mock("../src/core/engine", () => {
 	return {
 		ResearchEngine: class {

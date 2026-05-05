@@ -142,8 +142,15 @@ program
 		s.start(`Researching depth level ${validatedInput.depth}...`);
 
 		try {
+			const { ConfigManager } = await import("./utils/config");
+			const configManager = new ConfigManager();
+			await configManager.getConfig(); // explicitly warm up the cache asynchronously
+
 			const { ResearchEngine } = await import("./core/engine");
-			const engine = new ResearchEngine({ depth: validatedInput.depth });
+			const engine = new ResearchEngine(
+				{ depth: validatedInput.depth },
+				configManager,
+			);
 			const result = await engine.run(validatedInput.topic, (msg) => {
 				s.message(msg);
 			});

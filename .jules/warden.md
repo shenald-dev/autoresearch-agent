@@ -201,3 +201,11 @@ Checked for dead code using `knip` and `ts-prune`. Verified that `bin/cli.js` is
 
 **Alignment / Deferred:**
 Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.25 to deploy these updates.
+
+## 2026-05-05 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT attempted to optimize configuration reading by adding caching to `ConfigManager`. However, to fully realize this optimization, it needed dependency injection and explicit cache warm-up from the CLI entry point. Implemented this by injecting `ConfigManager` into `ResearchEngine` and initializing it in `src/index.ts`. No dead code found via `knip` or `ts-prune`.
+
+**Alignment / Deferred:**
+Aligned the test suite by mocking `ConfigManager` in `tests/index.test.ts` to prevent the CLI tests from hitting the filesystem. Tagging release v1.0.26 to deploy these updates.

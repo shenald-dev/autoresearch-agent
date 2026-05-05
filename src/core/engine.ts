@@ -17,9 +17,9 @@ export class ResearchEngine {
 	private fetcher: WebFetcher;
 	private prompt: PromptTemplate;
 
-	constructor(config: EngineConfig) {
+	constructor(config: EngineConfig, configManager?: ConfigManager) {
 		this.config = config;
-		this.configManager = new ConfigManager();
+		this.configManager = configManager || new ConfigManager();
 		this.searcher = new GoogleSearcher(this.configManager);
 		// Scale max concurrency based on depth to avoid overwhelming systems but speed up deep searches
 		this.fetcher = new WebFetcher(Math.min(10, config.depth * 2));
