@@ -257,7 +257,10 @@ export class WebFetcher {
 	public async fetchBatch(urls: string[]): Promise<Map<string, string>> {
 		const results = new Map<string, string>();
 
-		// Pre-initialize to maintain exact input ranking order
+		// Pre-initialize to maintain exact input ranking order.
+		// JavaScript Maps preserve insertion order. By setting keys here before concurrent
+		// async tasks complete out-of-order, we guarantee the final Map strictly matches
+		// the Google Search relevance ranking, improving downstream LLM prompt quality.
 		for (const u of urls) {
 			results.set(u, "");
 		}
