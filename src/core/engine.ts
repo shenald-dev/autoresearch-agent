@@ -20,6 +20,7 @@ export class ResearchEngine {
 	constructor(config: EngineConfig) {
 		this.config = config;
 		this.configManager = new ConfigManager();
+		// Share the ConfigManager instance to avoid redundant config.json reads across services
 		this.searcher = new GoogleSearcher(this.configManager);
 		// Scale max concurrency based on depth to avoid overwhelming systems but speed up deep searches
 		this.fetcher = new WebFetcher(Math.min(10, config.depth * 2));
