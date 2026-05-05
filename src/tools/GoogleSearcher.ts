@@ -12,8 +12,8 @@ export class GoogleSearcher {
 	private configManager: ConfigManager;
 	private cache: Map<string, Promise<SearchResult[]>>;
 
-	constructor() {
-		this.configManager = new ConfigManager();
+	constructor(configManager?: ConfigManager) {
+		this.configManager = configManager || new ConfigManager();
 		this.cache = new Map();
 	}
 

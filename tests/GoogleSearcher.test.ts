@@ -22,6 +22,18 @@ describe("GoogleSearcher", () => {
 		vi.clearAllMocks();
 	});
 
+	it("should use injected configManager", async () => {
+		const customConfigManager = new ConfigManager();
+		customConfigManager.get = vi.fn().mockResolvedValue("custom-key");
+		const customSearcher = new GoogleSearcher(customConfigManager);
+		(global.fetch as any).mockResolvedValueOnce({
+			ok: true,
+			json: async () => ({ organic: [] }),
+		});
+		await customSearcher.search("test");
+		expect(customConfigManager.get).toHaveBeenCalledWith("SERPER_API_KEY");
+	});
+
 	it("should return search results on successful API call", async () => {
 		const mockResponse = {
 			organic: [
