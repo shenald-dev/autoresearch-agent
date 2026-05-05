@@ -263,4 +263,30 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+
+	it("should preserve input URL order in the results map regardless of fetch completion time", async () => {
+		const originalFetch = global.fetch;
+
+		global.fetch = vi.fn().mockImplementation(async (url) => {
+			if (url.includes("slow")) {
+				await new Promise((resolve) => setTimeout(resolve, 50));
+			}
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => `Mock ${url}`,
+			};
+		});
+
+		const urls = [
+			"https://example.com/slow",
+			"https://example.com/fast",
+		];
+
+		const results = await fetcher.fetchBatch(urls);
+		expect(Array.from(results.keys())).toEqual(urls);
+
+		global.fetch = originalFetch;
+	});
 });
