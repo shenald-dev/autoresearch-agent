@@ -143,7 +143,16 @@ program
 
 		try {
 			const { ResearchEngine } = await import("./core/engine");
-			const engine = new ResearchEngine({ depth: validatedInput.depth });
+			const { ConfigManager } = await import("./utils/config");
+			const configManager = new ConfigManager();
+
+			// Initialize the config cache immediately by reading from disk
+			await configManager.getConfig();
+
+			const engine = new ResearchEngine({
+				depth: validatedInput.depth,
+				configManager,
+			});
 			const result = await engine.run(validatedInput.topic, (msg) => {
 				s.message(msg);
 			});
