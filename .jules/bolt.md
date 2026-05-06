@@ -112,3 +112,19 @@ In JavaScript/TypeScript, `Map` iteration strictly follows insertion order. When
 
 Action:
 To ensure deterministic ordering and prevent race conditions from scrambling context relevance, always pre-initialize the `Map` keys with empty values in the desired sequence before executing concurrent async tasks. Subsequent `Map.set()` calls during task completion will update the values in place without altering the established insertion order.
+
+## 2026-05-07 — Boilerplate HTML Content Stripping
+
+Learning:
+Boilerplate HTML elements like `<nav>`, `<footer>`, `<iframe>`, `<noscript>`, `<header>`, and `<aside>` often contain repetitive or irrelevant content that is useless for a text-based LLM. Including them wastes context window tokens and memory.
+
+Action:
+Updated the HTML stripping regex to include `<nav>`, `<footer>`, `<iframe>`, `<noscript>`, `<header>`, and `<aside>` alongside `<script>`, `<style>`, and `<svg>` blocks to drop this unwanted content early.
+
+## 2026-05-08 — Engine Search URL Deduplication
+
+Learning:
+When extracting URLs from search results to be fetched concurrently by WebFetcher, duplicate URLs can occasionally appear. While WebFetcher has cache deduplication, passing duplicate URLs wastes iteration cycles and causes redundant downstream processing.
+
+Action:
+Preemptively deduplicated the list of URLs extracted from search results (`new Set(rawUrls)`) before passing them to `fetchBatch`.

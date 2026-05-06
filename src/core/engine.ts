@@ -69,7 +69,7 @@ Return ONLY the markdown document.
 
 		// Phase 1: Search
 		updateStatus(`🔍 Searching Google for: "${topic}"...`);
-		const searchResults = await this.searcher.search(
+		let searchResults = await this.searcher.search(
 			topic,
 			this.config.depth * 2,
 		);
@@ -77,6 +77,14 @@ Return ONLY the markdown document.
 		if (searchResults.length === 0) {
 			return `No results found for "${topic}". The API key may be missing or the query was too niche.`;
 		}
+
+		// Deduplicate search results by link to avoid redundant fetches and context bloat
+		const seenLinks = new Set<string>();
+		searchResults = searchResults.filter((r) => {
+			if (seenLinks.has(r.link)) return false;
+			seenLinks.add(r.link);
+			return true;
+		});
 
 		// Phase 2: Fetch and Extract
 		updateStatus(
