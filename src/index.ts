@@ -148,7 +148,7 @@ program
 
 			const { ResearchEngine } = await import("./core/engine");
 			const engine = new ResearchEngine(
-				{ depth: validatedInput.depth },
+				{ depth: validatedInput.depth, configManager },
 				configManager,
 			);
 			const result = await engine.run(validatedInput.topic, (msg) => {

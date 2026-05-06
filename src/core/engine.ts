@@ -6,6 +6,7 @@ import { ConfigManager } from "../utils/config";
 
 interface EngineConfig {
 	depth: number;
+	configManager?: ConfigManager;
 }
 
 type StatusCallback = (message: string) => void;
@@ -19,7 +20,8 @@ export class ResearchEngine {
 
 	constructor(config: EngineConfig, configManager?: ConfigManager) {
 		this.config = config;
-		this.configManager = configManager || new ConfigManager();
+		this.configManager =
+			configManager || config.configManager || new ConfigManager();
 		this.searcher = new GoogleSearcher(this.configManager);
 		// Scale max concurrency based on depth to avoid overwhelming systems but speed up deep searches
 		this.fetcher = new WebFetcher(Math.min(10, config.depth * 2));
