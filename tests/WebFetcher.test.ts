@@ -289,4 +289,45 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+
+	it("should strip out unnecessary boilerplate tags like nav, footer, iframe, noscript", async () => {
+		const originalFetch = global.fetch;
+
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => `
+					<html>
+						<header><h1>Keep Title</h1></header>
+						<nav><ul><li>Drop Link</li></ul></nav>
+						<body>
+							<article>
+								<p>Keep Content</p>
+							</article>
+							<svg><circle cx="50"/></svg>
+							<footer><p>Drop Copyright</p></footer>
+							<iframe>Drop Iframe</iframe>
+							<noscript>Drop Noscript</noscript>
+							<aside>Keep Aside</aside>
+						</body>
+					</html>
+				`,
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/strip");
+
+		expect(result).toContain("Keep Title");
+		expect(result).toContain("Keep Content");
+		expect(result).toContain("Keep Aside");
+
+		expect(result).not.toContain("Drop Link");
+		expect(result).not.toContain("Drop Copyright");
+		expect(result).not.toContain("Drop Iframe");
+		expect(result).not.toContain("Drop Noscript");
+
+		global.fetch = originalFetch;
+	});
 });
