@@ -223,7 +223,10 @@ export class WebFetcher {
 
 				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
 				const strippedText = text
-					.replace(/<(script|style|svg)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi, "") // Remove complete and unclosed script/style/svg blocks
+					.replace(
+						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
+						"",
+					) // Remove complete and unclosed script/style/svg/nav/footer/iframe/noscript blocks
 					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag
 					.replace(/\s+/g, " ")
 					.trim();
