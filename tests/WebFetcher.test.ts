@@ -289,4 +289,38 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+
+	it("should strip boilerplate HTML tags like nav, footer, iframe, and noscript", async () => {
+		const originalFetch = global.fetch;
+		const mockHtml = `
+			<html>
+			<body>
+				<nav>Menu</nav>
+				<header><h1>Real Content</h1></header>
+				<main>Main article</main>
+				<footer>Copyright</footer>
+				<iframe src="ads"></iframe>
+				<noscript>Enable JS</noscript>
+			</body>
+			</html>
+		`;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => mockHtml,
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/boilerplate");
+		expect(result).not.toContain("Menu");
+		expect(result).not.toContain("Copyright");
+		expect(result).not.toContain("ads");
+		expect(result).not.toContain("Enable JS");
+		expect(result).toContain("Real Content");
+		expect(result).toContain("Main article");
+
+		global.fetch = originalFetch;
+	});
 });
