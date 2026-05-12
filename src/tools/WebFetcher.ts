@@ -226,7 +226,7 @@ export class WebFetcher {
 					.replace(
 						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
 						"",
-					) // Remove complete and unclosed script/style/svg blocks
+					) // Remove complete and unclosed boilerplate blocks
 					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag
 					.replace(/\s+/g, " ")
 					.trim();

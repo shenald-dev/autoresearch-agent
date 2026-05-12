@@ -2,6 +2,42 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { WebFetcher } from "../src/tools/WebFetcher";
 
 describe("WebFetcher", () => {
+	it("should preserve semantic HTML but strip boilerplate like <nav> and <footer>", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => `
+					<html>
+						<body>
+							<nav>Should be stripped</nav>
+							<header><h1>Semantic Title</h1></header>
+							<main>Main content here</main>
+							<footer>Should also be stripped</footer>
+							<iframe src="ads"></iframe>
+							<noscript>No JS</noscript>
+						</body>
+					</html>
+				`,
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-html");
+
+		expect(result).toContain("Semantic Title");
+		expect(result).toContain("Main content here");
+
+		expect(result).not.toContain("Should be stripped");
+		expect(result).not.toContain("Should also be stripped");
+		expect(result).not.toContain("ads");
+		expect(result).not.toContain("No JS");
+
+		global.fetch = originalFetch;
+	});
+
+
 	let fetcher: WebFetcher;
 
 	beforeEach(() => {
@@ -289,4 +325,22 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+
+	it("should strip boilerplate HTML tags to save context", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "<nav>Navigation</nav><footer>Footer</footer><noscript>No JS</noscript><iframe>Ads</iframe><p>Main content</p>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-strip");
+		expect(result).toBe("Main content");
+
+		global.fetch = originalFetch;
+	});
+
 });
