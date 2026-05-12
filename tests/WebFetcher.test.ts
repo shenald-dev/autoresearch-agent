@@ -307,4 +307,21 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+
+	it("should preserve actual content when stripping boilerplate tags", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "<nav>Navigation</nav><article><h1>The Real Story</h1><p>Here is some text.</p></article><footer>Footer</footer><noscript>No JS</noscript><iframe>Ads</iframe>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-preserve");
+		expect(result).toBe("The Real Story Here is some text.");
+
+		global.fetch = originalFetch;
+	});
 });
