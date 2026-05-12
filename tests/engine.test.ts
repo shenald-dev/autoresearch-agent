@@ -93,4 +93,37 @@ describe("ResearchEngine", () => {
 		expect(result).not.toContain("test1.com");
 		expect(result).toContain("test2.com");
 	});
+
+	it("should gracefully handle empty arrays from searcher", async () => {
+		engine.searcher.search.mockResolvedValueOnce([]);
+		const result = await engine.run("empty topic");
+		expect(result).toContain("No results found");
+	});
+
+	it("should safely handle malformed URLs or non-URL entries in search results during deduplication", async () => {
+		engine.searcher.search.mockResolvedValueOnce([
+			{ link: "not a valid url format" },
+			{ link: "http://good-url.com" },
+			{ link: "not a valid url format" }, // duplicate malformed
+		]);
+
+		const fetchResults = new Map();
+		fetchResults.set("not a valid url format", "Error: Invalid URL");
+		fetchResults.set("http://good-url.com", "Good Content");
+		engine.fetcher.fetchBatch.mockResolvedValueOnce(fetchResults);
+
+		engine.prompt.pipe = vi.fn().mockReturnValue({
+			invoke: vi.fn().mockImplementation(async (args: any) => {
+				return { content: args.context };
+			}),
+		});
+
+		const result = await engine.run("malformed test topic");
+
+		// Should still process the good URL and not fail on the malformed one
+		expect(result).toContain("Good Content");
+		expect(result).not.toContain("Error: Invalid URL");
+		// Verify fetchBatch only received two unique inputs
+		expect(engine.fetcher.fetchBatch).toHaveBeenCalledWith(["not a valid url format", "http://good-url.com"]);
+	});
 });
