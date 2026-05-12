@@ -37,6 +37,43 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+	it("should properly strip nested boilerplate tags", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => `
+					<html>
+						<body>
+							<nav>
+								<ul>
+									<li><a href="#">Link 1</a></li>
+									<li><script>console.log("nested script")</script></li>
+								</ul>
+								<div>Some text</div>
+								<iframe src="inner" />
+							</nav>
+							<main>Main content</main>
+						</body>
+					</html>
+				`,
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-nested");
+
+		expect(result).toContain("Main content");
+
+		expect(result).not.toContain("Link 1");
+		expect(result).not.toContain("nested script");
+		expect(result).not.toContain("Some text");
+		expect(result).not.toContain("inner");
+
+		global.fetch = originalFetch;
+	});
+
 	it("should handle edge cases with self-closing boilerplate tags and tags with unusual attributes", async () => {
 		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
