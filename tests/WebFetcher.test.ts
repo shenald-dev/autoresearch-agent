@@ -318,6 +318,8 @@ describe("WebFetcher", () => {
 <footer data-test="true">Footer</footer>
 <iframe src="test"></iframe>
 <noscript><span>No JS</span></noscript>
+<form><input type="text" /></form>
+<broken<tag>
 <p>Main content</p>`
 			};
 		});
