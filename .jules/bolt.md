@@ -112,3 +112,11 @@ In JavaScript/TypeScript, `Map` iteration strictly follows insertion order. When
 
 Action:
 To ensure deterministic ordering and prevent race conditions from scrambling context relevance, always pre-initialize the `Map` keys with empty values in the desired sequence before executing concurrent async tasks. Subsequent `Map.set()` calls during task completion will update the values in place without altering the established insertion order.
+
+## 2026-05-11 — Expand HTML Stripping Regex
+
+Learning:
+Unnecessary boilerplate elements such as `<nav>`, `<footer>`, `<iframe>`, and `<noscript>` consume valuable context tokens and add no semantic value to the extracted text. Semantic structural tags like `<header>` and `<aside>` should be preserved as they frequently contain essential content.
+
+Action:
+Expanded the HTML stripping regex in `WebFetcher` to safely remove complete and unclosed boilerplate tags without touching semantic tags to save LLM context window tokens and improve API efficiency.
