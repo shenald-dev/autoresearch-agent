@@ -1,3 +1,12 @@
+
+## 2026-05-12 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Checked for dead code using `knip` and `ts-prune`. Pruned `resolve_changelog.js` and `resolve_warden.js` which are unused files, but preserved `bin/cli.js` as it is an essential entry point despite `knip` flagging it.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.28 to deploy these updates.
+
 ## 2026-05-03 — Assessment & Lifecycle
 
 **Observation / Pruned:**
