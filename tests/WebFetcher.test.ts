@@ -324,4 +324,21 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+
+	it("should gracefully handle malformed HTML without blowing up the context", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "<nav>Broken Nav</nav> <p>Real Content</p> <script>alert(1);<script> <p>More Content</p>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-malformed");
+		expect(result).toContain("Real Content");
+
+		global.fetch = originalFetch;
+	});
 });
