@@ -304,6 +304,7 @@ describe("WebFetcher", () => {
 			</body>
 			</html>
 		`;
+
 		global.fetch = vi.fn().mockImplementation(async () => {
 			return {
 				status: 200,
