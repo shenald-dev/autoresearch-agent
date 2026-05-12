@@ -307,6 +307,26 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+	it("should not strip content inside semantic structural tags like header or aside", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => `<header>Header Content</header>
+<aside>Aside Content</aside>
+<article>Article Content</article>
+<p>Main content</p>`
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-semantic-tags");
+		expect(result).toBe("Header Content Aside Content Article Content Main content");
+
+		global.fetch = originalFetch;
+	});
+
 	it("should correctly strip boilerplate tags in edge cases like attributes, nested elements, and self-closing variants", async () => {
 		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
