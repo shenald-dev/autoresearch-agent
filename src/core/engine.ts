@@ -85,6 +85,7 @@ Return ONLY the markdown document.
 			let normalized = r.link;
 			try {
 				const parsed = new URL(r.link);
+				// Strip hash fragments to normalize URLs (e.g. #section) since they don't affect server content
 				parsed.hash = "";
 				normalized = parsed.toString();
 			} catch {}
