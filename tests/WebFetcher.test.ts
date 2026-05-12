@@ -37,6 +37,43 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+	it("should handle edge cases with self-closing boilerplate tags and tags with unusual attributes", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => `
+					<html>
+						<body>
+							<nav class="super-weird" data-custom="yes" >Strip this</nav>
+							<iframe src="tracker" width="0" height="0" />
+							<noscript aria-hidden="true" >No JS</noscript>
+							<footer
+								id="main-footer"
+							>
+								Multi-line attributes
+							</footer>
+							<main>Keep this content</main>
+						</body>
+					</html>
+				`,
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-edge-cases");
+
+		expect(result).toContain("Keep this content");
+
+		expect(result).not.toContain("Strip this");
+		expect(result).not.toContain("Multi-line attributes");
+		expect(result).not.toContain("No JS");
+		expect(result).not.toContain("tracker");
+
+		global.fetch = originalFetch;
+	});
+
 
 	let fetcher: WebFetcher;
 
