@@ -69,7 +69,7 @@ Return ONLY the markdown document.
 
 		// Phase 1: Search
 		updateStatus(`🔍 Searching Google for: "${topic}"...`);
-		let searchResults = await this.searcher.search(
+		const searchResults = await this.searcher.search(
 			topic,
 			this.config.depth * 2,
 		);
@@ -78,19 +78,29 @@ Return ONLY the markdown document.
 			return `No results found for "${topic}". The API key may be missing or the query was too niche.`;
 		}
 
-		// Deduplicate search results by link to avoid redundant fetches and context bloat
+		// Preemptively deduplicate search results by normalized URL
+		// This saves concurrency slots and prevents redundant processing
 		const seenLinks = new Set<string>();
-		searchResults = searchResults.filter((r) => {
-			if (seenLinks.has(r.link)) return false;
-			seenLinks.add(r.link);
+		const uniqueSearchResults = searchResults.filter((r) => {
+			let normalized = r.link;
+			try {
+				const parsed = new URL(r.link);
+				parsed.hash = "";
+				normalized = parsed.toString();
+			} catch {}
+
+			if (seenLinks.has(normalized)) {
+				return false;
+			}
+			seenLinks.add(normalized);
 			return true;
 		});
 
 		// Phase 2: Fetch and Extract
 		updateStatus(
-			`📄 Discovered ${searchResults.length} sources. Fetching content concurrently...`,
+			`📄 Discovered ${uniqueSearchResults.length} sources. Fetching content concurrently...`,
 		);
-		const urls = searchResults.map((r) => r.link);
+		const urls = uniqueSearchResults.map((r) => r.link);
 		const fetchResults = await this.fetcher.fetchBatch(urls);
 
 		// Phase 3: Synthesize
