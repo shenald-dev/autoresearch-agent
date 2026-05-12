@@ -307,4 +307,25 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+	it("should correctly strip boilerplate tags in edge cases like attributes, nested elements, and self-closing variants", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => `<nav class="nav" id="test">Nav</nav>
+<footer data-test="true">Footer</footer>
+<iframe src="test"></iframe>
+<noscript><span>No JS</span></noscript>
+<p>Main content</p>`
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-edge-cases");
+		expect(result).toBe("Main content");
+
+		global.fetch = originalFetch;
+	});
+
 });

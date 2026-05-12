@@ -120,3 +120,19 @@ Boilerplate HTML tags like `<nav>`, `<footer>`, `<iframe>`, and `<noscript>` con
 
 Action:
 Expanded the HTML stripping regex to explicitly remove safely isolated boilerplate tags (`<nav>`, `<footer>`, `<iframe>`, `<noscript>`) early in the stream, while preserving semantic structural tags.
+
+## 2026-05-12 — Transition to Cheerio for HTML Stripping
+
+Learning:
+While regex provides a fast baseline for stripping simple HTML tags, it is extremely fragile when handling edge cases like tags with attributes, self-closing tags, nested structures, and malformed markup. As the list of tags to strip grows (e.g., adding `nav`, `footer`, `iframe`), the regex becomes harder to maintain and more prone to errors.
+
+Action:
+Replaced the basic regex-based HTML stripping logic in `WebFetcher` with a robust, DOM-based solution using the `cheerio` parser. This ensures accurate and reliable removal of boilerplate tags regardless of HTML structural edge cases while still improving context token conservation.
+
+## 2026-05-12 — Cheerio and Self-Closing iframes
+
+Learning:
+When testing `cheerio` HTML stripping on edge cases like self-closing `<iframe src="test" />`, it parses it according to standard HTML rules where `<iframe>` is not a void element, so it treats all subsequent content as being *inside* the iframe and subsequently removes it, causing test failures.
+
+Action:
+Updated tests to use valid `<iframe src="test"></iframe>` syntax, as `cheerio` correctly interprets real-world malformed HTML without artificially breaking standard elements like iframes that require explicit closing tags in HTML5.

@@ -1,5 +1,6 @@
 import * as dns from "node:dns/promises";
 import * as url from "node:url";
+import { load } from "cheerio";
 import * as ipaddr from "ipaddr.js";
 import pLimit from "p-limit";
 
@@ -221,15 +222,10 @@ export class WebFetcher {
 					text = await response.text();
 				}
 
-				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
-				const strippedText = text
-					.replace(
-						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
-						"",
-					) // Remove complete and unclosed boilerplate blocks
-					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag
-					.replace(/\s+/g, " ")
-					.trim();
+				// Robust HTML to Text stripping using Cheerio
+				const $ = load(text);
+				$("script, style, svg, nav, footer, iframe, noscript").remove();
+				const strippedText = $.text().replace(/\s+/g, " ").trim();
 
 				const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
 				return truncated;
