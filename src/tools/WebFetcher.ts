@@ -195,7 +195,17 @@ export class WebFetcher {
 				let text = "";
 				if (response.body) {
 					reader = response.body.getReader();
-					const decoder = new TextDecoder();
+					let charset = "utf-8";
+					const charsetMatch = contentType.match(/charset=([\w-]+)/);
+					if (charsetMatch?.[1]) {
+						charset = charsetMatch[1];
+					}
+					let decoder: TextDecoder;
+					try {
+						decoder = new TextDecoder(charset);
+					} catch {
+						decoder = new TextDecoder("utf-8");
+					}
 					let totalBytes = 0;
 					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM
 					const chunks: string[] = [];

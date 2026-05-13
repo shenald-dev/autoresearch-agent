@@ -307,4 +307,60 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+
+	it("should decode non-utf8 text based on charset and fallback safely", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async (url) => {
+			if (url.includes("windows")) {
+				return {
+					status: 200,
+					headers: new Headers({ "content-type": "text/html; charset=windows-1252" }),
+					ok: true,
+					body: {
+						getReader: () => {
+							let read = false;
+							return {
+								read: async () => {
+									if (!read) {
+										read = true;
+										return { done: false, value: new Uint8Array([0xe9]) }; // 'é' in windows-1252
+									}
+									return { done: true, value: undefined };
+								},
+								cancel: async () => {}
+							};
+						}
+					}
+				};
+			}
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=invalid-charset" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let read = false;
+						return {
+							read: async () => {
+								if (!read) {
+									read = true;
+									return { done: false, value: new Uint8Array([0x61, 0x62, 0x63]) }; // 'abc'
+								}
+								return { done: true, value: undefined };
+							},
+							cancel: async () => {}
+						};
+					}
+				}
+			};
+		});
+
+		const resultWindows = await (fetcher as any).fetchSingle("https://example.com/windows");
+		expect(resultWindows).toBe("é");
+
+		const resultInvalid = await (fetcher as any).fetchSingle("https://example.com/invalid");
+		expect(resultInvalid).toBe("abc");
+
+		global.fetch = originalFetch;
+	});
 });
