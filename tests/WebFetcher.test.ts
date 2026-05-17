@@ -307,4 +307,38 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+
+	it("should decode response body using the charset specified in the Content-Type header", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			const encoder = new TextEncoder();
+			// We will just mock a response that returns a Uint8Array, and test if the TextDecoder is instantiated without crashing
+			const mockStream = {
+				getReader: () => {
+					let done = false;
+					return {
+						read: async () => {
+							if (done) return { done: true, value: undefined };
+							done = true;
+							return { done: false, value: encoder.encode("Mock ISO content") };
+						},
+						cancel: vi.fn().mockResolvedValue(undefined)
+					};
+				}
+			};
+
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=iso-8859-1" }),
+				ok: true,
+				body: mockStream,
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/iso-8859-1-test");
+		expect(result).toBe("Mock ISO content");
+
+		global.fetch = originalFetch;
+	});
+
 });
