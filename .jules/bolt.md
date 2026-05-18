@@ -120,3 +120,11 @@ Unnecessary boilerplate elements such as `<nav>`, `<footer>`, `<iframe>`, and `<
 
 Action:
 Expanded the HTML stripping regex in `WebFetcher` to safely remove complete and unclosed boilerplate tags without touching semantic tags to save LLM context window tokens and improve API efficiency.
+
+## 2026-05-18 — TextDecoder Crash Fix
+
+Learning:
+When decoding fetched HTTP response bodies using `TextDecoder`, do not assume `utf-8` by default.
+
+Action:
+Extract the `charset` from the `Content-Type` header using a regex that handles optional quotes and instantiate `TextDecoder(charset)`. Always wrap this in a `try...catch` block with a fallback to `utf-8`.
