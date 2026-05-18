@@ -307,4 +307,55 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+
+	it("should decode response body using charset from Content-Type header", async () => {
+		const originalFetch = global.fetch;
+
+		global.fetch = vi.fn().mockImplementation(async () => {
+			const stream = new ReadableStream({
+				start(controller) {
+					// Using iso-8859-1 for test
+					controller.enqueue(new Uint8Array([0xe9])); // 'é' in iso-8859-1
+					controller.close();
+				}
+			});
+
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=iso-8859-1" }),
+				ok: true,
+				body: stream,
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/encoding-test");
+		expect(result).toBe("é");
+
+		global.fetch = originalFetch;
+	});
+
+	it("should fallback to utf-8 if Content-Type charset is invalid", async () => {
+		const originalFetch = global.fetch;
+
+		global.fetch = vi.fn().mockImplementation(async () => {
+			const stream = new ReadableStream({
+				start(controller) {
+					controller.enqueue(new TextEncoder().encode("Hello"));
+					controller.close();
+				}
+			});
+
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=invalid-charset-123" }),
+				ok: true,
+				body: stream,
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/invalid-charset-test");
+		expect(result).toBe("Hello");
+
+		global.fetch = originalFetch;
+	});
 });
