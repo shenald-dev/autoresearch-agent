@@ -316,7 +316,7 @@ describe("WebFetcher", () => {
 		const encoder = new TextEncoder();
 		const utf8Bytes = encoder.encode("English: Hello");
 
-		// Let's mock a fetch that returns an array buffer wrapped in a reader
+		// Mock a fetch with a known valid charset (utf-8)
 		global.fetch = vi.fn().mockImplementation(async () => {
 			return {
 				status: 200,
@@ -341,7 +341,7 @@ describe("WebFetcher", () => {
 		const result = await (fetcher as any).fetchSingle("https://example.com/charset-test");
 		expect(result).toBe("English: Hello");
 
-		// Test fallback
+		// Mock a fetch with an invalid/unknown charset to trigger the catch block fallback
 		global.fetch = vi.fn().mockImplementation(async () => {
 			return {
 				status: 200,
@@ -365,6 +365,31 @@ describe("WebFetcher", () => {
 
 		const resultFallback = await (fetcher as any).fetchSingle("https://example.com/charset-fallback-test");
 		expect(resultFallback).toBe("English: Hello");
+
+		// Mock a fetch with no charset at all
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let called = false;
+						return {
+							read: async () => {
+								if (called) return { done: true, value: undefined };
+								called = true;
+								return { done: false, value: utf8Bytes };
+							},
+							cancel: vi.fn()
+						};
+					}
+				}
+			};
+		});
+
+		const resultNoCharset = await (fetcher as any).fetchSingle("https://example.com/no-charset-test");
+		expect(resultNoCharset).toBe("English: Hello");
 
 		global.fetch = originalFetch;
 	});
