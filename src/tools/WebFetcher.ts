@@ -196,11 +196,15 @@ export class WebFetcher {
 				if (response.body) {
 					reader = response.body.getReader();
 					let decoder: TextDecoder;
-					const charsetMatch = contentType.match(/charset=['"]?([\w-]+)['"]?/i);
 					try {
-						decoder = new TextDecoder(charsetMatch ? charsetMatch[1] : "utf-8");
-					} catch {
-						decoder = new TextDecoder("utf-8");
+						const match = contentType.match(/charset=['"]?([\w-]+)['"]?/i);
+						decoder = new TextDecoder(match ? match[1] : "utf-8");
+					} catch (e) {
+						if (e instanceof RangeError || e instanceof TypeError) {
+							decoder = new TextDecoder("utf-8");
+						} else {
+							throw e;
+						}
 					}
 					let totalBytes = 0;
 					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM
