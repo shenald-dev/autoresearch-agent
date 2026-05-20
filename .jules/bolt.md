@@ -113,26 +113,14 @@ In JavaScript/TypeScript, `Map` iteration strictly follows insertion order. When
 Action:
 To ensure deterministic ordering and prevent race conditions from scrambling context relevance, always pre-initialize the `Map` keys with empty values in the desired sequence before executing concurrent async tasks. Subsequent `Map.set()` calls during task completion will update the values in place without altering the established insertion order.
 
-## 2026-05-08 — Expand HTML Stripping for Boilerplate Tags
+## 2026-05-11 — Expand HTML Stripping Regex
 
 Learning:
-Boilerplate HTML tags like `<nav>`, `<footer>`, `<iframe>`, and `<noscript>` consume valuable LLM context tokens without adding semantic value for text-based analysis, whereas tags like `<header>` and `<aside>` often contain critical structural content.
+Unnecessary boilerplate elements such as `<nav>`, `<footer>`, `<iframe>`, and `<noscript>` consume valuable context tokens and add no semantic value to the extracted text. Semantic structural tags like `<header>` and `<aside>` should be preserved as they frequently contain essential content.
 
 Action:
-Expanded the HTML stripping regex to explicitly remove safely isolated boilerplate tags (`<nav>`, `<footer>`, `<iframe>`, `<noscript>`) early in the stream, while preserving semantic structural tags.
+Expanded the HTML stripping regex in `WebFetcher` to safely remove complete and unclosed boilerplate tags without touching semantic tags to save LLM context window tokens and improve API efficiency.
 
-## 2026-05-12 — Transition to Cheerio for HTML Stripping
-
-Learning:
-While regex provides a fast baseline for stripping simple HTML tags, it is extremely fragile when handling edge cases like tags with attributes, self-closing tags, nested structures, and malformed markup. As the list of tags to strip grows (e.g., adding `nav`, `footer`, `iframe`), the regex becomes harder to maintain and more prone to errors.
-
-Action:
-Replaced the basic regex-based HTML stripping logic in `WebFetcher` with a robust, DOM-based solution using the `cheerio` parser. This ensures accurate and reliable removal of boilerplate tags regardless of HTML structural edge cases while still improving context token conservation.
-
-## 2026-05-12 — Cheerio and Self-Closing iframes
-
-Learning:
-When testing `cheerio` HTML stripping on edge cases like self-closing `<iframe src="test" />`, it parses it according to standard HTML rules where `<iframe>` is not a void element, so it treats all subsequent content as being *inside* the iframe and subsequently removes it, causing test failures.
-
-Action:
-Updated tests to use valid `<iframe src="test"></iframe>` syntax, as `cheerio` correctly interprets real-world malformed HTML without artificially breaking standard elements like iframes that require explicit closing tags in HTML5.
+## 2025-05-19 — Dynamic Charset Decoding
+Learning: Hardcoding TextDecoder() without extracting the charset from Content-Type can lead to runtime crashes or incorrect decoding when fetching non-utf-8 web content.
+Action: Always extract the charset using a regex on Content-Type and wrap TextDecoder instantiation in a try-catch fallback to utf-8.
