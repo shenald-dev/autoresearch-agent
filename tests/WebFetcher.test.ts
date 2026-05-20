@@ -307,4 +307,86 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+
+	it("should decode text with dynamic charset from Content-Type", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			const utf8Buffer = new TextEncoder().encode("Hello World");
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=utf-8" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let isDone = false;
+						return {
+							read: async () => {
+								if (isDone) return { done: true, value: undefined };
+								isDone = true;
+								return { done: false, value: utf8Buffer };
+							},
+							cancel: vi.fn()
+						};
+					}
+				}
+			};
+		});
+
+		const result1 = await (fetcher as any).fetchSingle("https://example.com/utf8");
+		expect(result1).toContain("Hello World");
+
+		global.fetch = vi.fn().mockImplementation(async () => {
+			// Simulating windows-1251 encoded content
+			const win1251Buffer = new Uint8Array([0xcf, 0xf0, 0xe8, 0xe2, 0xe5, 0xf2]); // "Привет" in win-1251
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=windows-1251" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let isDone = false;
+						return {
+							read: async () => {
+								if (isDone) return { done: true, value: undefined };
+								isDone = true;
+								return { done: false, value: win1251Buffer };
+							},
+							cancel: vi.fn()
+						};
+					}
+				}
+			};
+		});
+
+		const result2 = await (fetcher as any).fetchSingle("https://example.com/win1251");
+		expect(result2).toContain("Привет");
+
+		// Test fallback to utf-8 on invalid charset
+		global.fetch = vi.fn().mockImplementation(async () => {
+			const utf8Buffer = new TextEncoder().encode("Fallback OK");
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=invalid-charset" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let isDone = false;
+						return {
+							read: async () => {
+								if (isDone) return { done: true, value: undefined };
+								isDone = true;
+								return { done: false, value: utf8Buffer };
+							},
+							cancel: vi.fn()
+						};
+					}
+				}
+			};
+		});
+
+		const result3 = await (fetcher as any).fetchSingle("https://example.com/invalid");
+		expect(result3).toContain("Fallback OK");
+
+		global.fetch = originalFetch;
+	});
 });
