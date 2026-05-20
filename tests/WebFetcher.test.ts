@@ -307,4 +307,60 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+	it("should extract charset from Content-Type and fallback to utf-8 safely", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async (url) => {
+			if (url === "https://example.com/iso-8859-1") {
+				return {
+					status: 200,
+					headers: new Headers({ "content-type": "text/html; charset=iso-8859-1" }),
+					ok: true,
+					body: {
+						getReader: () => {
+							let done = false;
+							return {
+								read: async () => {
+									if (done) return { done: true, value: undefined };
+									done = true;
+									// "café" encoded in iso-8859-1
+									return { done: false, value: new Uint8Array([0x63, 0x61, 0x66, 0xe9]) };
+								},
+								cancel: async () => {}
+							};
+						}
+					}
+				};
+			} else if (url === "https://example.com/invalid-charset") {
+				return {
+					status: 200,
+					headers: new Headers({ "content-type": "text/html; charset=invalid-xyz" }),
+					ok: true,
+					body: {
+						getReader: () => {
+							let done = false;
+							return {
+								read: async () => {
+									if (done) return { done: true, value: undefined };
+									done = true;
+									// Valid utf-8 sequence to prove fallback works
+									return { done: false, value: new Uint8Array([0x63, 0x61, 0x66, 0xc3, 0xa9]) };
+								},
+								cancel: async () => {}
+							};
+						}
+					}
+				};
+			}
+		});
+
+		const testFetcher = new WebFetcher(3);
+		const resultIso = await (testFetcher as any).fetchSingle("https://example.com/iso-8859-1");
+		expect(resultIso).toBe("café");
+
+		const resultInvalid = await (testFetcher as any).fetchSingle("https://example.com/invalid-charset");
+		expect(resultInvalid).toBe("café");
+
+		global.fetch = originalFetch;
+	});
+
 });
