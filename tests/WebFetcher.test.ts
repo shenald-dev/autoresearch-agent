@@ -94,6 +94,46 @@ describe("WebFetcher", () => {
 		);
 		expect(result).toContain("Error: Redirected to invalid or insecure URL");
 
+		// 3. Extra spaces in Content-Type
+		global.fetch = vi.fn().mockImplementation(async () => {
+			const encoder = new TextEncoder();
+			const encoded = encoder.encode("Spaced Test Content");
+			const stream = new ReadableStream({
+				start(controller) {
+					controller.enqueue(encoded);
+					controller.close();
+				}
+			});
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset  =  windows-1252" }),
+				ok: true,
+				body: stream,
+			};
+		});
+		let resultSpaced = await (fetcher as any).fetchSingle("https://example.com/spaced-charset");
+		expect(resultSpaced).toBe("Spaced Test Content");
+		(fetcher as any).cache.clear();
+
+		// 4. Missing charset
+		global.fetch = vi.fn().mockImplementation(async () => {
+			const encoder = new TextEncoder();
+			const encoded = encoder.encode("Missing Test Content");
+			const stream = new ReadableStream({
+				start(controller) {
+					controller.enqueue(encoded);
+					controller.close();
+				}
+			});
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				body: stream,
+			};
+		});
+		let resultMissing = await (fetcher as any).fetchSingle("https://example.com/missing-charset");
+		expect(resultMissing).toBe("Missing Test Content");
 		global.fetch = originalFetch;
 	});
 
