@@ -358,4 +358,29 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+
+	it("should fallback to utf-8 if Content-Type charset is missing", async () => {
+		const originalFetch = global.fetch;
+
+		global.fetch = vi.fn().mockImplementation(async () => {
+			const stream = new ReadableStream({
+				start(controller) {
+					controller.enqueue(new TextEncoder().encode("Hello"));
+					controller.close();
+				}
+			});
+
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				body: stream,
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/missing-charset-test");
+		expect(result).toBe("Hello");
+
+		global.fetch = originalFetch;
+	});
 });
