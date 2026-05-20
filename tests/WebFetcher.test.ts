@@ -363,4 +363,35 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+
+	it("should handle quoted charsets and extra whitespace", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async (url) => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": 'text/html; charset="WINDOWS-1252" ' }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let read = false;
+						return {
+							read: async () => {
+								if (!read) {
+									read = true;
+									return { done: false, value: new Uint8Array([0xe9]) }; // 'é' in windows-1252
+								}
+								return { done: true, value: undefined };
+							},
+							cancel: async () => {}
+						};
+					}
+				}
+			};
+		});
+
+		const resultQuoted = await (fetcher as any).fetchSingle("https://example.com/quoted");
+		expect(resultQuoted).toBe("é");
+
+		global.fetch = originalFetch;
+	});
 });

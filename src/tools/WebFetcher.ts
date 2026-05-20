@@ -196,9 +196,9 @@ export class WebFetcher {
 				if (response.body) {
 					reader = response.body.getReader();
 					let charset = "utf-8";
-					const charsetMatch = contentType.match(/charset=([\w-]+)/);
+					const charsetMatch = contentType.match(/charset=['"]?([\w-]+)['"]?/i);
 					if (charsetMatch?.[1]) {
-						charset = charsetMatch[1];
+						charset = charsetMatch[1].trim().toLowerCase();
 					}
 					let decoder: TextDecoder;
 					try {
