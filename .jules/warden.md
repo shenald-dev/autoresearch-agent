@@ -217,10 +217,10 @@ Observed that BOLT effectively optimized the system by reusing the ConfigManager
 **Alignment / Deferred:**
 Aligned the test suite execution. All tests passing. Tagging release v1.0.28 to deploy these updates.
 
-## 2026-05-11 — Assessment & Lifecycle (3)
+## 2026-05-11 — Assessment & Lifecycle (4)
 
 **Observation / Pruned:**
-Pruned additional temporary scratchpad scripts.
+Observed that BOLT successfully implemented dynamic charset decoding. Pruned additional temporary scratchpad scripts.
 
 **Alignment / Deferred:**
-Aligned the test suite execution. Tagging release v1.0.29 to deploy these updates.
+Aligned the test suite execution. Tagging release v1.0.30 to deploy these updates.
