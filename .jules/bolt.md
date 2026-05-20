@@ -124,3 +124,11 @@ Expanded the HTML stripping regex in `WebFetcher` to safely remove complete and 
 ## 2025-05-19 — Dynamic Charset Decoding
 Learning: Hardcoding TextDecoder() without extracting the charset from Content-Type can lead to runtime crashes or incorrect decoding when fetching non-utf-8 web content.
 Action: Always extract the charset using a regex on Content-Type and wrap TextDecoder instantiation in a try-catch fallback to utf-8.
+
+## 2026-05-20 — HTML Comments Stripping Optimization
+
+Learning:
+HTML payloads contain comments (`<!-- ... -->`) which often contain invalid internal tags or massive chunks of commented-out elements. These are entirely useless to text-based LLMs, waste context window tokens, and sometimes evade current stripping strategies if they contain nested tag-like structures.
+
+Action:
+Pre-process HTML strings by stripping all HTML comments using `.replace(/<!--[\s\S]*?-->/g, "")` before executing tag cleanup. This saves valuable context tokens, prevents context window explosion, and mitigates nested tag parsing errors.

@@ -290,6 +290,24 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+
+	it("should strip HTML comments safely", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "<!-- <div> hidden > text --> <p>Main content</p>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-strip-comments");
+		expect(result).toBe("Main content");
+
+		global.fetch = originalFetch;
+	});
+
 	it("should strip boilerplate HTML tags to save context", async () => {
 		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
