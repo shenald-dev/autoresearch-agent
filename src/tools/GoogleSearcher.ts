@@ -2,6 +2,16 @@ import * as p from "@clack/prompts";
 import pc from "picocolors";
 import { ConfigManager } from "../utils/config";
 
+export class HttpError extends Error {
+	constructor(
+		message: string,
+		public status: number,
+	) {
+		super(message);
+		this.name = "HttpError";
+	}
+}
+
 interface SearchResult {
 	title: string;
 	link: string;
@@ -30,6 +40,16 @@ export class GoogleSearcher {
 				return await operation();
 			} catch (error: unknown) {
 				attempt++;
+
+				if (
+					error instanceof HttpError &&
+					error.status >= 400 &&
+					error.status < 500 &&
+					error.status !== 429
+				) {
+					throw error; // Fail fast on client errors (e.g., 401, 403, 404)
+				}
+
 				if (attempt === maxRetries) {
 					throw error;
 				}
@@ -80,7 +100,10 @@ export class GoogleSearcher {
 
 					if (!response.ok) {
 						await response.body?.cancel().catch(() => {});
-						throw new Error(`Serper API HTTP error: ${response.status}`);
+						throw new HttpError(
+							`Serper API HTTP error: ${response.status}`,
+							response.status,
+						);
 					}
 
 					const data = await response.json();
