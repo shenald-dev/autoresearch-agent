@@ -394,4 +394,60 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+
+	it("should default to utf-8 if content-type does not specify a charset or is empty", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async (url) => {
+			if (url.includes("noheader")) {
+				return {
+					status: 200,
+					headers: new Headers(), // no content-type
+					ok: true,
+					body: {
+						getReader: () => {
+							let read = false;
+							return {
+								read: async () => {
+									if (!read) {
+										read = true;
+										return { done: false, value: new Uint8Array([0x61, 0x62, 0x63]) }; // 'abc'
+									}
+									return { done: true, value: undefined };
+								},
+								cancel: async () => {}
+							};
+						}
+					}
+				};
+			}
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }), // no charset
+				ok: true,
+				body: {
+					getReader: () => {
+						let read = false;
+						return {
+							read: async () => {
+								if (!read) {
+									read = true;
+									return { done: false, value: new Uint8Array([0x61, 0x62, 0x63]) }; // 'abc'
+								}
+								return { done: true, value: undefined };
+							},
+							cancel: async () => {}
+						};
+					}
+				}
+			};
+		});
+
+		const resultNoHeader = await (fetcher as any).fetchSingle("https://example.com/noheader");
+		expect(resultNoHeader).toBe("abc");
+
+		const resultNoCharset = await (fetcher as any).fetchSingle("https://example.com/nocharset");
+		expect(resultNoCharset).toBe("abc");
+
+		global.fetch = originalFetch;
+	});
 });
