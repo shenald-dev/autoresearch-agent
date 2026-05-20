@@ -37,6 +37,34 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+	it("should handle extremely malformed HTML edge cases safely", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => `
+					<html>
+						<body>
+							<!-- Unclosed tag that hits EOF -->
+							<nav>
+								Look at this mess
+								<footer>
+									<script>
+						</body>
+					</html>
+				`,
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-malformed");
+
+		expect(result).not.toContain("Look at this mess");
+
+		global.fetch = originalFetch;
+	});
+
 	it("should properly strip nested boilerplate tags", async () => {
 		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
