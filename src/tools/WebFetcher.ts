@@ -198,8 +198,7 @@ export class WebFetcher {
 					let decoder: TextDecoder;
 					try {
 						const match = contentType.match(/charset=['"]?([\w-]+)['"]?/i);
-						const charset = match ? match[1] : "utf-8";
-						decoder = new TextDecoder(charset);
+						decoder = new TextDecoder(match ? match[1] : "utf-8");
 					} catch {
 						decoder = new TextDecoder("utf-8");
 					}
