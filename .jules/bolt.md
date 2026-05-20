@@ -121,6 +121,7 @@ Unnecessary boilerplate elements such as `<nav>`, `<footer>`, `<iframe>`, and `<
 Action:
 Expanded the HTML stripping regex in `WebFetcher` to safely remove complete and unclosed boilerplate tags without touching semantic tags to save LLM context window tokens and improve API efficiency.
 
+<<<<<<< HEAD
 ## 2026-05-18 — TextDecoder Charset Optimization
 
 Learning:
@@ -128,3 +129,8 @@ When decoding fetched HTTP response bodies using `TextDecoder`, defaulting to `u
 
 Action:
 Ensure `TextDecoder` uses the `charset` extracted from the `Content-Type` header (handling optional quotes via regex) and falls back to `utf-8` if the charset is invalid or unsupported. To prevent Biome linting errors, explicitly declare the `decoder` variable with its type (e.g., `let decoder: TextDecoder;`) before the `try...catch` block.
+=======
+## 2025-05-19 — Dynamic Charset Decoding
+Learning: Hardcoding TextDecoder() without extracting the charset from Content-Type can lead to runtime crashes or incorrect decoding when fetching non-utf-8 web content.
+Action: Always extract the charset using a regex on Content-Type and wrap TextDecoder instantiation in a try-catch fallback to utf-8.
+>>>>>>> origin/master
