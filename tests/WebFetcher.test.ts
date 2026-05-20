@@ -307,4 +307,94 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+
+	it("should decode different charsets correctly and fallback to utf-8 safely", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async (url) => {
+			if (url.includes("iso")) {
+				return {
+					status: 200,
+					headers: new Headers({ "content-type": "text/html; charset=iso-8859-1" }),
+					ok: true,
+					body: {
+						getReader: () => {
+							const text = "H\xe9llo W\xf6rld";
+							const uint8Array = new Uint8Array(text.length);
+							for (let i = 0; i < text.length; i++) {
+								uint8Array[i] = text.charCodeAt(i);
+							}
+							let done = false;
+							return {
+								read: async () => {
+									if (done) return { done: true, value: undefined };
+									done = true;
+									return { done: false, value: uint8Array };
+								},
+								cancel: vi.fn()
+							};
+						}
+					}
+				};
+			} else if (url.includes("unsupported")) {
+				return {
+					status: 200,
+					headers: new Headers({ "content-type": "text/html; charset=unsupported-charset" }),
+					ok: true,
+					body: {
+						getReader: () => {
+							const text = "Fallback to UTF-8";
+							const uint8Array = new Uint8Array(text.length);
+							for (let i = 0; i < text.length; i++) {
+								uint8Array[i] = text.charCodeAt(i);
+							}
+							let done = false;
+							return {
+								read: async () => {
+									if (done) return { done: true, value: undefined };
+									done = true;
+									return { done: false, value: uint8Array };
+								},
+								cancel: vi.fn()
+							};
+						}
+					}
+				};
+			} else {
+				return {
+					status: 200,
+					headers: new Headers({ "content-type": "text/html" }),
+					ok: true,
+					body: {
+						getReader: () => {
+							const text = "No charset provided";
+							const uint8Array = new Uint8Array(text.length);
+							for (let i = 0; i < text.length; i++) {
+								uint8Array[i] = text.charCodeAt(i);
+							}
+							let done = false;
+							return {
+								read: async () => {
+									if (done) return { done: true, value: undefined };
+									done = true;
+									return { done: false, value: uint8Array };
+								},
+								cancel: vi.fn()
+							};
+						}
+					}
+				};
+			}
+		});
+
+		const resultIso = await (fetcher as any).fetchSingle("https://example.com/iso");
+		expect(resultIso).toContain("Héllo Wörld");
+
+		const resultUnsupported = await (fetcher as any).fetchSingle("https://example.com/unsupported");
+		expect(resultUnsupported).toContain("Fallback to UTF-8");
+
+		const resultNoCharset = await (fetcher as any).fetchSingle("https://example.com/no-charset");
+		expect(resultNoCharset).toContain("No charset provided");
+
+		global.fetch = originalFetch;
+	});
 });
