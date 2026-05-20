@@ -218,6 +218,53 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+	it("should gracefully handle malformed or non-UTF-8 charsets in Content-Type header", async () => {
+		const originalFetch = global.fetch;
+
+		// 1. Valid non-utf-8 charset
+		global.fetch = vi.fn().mockImplementation(async () => {
+			const encoder = new TextEncoder();
+			const encoded = encoder.encode("Valid Test Content");
+			const stream = new ReadableStream({
+				start(controller) {
+					controller.enqueue(encoded);
+					controller.close();
+				}
+			});
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=windows-1252" }),
+				ok: true,
+				body: stream,
+			};
+		});
+		let result = await (fetcher as any).fetchSingle("https://example.com/windows-1252");
+		expect(result).toBe("Valid Test Content");
+		(fetcher as any).cache.clear();
+
+		// 2. Malformed/Unsupported charset fallback to utf-8
+		global.fetch = vi.fn().mockImplementation(async () => {
+			const encoder = new TextEncoder();
+			const encoded = encoder.encode("Malformed Test Content");
+			const stream = new ReadableStream({
+				start(controller) {
+					controller.enqueue(encoded);
+					controller.close();
+				}
+			});
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=invalid-charset" }),
+				ok: true,
+				body: stream,
+			};
+		});
+		result = await (fetcher as any).fetchSingle("https://example.com/malformed-charset");
+		expect(result).toBe("Malformed Test Content");
+
+		global.fetch = originalFetch;
+	});
+
 	it("should evict normalizedUrl from cache on fetch error", async () => {
 		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
