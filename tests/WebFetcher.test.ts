@@ -297,7 +297,7 @@ describe("WebFetcher", () => {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
 				ok: true,
-				text: async () => "<nav>Navigation</nav><footer>Footer</footer><noscript>No JS</noscript><iframe>Ads</iframe><p>Main content</p>"
+				text: async () => "<nav>Navigation</nav><footer>Footer</footer><iframe>Ads</iframe><p>Main content</p>"
 			};
 		});
 
@@ -315,7 +315,7 @@ describe("WebFetcher", () => {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
 				ok: true,
-				text: async () => "<nav>Navigation</nav><article><h1>The Real Story</h1><p>Here is some text.</p></article><footer>Footer</footer><noscript>No JS</noscript><iframe>Ads</iframe>"
+				text: async () => "<nav>Navigation</nav><article><h1>The Real Story</h1><p>Here is some text.</p></article><footer>Footer</footer><iframe>Ads</iframe>"
 			};
 		});
 
@@ -401,6 +401,29 @@ describe("WebFetcher", () => {
 
 		const result = await (fetcher as any).fetchSingle("https://example.com/fallback-test");
 		expect(result).toBe("a");
+
+		global.fetch = originalFetch;
+	});
+
+	it("should preserve noscript fallback content while stripping the tags", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "<noscript>This site requires JS</noscript><article>Main content</article>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-noscript-content");
+		// The current regex completely removes the <noscript> tag AND its contents.
+		// If the user wants to preserve noscript *content*, the regex must be adjusted to only remove the tag itself,
+		// or not strip noscript at all if they want the content. Wait, the original intent was to REMOVE noscript entirely as boilerplate.
+        // Let's check the regex again: /<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi
+        // It DOES remove the content. The comment says "preserve meaningful noscript content" - if it has meaning, we shouldn't strip it.
+        // Let's remove noscript from the strip regex.
+        expect(result).toContain("This site requires JS");
 
 		global.fetch = originalFetch;
 	});
