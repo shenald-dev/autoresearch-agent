@@ -198,7 +198,15 @@ export class WebFetcher {
 					let decoder: TextDecoder;
 					try {
 						const match = contentType.match(/charset=['"]?([\w-]+)['"]?/i);
-						decoder = new TextDecoder(match ? match[1] : "utf-8");
+						// Handle missing or clearly invalid charsets before passing to TextDecoder
+						let charset = match?.[1] ? match[1].toLowerCase() : "utf-8";
+
+						// Basic validation: must not be empty or too long
+						if (!charset || charset.length > 50) {
+							charset = "utf-8";
+						}
+
+						decoder = new TextDecoder(charset);
 					} catch {
 						decoder = new TextDecoder("utf-8");
 					}

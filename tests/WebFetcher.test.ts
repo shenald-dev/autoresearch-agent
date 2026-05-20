@@ -308,3 +308,63 @@ describe("WebFetcher", () => {
 	});
 
 });
+
+	it("should decode streams dynamically based on content-type charset", async () => {
+		const fetcher = new WebFetcher(3);
+		const originalFetch = global.fetch;
+
+		const encoder = new TextEncoder();
+		const utf8Bytes = encoder.encode("English: Hello");
+
+		// Let's mock a fetch that returns an array buffer wrapped in a reader
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=utf-8" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let called = false;
+						return {
+							read: async () => {
+								if (called) return { done: true, value: undefined };
+								called = true;
+								return { done: false, value: utf8Bytes };
+							},
+							cancel: vi.fn()
+						};
+					}
+				}
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/charset-test");
+		expect(result).toBe("English: Hello");
+
+		// Test fallback
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=unknown-charset-123" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let called = false;
+						return {
+							read: async () => {
+								if (called) return { done: true, value: undefined };
+								called = true;
+								return { done: false, value: utf8Bytes };
+							},
+							cancel: vi.fn()
+						};
+					}
+				}
+			};
+		});
+
+		const resultFallback = await (fetcher as any).fetchSingle("https://example.com/charset-fallback-test");
+		expect(resultFallback).toBe("English: Hello");
+
+		global.fetch = originalFetch;
+	});
