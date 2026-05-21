@@ -342,6 +342,38 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+	it("should fallback to utf-8 if charset is missing", async () => {
+		const fetcher = new WebFetcher(3);
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }), // no charset
+				ok: true,
+				body: {
+					getReader: () => {
+						let done = false;
+						return {
+							read: async () => {
+								if (!done) {
+									done = true;
+									return { done: false, value: new Uint8Array([0x61]) }; // 'a'
+								}
+								return { done: true, value: undefined };
+							},
+							cancel: async () => {},
+						};
+					},
+				},
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/no-charset-test");
+		expect(result).toBe("a");
+
+		global.fetch = originalFetch;
+	});
+
 	it("should fallback to utf-8 if charset is unsupported", async () => {
 		const fetcher = new WebFetcher(3);
 		const originalFetch = global.fetch;
