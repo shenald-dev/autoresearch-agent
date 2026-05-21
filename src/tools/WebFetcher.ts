@@ -196,10 +196,18 @@ export class WebFetcher {
 				let text = "";
 				if (response.body) {
 					reader = response.body.getReader();
+					let charset = "utf-8";
+					if (contentType) {
+						const charsetMatch = contentType.match(
+							/charset=['"]?([\w-]+)['"]?/i,
+						);
+						if (charsetMatch?.[1]) {
+							charset = charsetMatch[1].trim().toLowerCase();
+						}
+					}
 					let decoder: TextDecoder;
 					try {
-						const charset = extractCharset(contentType);
-						decoder = new TextDecoder(charset.trim().toLowerCase());
+						decoder = new TextDecoder(charset);
 					} catch {
 						decoder = new TextDecoder("utf-8");
 					}
