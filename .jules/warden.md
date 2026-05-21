@@ -216,3 +216,19 @@ Observed that BOLT effectively optimized the system by reusing the ConfigManager
 
 **Alignment / Deferred:**
 Aligned the test suite execution. Ran npm update to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.27 to deploy these updates.
+
+## 2026-05-20 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the `WebFetcher` charset extraction by replacing the inline regex parsing logic with a direct call to the shared `extractCharset` utility from `src/utils/http.ts`. This eliminates redundant logic and ensures consistent decoding behavior across the codebase. Checked for dead code using `knip` and discovered `HttpError` was unnecessarily exported in `src/tools/GoogleSearcher.ts`. Removed the unused export.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.29 to deploy these updates.
+
+## 2026-05-13 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively expanded the HTML stripping regex to conserve LLM context tokens by removing boilerplate tags. Verified the changes with the test suite. Scanned for dead code using `knip` and `ts-prune` and pruned unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to safely bump patch/minor dependencies. Cut release v1.0.28 to deploy these performance updates.
