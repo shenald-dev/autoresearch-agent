@@ -4,9 +4,17 @@ All notable changes to autoresearch-agent will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-## [1.0.28] - 2026-05-14
-* **[Pruned]:** Removed temporary merge conflict resolution scripts resolve_changelog.js and resolve_warden.js.
+## [1.0.29] - 2026-05-20
+* **[Optimized]:** Replaced inline charset parsing in WebFetcher with the shared `extractCharset` utility to eliminate duplicate computation.
+* **[Pruned]:** Removed unused `HttpError` export from `GoogleSearcher`.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.28] - 2026-05-14
+* **[Optimized]:** Expanded HTML stripping regex in WebFetcher to remove boilerplate tags without touching semantic structural tags.
+* **[Pruned]:** Removed temporary merge conflict resolution scripts resolve_changelog.js and resolve_warden.js.
+* **[QA]:** Added nested boilerplate tests to WebFetcher to ensure semantic content preservation.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 
 ## [1.0.27] - 2026-05-11
 * **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
