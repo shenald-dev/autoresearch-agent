@@ -208,4 +208,24 @@ Aligned the test suite execution. Ran `npm update` to bump patch/minor dependenc
 Observed that BOLT effectively optimized the system by reusing the ConfigManager instance across services to optimize file reads. Checked for dead code using knip and ts-prune. Verified that bin/cli.js is an essential entry point despite knip flagging it. No dead code found.
 
 **Alignment / Deferred:**
+<<<<<<< HEAD
 Aligned the test suite execution. Ran npm update to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.28 to deploy these updates.
+=======
+Aligned the test suite execution. Ran npm update to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.27 to deploy these updates.
+
+## 2026-05-11 — Assessment & Lifecycle (2)
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the system by reusing the ConfigManager instance. Pruned temporary resolution scripts `resolve_changelog.js` and `resolve_warden.js`.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. All tests passing. Tagging release v1.0.28 to deploy these updates.
+
+## 2026-05-20 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the `WebFetcher` charset extraction by replacing the inline regex parsing logic with a direct call to the shared `extractCharset` utility from `src/utils/http.ts`. This eliminates redundant logic and ensures consistent decoding behavior across the codebase. Checked for dead code using `knip` and discovered `HttpError` was unnecessarily exported in `src/tools/GoogleSearcher.ts`. Removed the unused export.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.29 to deploy these updates.
+>>>>>>> origin/master
