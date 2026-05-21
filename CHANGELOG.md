@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * **Lifecycle:** Verified BOLT optimizations (HTML stripping context deduction, fetch concurrency). Pruned dead resolve script files and applied safe dependency minor/patch updates. Prepared v1.0.28 release.
 * **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
+* **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
 
 ## [1.0.27] - 2026-05-11
 * **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
