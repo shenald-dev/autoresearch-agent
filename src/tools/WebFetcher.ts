@@ -2,6 +2,7 @@ import * as dns from "node:dns/promises";
 import * as url from "node:url";
 import * as ipaddr from "ipaddr.js";
 import pLimit from "p-limit";
+import { extractCharset } from "../utils/http";
 
 export class WebFetcher {
 	private cache: Map<string, Promise<string>>;
@@ -195,7 +196,12 @@ export class WebFetcher {
 				let text = "";
 				if (response.body) {
 					reader = response.body.getReader();
-					const decoder = new TextDecoder();
+					let decoder: TextDecoder;
+					try {
+						decoder = new TextDecoder(extractCharset(contentType));
+					} catch {
+						decoder = new TextDecoder("utf-8");
+					}
 					let totalBytes = 0;
 					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM
 					const chunks: string[] = [];
