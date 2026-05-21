@@ -217,18 +217,18 @@ Observed that BOLT effectively optimized the system by reusing the ConfigManager
 **Alignment / Deferred:**
 Aligned the test suite execution. All tests passing. Tagging release v1.0.28 to deploy these updates.
 
-## 2026-05-11 — Assessment & Lifecycle (5)
+## 2026-05-20 — Assessment & Lifecycle
 
 **Observation / Pruned:**
-Observed that BOLT successfully refactored charset extraction logic. Pruned additional temporary scratchpad scripts.
+Observed that BOLT effectively optimized the `WebFetcher` charset extraction by replacing the inline regex parsing logic with a direct call to the shared `extractCharset` utility from `src/utils/http.ts`. This eliminates redundant logic and ensures consistent decoding behavior across the codebase. Checked for dead code using `knip` and discovered `HttpError` was unnecessarily exported in `src/tools/GoogleSearcher.ts`. Removed the unused export.
 
 **Alignment / Deferred:**
-Aligned the test suite execution. Tagging release v1.0.31 to deploy these updates.
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.29 to deploy these updates.
 
-## 2026-05-11 — Assessment & Lifecycle (6)
+## 2026-05-20 — Assessment & Lifecycle (2)
 
 **Observation / Pruned:**
-Resolved extensive merge conflicts with master, absorbing HTTP utility and fail-fast search optimizations.
+Resolved extensive merge conflicts with master. The changes now correctly integrate shared HTTP charset extraction utilities, `ConfigManager` optimization, fail-fast search behavior, and expanded HTML boilerplate stripping regex.
 
 **Alignment / Deferred:**
-Aligned the test suite execution. All tests pass successfully. Tagging release v1.0.32.
+Aligned the test suite execution. All tests pass successfully. Tagging release v1.0.33.

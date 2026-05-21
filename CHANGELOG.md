@@ -4,20 +4,13 @@ All notable changes to autoresearch-agent will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-## [1.0.32] - 2026-05-11
-* **[Fixed]:** Resolved merge conflicts and consolidated recent optimizations including shared HTTP utilities and fail-fast search logic.
+## [1.0.33] - 2026-05-20
+* **[Fixed]:** Resolved merge conflicts with master and integrated latest agent updates (HTTP utilities, ConfigManager optimization, HTML stripping improvements).
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
-## [1.0.31] - 2026-05-11
-* **[Pruned]:** Removed temporary scratchpad scripts.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.30] - 2026-05-11
-* **[Fixed]:** Abstracted HTTP charset extraction logic into a shared utility `src/utils/http.ts` and implemented dynamic character decoding in `WebFetcher` using `iconv-lite` to correctly handle non-UTF-8 response payloads and prevent garbled content.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.29] - 2026-05-11
-* **[Pruned]:** Removed temporary scratchpad scripts.
+## [1.0.29] - 2026-05-20
+* **[Optimized]:** Replaced inline charset parsing in WebFetcher with the shared `extractCharset` utility to eliminate duplicate computation.
+* **[Pruned]:** Removed unused `HttpError` export from `GoogleSearcher`.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
 ## [1.0.28] - 2026-05-11
