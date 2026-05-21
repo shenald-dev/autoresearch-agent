@@ -308,60 +308,67 @@ describe("WebFetcher", () => {
 	});
 
 
-	it("should decode non-utf8 text based on charset and fallback safely", async () => {
+	it("should decode response body correctly using charset from Content-Type", async () => {
+		const fetcher = new WebFetcher(3);
 		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async (url) => {
-			if (url.includes("windows")) {
-				return {
-					status: 200,
-					headers: new Headers({ "content-type": "text/html; charset=windows-1252" }),
-					ok: true,
-					body: {
-						getReader: () => {
-							let read = false;
-							return {
-								read: async () => {
-									if (!read) {
-										read = true;
-										return { done: false, value: new Uint8Array([0xe9]) }; // 'é' in windows-1252
-									}
-									return { done: true, value: undefined };
-								},
-								cancel: async () => {}
-							};
-						}
-					}
-				};
-			}
+		global.fetch = vi.fn().mockImplementation(async () => {
 			return {
 				status: 200,
-				headers: new Headers({ "content-type": "text/html; charset=invalid-charset" }),
+				headers: new Headers({ "content-type": "text/html; charset=ISO-8859-1" }),
 				ok: true,
 				body: {
 					getReader: () => {
-						let read = false;
+						let done = false;
 						return {
 							read: async () => {
-								if (!read) {
-									read = true;
-									return { done: false, value: new Uint8Array([0x61, 0x62, 0x63]) }; // 'abc'
+								if (!done) {
+									done = true;
+									// 0xe9 is 'é' in ISO-8859-1
+									return { done: false, value: new Uint8Array([0xe9]) };
 								}
 								return { done: true, value: undefined };
 							},
-							cancel: async () => {}
+							cancel: async () => {},
 						};
-					}
-				}
+					},
+				},
 			};
 		});
 
-		const resultWindows = await (fetcher as any).fetchSingle("https://example.com/windows");
-		expect(resultWindows).toBe("é");
-
-		const resultInvalid = await (fetcher as any).fetchSingle("https://example.com/invalid");
-		expect(resultInvalid).toBe("abc");
+		const result = await (fetcher as any).fetchSingle("https://example.com/iso-test");
+		expect(result).toBe("é");
 
 		global.fetch = originalFetch;
+	});
+
+	it("should fallback to utf-8 if charset is unsupported", async () => {
+		const fetcher = new WebFetcher(3);
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=unsupported-charset" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let done = false;
+						return {
+							read: async () => {
+								if (!done) {
+									done = true;
+									return { done: false, value: new Uint8Array([0x61]) }; // 'a'
+								}
+								return { done: true, value: undefined };
+							},
+							cancel: async () => {},
+						};
+					},
+				},
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/fallback-test");
+		expect(result).toBe("a");
 	});
 
 	it("should handle quoted charsets and extra whitespace", async () => {
