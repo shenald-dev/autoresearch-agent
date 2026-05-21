@@ -330,4 +330,39 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+
+	it("should correctly handle and strip nested boilerplate tags", async () => {
+		const originalFetch = global.fetch;
+
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => `
+					<html>
+						<body>
+							<p>Important Content</p>
+							<footer>
+								<div>
+									<nav>
+										<ul><li>Nested Drop Link</li></ul>
+									</nav>
+									<p>Nested Drop Copyright</p>
+								</div>
+							</footer>
+						</body>
+					</html>
+				`,
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/nested-strip");
+
+		expect(result).toContain("Important Content");
+		expect(result).not.toContain("Nested Drop Link");
+		expect(result).not.toContain("Nested Drop Copyright");
+
+		global.fetch = originalFetch;
+	});
 });
