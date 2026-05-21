@@ -4,13 +4,9 @@ All notable changes to autoresearch-agent will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-<<<<<<< HEAD
-## [1.0.27] - 2026-05-11
-* **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-* **[Performance]:** Expanded HTML stripping regex in WebFetcher to include `<nav>`, `<footer>`, `<iframe>`, and `<noscript>` tags, conserving LLM context tokens and reducing parsing payload size.
-=======
 ## [1.0.29] - 2026-05-20
+* **[Performance]:** Expanded HTML stripping regex in WebFetcher to include boilerplate elements like `<nav>`, `<footer>`, `<iframe>`, and `<noscript>` tags, conserving LLM context tokens and reducing parsing payload size without breaking self-closing or nested variants.
+* **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
 * **[Optimized]:** Replaced inline charset parsing in WebFetcher with the shared `extractCharset` utility to eliminate duplicate computation.
 * **[Pruned]:** Removed unused `HttpError` export from `GoogleSearcher`.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
@@ -21,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.27] - 2026-05-11
 * **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
->>>>>>> origin/master
+
 
 ## [1.0.25] - 2026-05-04
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
