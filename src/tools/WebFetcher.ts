@@ -229,7 +229,7 @@ export class WebFetcher {
 
 				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
 				const strippedText = text
-					.replace(/<!--[\s\S]*?-->/g, "") // Remove HTML comments early
+					.replace(/<!--[\s\S]*?-->/g, "") // Remove HTML comments early. Note: Safe because <script>/<style> blocks are removed entirely in the next step.
 					.replace(
 						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
 						"",
