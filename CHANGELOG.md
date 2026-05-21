@@ -4,10 +4,16 @@ All notable changes to autoresearch-agent will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+<<<<<<< HEAD
+## [1.0.28] - 2026-05-12
+* **[Pruned]:** Checked for dead code using `knip`. Pruned `resolve_changelog.js` and `resolve_warden.js` which are unused files, but preserved `bin/cli.js` as it is an essential entry point despite `knip` flagging it.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+=======
 
 ## [1.0.28] - 2026-05-11
 * **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
 
+>>>>>>> jules-16356879769424577070-88b5fc12
 
 ## [1.0.27] - 2026-05-11
 * **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
