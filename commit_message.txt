@@ -1,3 +1,0 @@
-test(fetcher): add test for missing charset fallback (dummy commit to trigger update 2)
-
-Triggering an empty commit to ensure the pull request state updates on GitHub side, as all review requests have been met.
