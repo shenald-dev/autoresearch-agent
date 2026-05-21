@@ -3,6 +3,7 @@ import * as url from "node:url";
 import { load } from "cheerio";
 import * as ipaddr from "ipaddr.js";
 import pLimit from "p-limit";
+import { extractCharset } from "../utils/http";
 
 export class WebFetcher {
 	private cache: Map<string, Promise<string>>;
