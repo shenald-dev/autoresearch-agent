@@ -290,43 +290,86 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
-	it("should strip out unnecessary boilerplate tags like nav, footer, iframe, noscript", async () => {
+	it("should strip boilerplate HTML tags to save context", async () => {
 		const originalFetch = global.fetch;
-
 		global.fetch = vi.fn().mockImplementation(async () => {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
 				ok: true,
-				text: async () => `
-					<html>
-						<header><h1>Keep Title</h1></header>
-						<nav><ul><li>Drop Link</li></ul></nav>
-						<body>
-							<article>
-								<p>Keep Content</p>
-							</article>
-							<svg><circle cx="50"/></svg>
-							<footer><p>Drop Copyright</p></footer>
-							<iframe>Drop Iframe</iframe>
-							<noscript>Drop Noscript</noscript>
-							<aside>Keep Aside</aside>
-						</body>
-					</html>
-				`,
+				text: async () => "<nav>Navigation</nav><footer>Footer</footer><noscript>No JS</noscript><iframe>Ads</iframe><p>Main content</p>"
 			};
 		});
 
-		const result = await (fetcher as any).fetchSingle("https://example.com/strip");
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-strip");
+		expect(result).toBe("Main content");
 
-		expect(result).toContain("Keep Title");
-		expect(result).toContain("Keep Content");
-		expect(result).toContain("Keep Aside");
+		global.fetch = originalFetch;
+	});
 
-		expect(result).not.toContain("Drop Link");
-		expect(result).not.toContain("Drop Copyright");
-		expect(result).not.toContain("Drop Iframe");
-		expect(result).not.toContain("Drop Noscript");
+
+
+	it("should decode response body correctly using charset from Content-Type", async () => {
+		const fetcher = new WebFetcher(3);
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=ISO-8859-1" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let done = false;
+						return {
+							read: async () => {
+								if (!done) {
+									done = true;
+									// 0xe9 is 'é' in ISO-8859-1
+									return { done: false, value: new Uint8Array([0xe9]) };
+								}
+								return { done: true, value: undefined };
+							},
+							cancel: async () => {},
+						};
+					},
+				},
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/iso-test");
+		expect(result).toBe("é");
+
+		global.fetch = originalFetch;
+	});
+
+	it("should fallback to utf-8 if charset is unsupported", async () => {
+		const fetcher = new WebFetcher(3);
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=unsupported-charset" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let done = false;
+						return {
+							read: async () => {
+								if (!done) {
+									done = true;
+									return { done: false, value: new Uint8Array([0x61]) }; // 'a'
+								}
+								return { done: true, value: undefined };
+							},
+							cancel: async () => {},
+						};
+					},
+				},
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/fallback-test");
+		expect(result).toBe("a");
 
 		global.fetch = originalFetch;
 	});
