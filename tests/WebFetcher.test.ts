@@ -111,7 +111,7 @@ describe("WebFetcher", () => {
 				body: stream,
 			};
 		});
-		let resultSpaced = await (fetcher as any).fetchSingle("https://example.com/spaced-charset");
+		const resultSpaced = await (fetcher as any).fetchSingle("https://example.com/spaced-charset");
 		expect(resultSpaced).toBe("Spaced Test Content");
 		(fetcher as any).cache.clear();
 
@@ -132,7 +132,7 @@ describe("WebFetcher", () => {
 				body: stream,
 			};
 		});
-		let resultMissing = await (fetcher as any).fetchSingle("https://example.com/missing-charset");
+		const resultMissing = await (fetcher as any).fetchSingle("https://example.com/missing-charset");
 		expect(resultMissing).toBe("Missing Test Content");
 		global.fetch = originalFetch;
 	});
@@ -254,123 +254,6 @@ describe("WebFetcher", () => {
 			"Mocked content",
 		);
 		expect(results.get("https://example.com/docs")).toBe("Mocked content");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should decode response body correctly using charset from Content-Type", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html; charset=ISO-8859-1" }),
-				ok: true,
-				body: {
-					getReader: () => {
-						let done = false;
-						return {
-							read: async () => {
-								if (!done) {
-									done = true;
-									// 0xe9 is 'é' in ISO-8859-1
-									return { done: false, value: new Uint8Array([0xe9]) };
-								}
-								return { done: true, value: undefined };
-							},
-							cancel: async () => {},
-						};
-					},
-				},
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/iso-test");
-		expect(result).toBe("é");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should fallback to utf-8 if charset is unsupported", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html; charset=unsupported-charset" }),
-				ok: true,
-				body: {
-					getReader: () => {
-						let done = false;
-						return {
-							read: async () => {
-								if (!done) {
-									done = true;
-									return { done: false, value: new Uint8Array([0x61]) }; // 'a'
-								}
-								return { done: true, value: undefined };
-							},
-							cancel: async () => {},
-						};
-					},
-				},
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/fallback-test");
-		expect(result).toBe("a");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should handle extra spaces in Content-Type gracefully", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-
-		global.fetch = vi.fn().mockImplementation(async () => {
-			const encoder = new TextEncoder();
-			const encoded = encoder.encode("Spaced Test Content");
-			const stream = new ReadableStream({
-				start(controller) {
-					controller.enqueue(encoded);
-					controller.close();
-				}
-			});
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html; charset  =  windows-1252" }),
-				ok: true,
-				body: stream,
-			};
-		});
-		const resultSpaced = await (fetcher as any).fetchSingle("https://example.com/spaced-charset");
-		expect(resultSpaced).toBe("Spaced Test Content");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should handle missing charset in Content-Type gracefully", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-
-		global.fetch = vi.fn().mockImplementation(async () => {
-			const encoder = new TextEncoder();
-			const encoded = encoder.encode("Missing Test Content");
-			const stream = new ReadableStream({
-				start(controller) {
-					controller.enqueue(encoded);
-					controller.close();
-				}
-			});
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-				body: stream,
-			};
-		});
-		const resultMissing = await (fetcher as any).fetchSingle("https://example.com/missing-charset");
-		expect(resultMissing).toBe("Missing Test Content");
 
 		global.fetch = originalFetch;
 	});
