@@ -228,6 +228,7 @@ export class WebFetcher {
 				}
 
 				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
+				// Note: HTML comments are preemptively stripped here to save context tokens and prevent parsing anomalies.
 				const strippedText = text
 					.replace(/<!--[\s\S]*?-->/g, "")
 					.replace(

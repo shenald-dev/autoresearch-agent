@@ -116,6 +116,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **[Fixed]:** Resolved Biome linter warnings by strictly organizing imports and using `node:` protocol for built-in modules.
 * **[Changed]:** Bumped minor/patch versions of dependencies (`npm update`).
 
+## [1.0.32] - 2026-05-22
+
+### Changed
+* **[Documentation]:** Aligned documentation to reflect the recent optimizations to HTML comment stripping in `WebFetcher`, saving context tokens.
+* **[Maintenance]:** Applied safe minor/patch dependency bumps via `npm update`.
+
 ## [0.1.0] - YYYY-MM-DD
 
 ### Added
