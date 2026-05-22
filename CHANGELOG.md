@@ -4,6 +4,10 @@ All notable changes to autoresearch-agent will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.0.34] - 2026-05-20
+* **[Fixed]:** Integrated recent optimizations and securely merged conflicts with the `master` branch, retaining shared HTTP extraction logic and ensuring test alignments.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 ## [1.0.33] - 2026-05-20
 * **[Fixed]:** Resolved merge conflicts with master and integrated latest agent updates (HTTP utilities, ConfigManager optimization, HTML stripping improvements).
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
