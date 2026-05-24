@@ -224,3 +224,11 @@ Observed that BOLT effectively optimized the `WebFetcher` charset extraction by 
 
 **Alignment / Deferred:**
 Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.29 to deploy these updates.
+
+## 2026-05-22 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the context tokens by preemptively stripping HTML comments before the main regex in `WebFetcher`. Checked for dead code using `knip` and `ts-prune` and found no unused files or exports other than the entrypoint `bin/cli.js`.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
