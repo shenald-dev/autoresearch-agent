@@ -180,11 +180,15 @@ export class WebFetcher {
 				const contentType = (
 					response.headers.get("content-type") || ""
 				).toLowerCase();
-				if (
-					contentType.includes("application/pdf") ||
-					contentType.includes("image/") ||
-					contentType.includes("video/")
-				) {
+
+				const isTextBased =
+					contentType === "" ||
+					contentType.includes("text/") ||
+					contentType.includes("application/json") ||
+					contentType.includes("application/xml") ||
+					contentType.includes("application/xhtml+xml");
+
+				if (!isTextBased) {
 					await response.body?.cancel().catch((err) => {
 						console.warn("WebFetcher cancel error:", err);
 					});

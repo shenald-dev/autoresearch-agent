@@ -127,3 +127,11 @@ Action: Always extract the charset using a regex on Content-Type and wrap TextDe
 ## 2026-05-21 — Preemptive HTML Comment Stripping
 Learning: Web documents frequently contain massive HTML comments that may harbor nested, unbroken, or malformed tags, which can trigger parsing anomalies and waste substantial LLM context tokens.
 Action: Preemptively strip all HTML comments using regex before standard boilerplate tag cleanup during document processing.
+
+## 2026-05-25 — Strict Content-Type Whitelisting
+
+Learning:
+Relying on a blacklist for `Content-Type` headers (e.g., rejecting only PDFs, images, and videos) is insecure and fragile. Malicious or generic binary payloads (like `application/zip` or `application/octet-stream`) can bypass the blacklist, causing the system to download and process useless non-text data, leading to memory exhaustion (OOM) and wasted context tokens.
+
+Action:
+Replaced the Content-Type blacklist with a strict whitelist. Now, the system only accepts known text-based formats (e.g., `text/*`, `application/json`, `application/xml`) or empty types. Any unrecognized format is immediately rejected, cleanly aborting the stream.
