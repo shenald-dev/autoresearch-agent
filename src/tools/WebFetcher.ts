@@ -83,9 +83,7 @@ export class WebFetcher {
 
 			this.hostValidationCache.set(hostname, validationPromise);
 
-			validationPromise.finally(() => {
-				this.hostValidationCache.delete(hostname);
-			});
+			// Retain DNS validation in cache to prevent redundant lookups for same hostname
 
 			return validationPromise;
 		} catch {
