@@ -121,6 +121,12 @@ Unnecessary boilerplate elements such as `<nav>`, `<footer>`, `<iframe>`, and `<
 Action:
 Expanded the HTML stripping regex in `WebFetcher` to safely remove complete and unclosed boilerplate tags without touching semantic tags to save LLM context window tokens and improve API efficiency.
 
+## 2026-05-21 — Preemptive HTML Comment Stripping
+Learning: Web documents frequently contain massive HTML comments that may harbor nested, unbroken, or malformed tags, which can trigger parsing anomalies and waste substantial LLM context tokens.
+Action: Preemptively strip all HTML comments using regex before standard boilerplate tag cleanup during document processing.
+## 2026-05-26 — Strict Allowlist for Fetch Content Types
+Learning: A blocklist approach for rejecting non-text payloads (e.g., matching 'pdf', 'image/', 'video/') allows other arbitrary binaries (like zip, exe, audio) to be downloaded up to the 500KB limit, wasting bandwidth, memory, and CPU decoding garbage data.
+Action: Implemented a strict allowlist in WebFetcher that only processes `text/`, `application/json`, `application/xml`, and `application/xhtml`, aggressively aborting streams for all other binary formats early.
 ## 2026-05-14 — Content-Type Charset Decoding
 
 Learning:
