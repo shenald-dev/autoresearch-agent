@@ -1,10 +1,10 @@
-## 2026-05-13 — Assessment & Lifecycle
+## 2026-05-26 — Assessment & Lifecycle
 
 **Observation / Pruned:**
-Observed that BOLT effectively expanded the HTML stripping regex to conserve LLM context tokens by removing boilerplate tags. Verified the changes with the test suite. Scanned for dead code using `knip` and `ts-prune` and pruned unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
+Observed that BOLT effectively optimized HTML stripping in `WebFetcher` to preemptively remove HTML comments to save context tokens. Checked for dead code using `knip` and verified that `bin/cli.js` is an essential entry point. Added an explicit unit test to `tests/WebFetcher.test.ts` to verify the HTML comment stripping functionality.
 
 **Alignment / Deferred:**
-Aligned the test suite execution. Ran `npm update` to safely bump patch/minor dependencies. Cut release v1.0.28 to deploy these performance updates.
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
 
 ## 2026-05-03 — Assessment & Lifecycle
 
@@ -216,6 +216,14 @@ Observed that BOLT effectively optimized the system by reusing the ConfigManager
 
 **Alignment / Deferred:**
 Aligned the test suite execution. Ran npm update to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.27 to deploy these updates.
+
+## 2026-05-26 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized HTML stripping in `WebFetcher` to preemptively remove HTML comments to save context tokens. Checked for dead code using `knip` and verified that `bin/cli.js` is an essential entry point. Added an explicit unit test to `tests/WebFetcher.test.ts` to verify the HTML comment stripping functionality.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
 
 ## 2026-05-20 — Assessment & Lifecycle
 
