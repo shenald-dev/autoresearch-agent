@@ -388,4 +388,22 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+
+	it("should strip HTML comments to save context tokens", async () => {
+		const fetcher = new WebFetcher(3);
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "<p>Before</p><!-- This is a large HTML comment that should be removed --><p>After</p>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-comment-strip");
+		expect(result).toBe("Before After");
+
+		global.fetch = originalFetch;
+	});
 });

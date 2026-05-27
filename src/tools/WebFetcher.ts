@@ -180,15 +180,14 @@ export class WebFetcher {
 				const contentType = (
 					response.headers.get("content-type") || ""
 				).toLowerCase();
-
-				const isTextBased =
-					contentType === "" ||
-					contentType.includes("text/") ||
-					contentType.includes("application/json") ||
-					contentType.includes("application/xml") ||
-					contentType.includes("application/xhtml+xml");
-
-				if (!isTextBased) {
+				// Enforce strict allowlist of text-based content types to prevent downloading arbitrary large binaries
+				if (
+					contentType &&
+					!contentType.includes("text/") &&
+					!contentType.includes("application/json") &&
+					!contentType.includes("application/xml") &&
+					!contentType.includes("application/xhtml")
+				) {
 					await response.body?.cancel().catch((err) => {
 						console.warn("WebFetcher cancel error:", err);
 					});
