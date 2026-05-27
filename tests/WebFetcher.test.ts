@@ -97,6 +97,39 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+	it("should correctly handle and strip malformed nested boilerplate tags", async () => {
+		const originalFetch = global.fetch;
+
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => `
+					<html>
+						<body>
+							<p>Important Content</p>
+							<footer>
+								<nav>
+									<!-- Malformed unclosed tags inside -->
+									<ul><li><noscript>Malformed <iframe> Content
+								</nav>
+							</footer>
+						</body>
+					</html>
+				`,
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/malformed-nested-strip");
+
+		expect(result).toContain("Important Content");
+		expect(result).not.toContain("Malformed");
+		expect(result).not.toContain("Malformed <iframe> Content");
+
+		global.fetch = originalFetch;
+	});
+
 	it("should cancel unconsumed response bodies during redirect loops to prevent socket leaks", async () => {
 		const originalFetch = global.fetch;
 		const mockCancel = vi.fn().mockResolvedValue(undefined);
