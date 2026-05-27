@@ -128,3 +128,10 @@ When decoding fetched HTTP response bodies using `TextDecoder`, assuming `utf-8`
 
 Action:
 Extract the `charset` from the `Content-Type` header using a regex that handles optional quotes (e.g., `contentType.match(/charset=['"]?([\w-]+)['"]?/i)`) to instantiate `TextDecoder(charset)`. Always wrap this instantiation in a `try...catch` block with a fallback to `new TextDecoder('utf-8')` to prevent runtime crashes from invalid or unsupported character sets.
+
+## 2026-05-21 — Preemptive HTML Comment Stripping
+Learning: Web documents frequently contain massive HTML comments that may harbor nested, unbroken, or malformed tags, which can trigger parsing anomalies and waste substantial LLM context tokens.
+Action: Preemptively strip all HTML comments using regex before standard boilerplate tag cleanup during document processing.
+## 2026-05-26 — Strict Allowlist for Fetch Content Types
+Learning: A blocklist approach for rejecting non-text payloads (e.g., matching 'pdf', 'image/', 'video/') allows other arbitrary binaries (like zip, exe, audio) to be downloaded up to the 500KB limit, wasting bandwidth, memory, and CPU decoding garbage data.
+Action: Implemented a strict allowlist in WebFetcher that only processes `text/`, `application/json`, `application/xml`, and `application/xhtml`, aggressively aborting streams for all other binary formats early.

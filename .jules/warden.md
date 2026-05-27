@@ -1,3 +1,11 @@
+## 2026-05-26 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized HTML stripping in `WebFetcher` to preemptively remove HTML comments to save context tokens. Checked for dead code using `knip` and verified that `bin/cli.js` is an essential entry point. Added an explicit unit test to `tests/WebFetcher.test.ts` to verify the HTML comment stripping functionality.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
+
 ## 2026-05-03 — Assessment & Lifecycle
 
 **Observation / Pruned:**
