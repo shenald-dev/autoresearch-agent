@@ -417,13 +417,24 @@ describe("WebFetcher", () => {
 		});
 
 		const result = await (fetcher as any).fetchSingle("https://example.com/test-noscript-content");
-		// The current regex completely removes the <noscript> tag AND its contents.
-		// If the user wants to preserve noscript *content*, the regex must be adjusted to only remove the tag itself,
-		// or not strip noscript at all if they want the content. Wait, the original intent was to REMOVE noscript entirely as boilerplate.
-        // Let's check the regex again: /<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi
-        // It DOES remove the content. The comment says "preserve meaningful noscript content" - if it has meaning, we shouldn't strip it.
-        // Let's remove noscript from the strip regex.
         expect(result).toContain("This site requires JS");
+
+		global.fetch = originalFetch;
+	});
+
+	it("should strip HTML comments to save context tokens", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "<p>Before</p><!-- This is a large HTML comment that should be removed --><p>After</p>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-comment-strip");
+		expect(result).toBe("Before After");
 
 		global.fetch = originalFetch;
 	});
