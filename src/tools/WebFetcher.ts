@@ -181,10 +181,13 @@ export class WebFetcher {
 				const contentType = (
 					response.headers.get("content-type") || ""
 				).toLowerCase();
+				// Enforce strict allowlist of text-based content types to prevent downloading arbitrary large binaries
 				if (
-					contentType.includes("application/pdf") ||
-					contentType.includes("image/") ||
-					contentType.includes("video/")
+					contentType &&
+					!contentType.includes("text/") &&
+					!contentType.includes("application/json") &&
+					!contentType.includes("application/xml") &&
+					!contentType.includes("application/xhtml")
 				) {
 					await response.body?.cancel().catch((err) => {
 						console.warn("WebFetcher cancel error:", err);
@@ -199,8 +202,7 @@ export class WebFetcher {
 					reader = response.body.getReader();
 					let decoder: TextDecoder;
 					try {
-						const match = contentType.match(/charset=['"]?([\w-]+)['"]?/i);
-						decoder = new TextDecoder(match ? match[1] : "utf-8");
+						decoder = new TextDecoder(extractCharset(contentType));
 					} catch {
 						decoder = new TextDecoder("utf-8");
 					}
@@ -230,9 +232,12 @@ export class WebFetcher {
 				}
 
 				// Robust HTML to Text stripping using Cheerio
-				const $ = load(text);
+				// First safely strip comments to ensure proper spacing if elements were only separated by comments
+				const htmlWithoutComments = text.replace(/<!--[\s\S]*?-->/g, " ");
+				const $ = load(htmlWithoutComments);
 				$("script, style, svg, nav, footer, iframe, noscript").remove();
-				const strippedText = $.text().replace(/\s+/g, " ").trim();
+				// Use .text() but add spaces between block elements to avoid concatenating text from different tags
+				const strippedText = $("body").text().replace(/\s+/g, " ").trim();
 
 				const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
 				return truncated;
