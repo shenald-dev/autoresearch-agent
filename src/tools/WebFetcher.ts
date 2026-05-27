@@ -2,6 +2,7 @@ import * as dns from "node:dns/promises";
 import * as url from "node:url";
 import * as ipaddr from "ipaddr.js";
 import pLimit from "p-limit";
+import { extractCharset } from "../utils/http";
 
 export class WebFetcher {
 	private cache: Map<string, Promise<string>>;
@@ -179,10 +180,13 @@ export class WebFetcher {
 				const contentType = (
 					response.headers.get("content-type") || ""
 				).toLowerCase();
+				// Enforce strict allowlist of text-based content types to prevent downloading arbitrary large binaries
 				if (
-					contentType.includes("application/pdf") ||
-					contentType.includes("image/") ||
-					contentType.includes("video/")
+					contentType &&
+					!contentType.includes("text/") &&
+					!contentType.includes("application/json") &&
+					!contentType.includes("application/xml") &&
+					!contentType.includes("application/xhtml")
 				) {
 					await response.body?.cancel().catch((err) => {
 						console.warn("WebFetcher cancel error:", err);
@@ -197,8 +201,7 @@ export class WebFetcher {
 					reader = response.body.getReader();
 					let decoder: TextDecoder;
 					try {
-						const match = contentType.match(/charset=['"]?([\w-]+)['"]?/i);
-						decoder = new TextDecoder(match ? match[1] : "utf-8");
+						decoder = new TextDecoder(extractCharset(contentType));
 					} catch {
 						decoder = new TextDecoder("utf-8");
 					}
@@ -229,6 +232,7 @@ export class WebFetcher {
 
 				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
 				const strippedText = text
+					.replace(/<!--[\s\S]*?-->/g, "")
 					.replace(
 						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
 						"",
