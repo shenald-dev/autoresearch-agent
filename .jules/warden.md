@@ -1,3 +1,19 @@
+## 2026-05-26 — Assessment & Lifecycle (2)
+
+**Observation / Pruned:**
+Successfully resolved compounding merge conflicts with master, absorbing and protecting the strict `Content-Type` allowlist and the HTML comment stripping regex, ensuring no regressions to recent optimizations.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Tagging release v1.0.35 to cleanly push the consolidated state.
+
+## 2026-05-26 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized HTML stripping in `WebFetcher` to preemptively remove HTML comments to save context tokens. Checked for dead code using `knip` and verified that `bin/cli.js` is an essential entry point. Added an explicit unit test to `tests/WebFetcher.test.ts` to verify the HTML comment stripping functionality.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
+
 ## 2026-05-03 — Assessment & Lifecycle
 
 **Observation / Pruned:**
@@ -224,11 +240,3 @@ Observed that BOLT effectively optimized the `WebFetcher` charset extraction by 
 
 **Alignment / Deferred:**
 Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.29 to deploy these updates.
-
-## 2026-05-20 — Assessment & Lifecycle (3)
-
-**Observation / Pruned:**
-Resolved successive merge conflicts with `master`. Assured that shared HTTP logic for fetching remains intact.
-
-**Alignment / Deferred:**
-Aligned the test suite execution. All tests pass successfully. Tagging release v1.0.34.
