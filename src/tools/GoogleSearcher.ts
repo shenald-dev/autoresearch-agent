@@ -2,7 +2,7 @@ import * as p from "@clack/prompts";
 import pc from "picocolors";
 import { ConfigManager } from "../utils/config";
 
-class HttpError extends Error {
+export class HttpError extends Error {
 	constructor(
 		message: string,
 		public status: number,
