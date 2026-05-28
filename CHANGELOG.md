@@ -4,8 +4,12 @@ All notable changes to autoresearch-agent will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-## [1.0.35] - 2026-05-26
-* **[Fixed]:** Resolved complex merge conflicts with `master`, strictly retaining the preemptive HTML comment stripping, the strict Content-Type allowlist, and all previously consolidated optimizations for HTTP fetching and charset decoding.
+## [1.0.36] - 2026-05-27
+* **[Fixed]:** Successfully resolved cascading merge conflicts with the `master` branch, meticulously protecting the strict `Content-Type` allowlist, the preemptive HTML comment stripping, and all previously consolidated optimizations for HTTP fetching and charset decoding.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.31] - 2026-05-27
+* **[Security]:** Enforced strict Content-Type allowlist in WebFetcher to prevent downloading arbitrary large binaries.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
 ## [1.0.30] - 2026-05-26
