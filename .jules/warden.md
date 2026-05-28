@@ -231,3 +231,11 @@ Observed that BOLT effectively optimized the `WebFetcher` charset extraction by 
 
 **Alignment / Deferred:**
 Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.29 to deploy these updates.
+
+## 2026-05-27 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT successfully enforced a strict `Content-Type` allowlist in `WebFetcher` to prevent downloading arbitrary large binaries. Checked for dead code using `knip` and verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
+
+**Alignment / Deferred:**
+Pinned `console-table-printer` to `2.15.0` to prevent a test failure during dependency updates. Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.31 to deploy these updates.
