@@ -231,6 +231,10 @@ export class WebFetcher {
 				}
 
 				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
+				// Note: Regex-based HTML stripping is limited and can struggle with severely malformed HTML.
+				// However, for the scope of extracting textual context for LLMs, these non-greedy regexes
+				// combined with the 500KB payload limit provide excellent performance and sufficient reliability
+				// without introducing large DOM parsing dependencies (which would impact startup time).
 				const strippedText = text
 					.replace(/<!--[\s\S]*?-->/g, "")
 					.replace(
