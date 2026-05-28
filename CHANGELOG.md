@@ -17,7 +17,7 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
    - [1.0.30] - 2026-05-26   [but note: in the base, the version 1.0.30 is actually listed as 1.0.30? Let me check the context]
 
  However, the context for base says:
-   Base (master): 
+   Base (master):
         - ## [1.0.27] - 2026-05-11   -> becomes + ## [1.0.31] - 2026-05-27
         - ## [1.0.25] - 2026-05-04   -> becomes + ## [1.0.30] - 2026-05-26
         - ## [1.0.24] - 2026-05-03   -> becomes (removed) and then + ## [1.0.29] - 2026-05-20
@@ -45,7 +45,7 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
 
  Let me re-read the context for base:
 
-   Base (master): 
+   Base (master):
         - ## [1.0.27] - 2026-05-11   [this is removed from the ancestor]
         + ## [1.0.31] - 2026-05-27   [added]
 
@@ -72,14 +72,14 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
 
  How to resolve?
 
- We are told: 
+ We are told:
    - This is a TRUE CONFLICT: both branches modified the same file from the same ancestor.
    - We must keep ALL meaningful changes from BOTH branches.
 
  Approach:
 
  We note that the base branch (master) has a version 1.0.31 that the head branch does not have.
- The head branch has versions 1.0.30, 1.0.29, 1.0.28 that the base branch also has? 
+ The head branch has versions 1.0.30, 1.0.29, 1.0.28 that the base branch also has?
 
  But wait: the base branch context shows that it has:
    [1.0.31] (added)
@@ -113,19 +113,19 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
 
    And then it shows that the base branch (which we are comparing against) has at the same location (after the header) the version [1.0.27] and below.
 
-   But note: the base branch actually has [1.0.30] and [1.0.29] and [1.0.28] as well? 
+   But note: the base branch actually has [1.0.30] and [1.0.29] and [1.0.28] as well?
 
-   How can we tell? The base branch context shows that it added [1.0.30], [1.0.29], [1.0.28] and [1.0.31]. 
+   How can we tell? The base branch context shows that it added [1.0.30], [1.0.29], [1.0.28] and [1.0.31].
 
-   However, the Git Diff (Head changes vs base) does not show a conflict in the [1.0.30] section? It only shows the head branch adding [1.0.30] and then the base branch having [1.0.27] at that point? 
+   However, the Git Diff (Head changes vs base) does not show a conflict in the [1.0.30] section? It only shows the head branch adding [1.0.30] and then the base branch having [1.0.27] at that point?
 
-   This suggests that the base branch, at the point where the head branch is adding [1.0.30], actually has the version [1.0.27] (from the ancestor) and then the base branch has updated that to [1.0.31] and then later inserted [1.0.30] and so on? 
+   This suggests that the base branch, at the point where the head branch is adding [1.0.30], actually has the version [1.0.27] (from the ancestor) and then the base branch has updated that to [1.0.31] and then later inserted [1.0.30] and so on?
 
    This is very confusing.
 
  Let me try to reconstruct the base branch and head branch from the ancestor.
 
- Ancestor: 
+ Ancestor:
    We don't have the full ancestor, but we know that the ancestor had a changelog that included versions up to at least 1.0.27 (because both base and head show changes starting from 1.0.27).
 
  Base branch (master) changes relative to ancestor:
@@ -163,7 +163,7 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
 
    In the base branch, at the location where the head branch is adding the three versions (1.0.30, 1.0.29, 1.0.28), the base branch has the version 1.0.27 (from the ancestor) and then the versions below.
 
-   But wait: the base branch context shows that it has already updated the version 1.0.27 to 1.0.31? And then inserted 1.0.30, 1.0.29, 1.0.28? 
+   But wait: the base branch context shows that it has already updated the version 1.0.27 to 1.0.31? And then inserted 1.0.30, 1.0.29, 1.0.28?
 
    Actually, the base branch context shows that it has:
 
@@ -207,13 +207,13 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
 
    Therefore, the base branch does NOT have the versions 1.0.30, 1.0.29, 1.0.28 at that location? It has the old [1.0.27] (from the ancestor) and then the versions below.
 
-   But wait: the base branch context said that it had added [1.0.31], [1.0.30], [1.0.29], [1.0.28]? 
+   But wait: the base branch context said that it had added [1.0.31], [1.0.30], [1.0.29], [1.0.28]?
 
-   This suggests that the base branch context we were given is not the entire story? Or perhaps the base branch context is showing changes relative to the ancestor, and the base branch has indeed added those versions, but they are not at the top? 
+   This suggests that the base branch context we were given is not the entire story? Or perhaps the base branch context is showing changes relative to the ancestor, and the base branch has indeed added those versions, but they are not at the top?
 
-   However, the Git Diff (Head changes vs base) is comparing the head branch to the base branch. It shows that the base branch, at the top of the changelog (after the header), has the [1.0.27] section. 
+   However, the Git Diff (Head changes vs base) is comparing the head branch to the base branch. It shows that the base branch, at the top of the changelog (after the header), has the [1.0.27] section.
 
-   Therefore, in the base branch, the versions 1.0.30, 1.0.29, 1.0.28 are NOT present at the top? They must be elsewhere? 
+   Therefore, in the base branch, the versions 1.0.30, 1.0.29, 1.0.28 are NOT present at the top? They must be elsewhere?
 
    But the base branch context showed that it added [1.0.30] in place of the removed [1.0.25]? That doesn't make sense for a changelog.
 
@@ -241,7 +241,7 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
 
    This means: the section that was [1.0.25] in the ancestor is now [1.0.30] and the content has been changed (the first bullet changed from "[Dependencies]:" to "[Optimized]:" and then the second bullet is the same as the ancestor's first bullet?).
 
-   But note: the ancestor's [1.0.25] section had only one bullet? Then the base branch changed it to two bullets? 
+   But note: the ancestor's [1.0.25] section had only one bullet? Then the base branch changed it to two bullets?
 
    This is very confusing.
 
@@ -257,7 +257,7 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
         - Then the [1.0.28] section (which is the base branch's version of the ancestor's [1.0.23])
         - Then the [1.0.27] section (which is the base branch's version of the ancestor's [1.0.22]? or is it a new addition?) -> actually, the base branch context shows later an addition of [1.0.27] which seems to be a duplicate?
 
-   But note: the base branch context shows multiple additions of [1.0.27]? 
+   But note: the base branch context shows multiple additions of [1.0.27]?
 
    However, the Git Diff (Head changes vs base) does not show the base branch having the versions 1.0.30, 1.0.29, 1.0.28 at the top. It shows the base branch having the [1.0.27] section (which is the base branch's version of the ancestor's [1.0.27]) at the top after the header.
 
@@ -279,17 +279,17 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
         - Then add the three new versions from the head branch (1.0.30, 1.0.29, 1.0.28) because they are in the head and not in the base at that location.
         - Then keep the base branch's [1.0.27] section and everything below.
 
-   But wait: the base branch also has changes in the [1.0.27] section? 
+   But wait: the base branch also has changes in the [1.0.27] section?
 
-        In the base branch, the [1.0.27] section has been changed from the ancestor: 
-            Ancestor's [1.0.27]: 
+        In the base branch, the [1.0.27] section has been changed from the ancestor:
+            Ancestor's [1.0.27]:
                 * **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
                 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-            Base branch's [1.0.27]: 
+            Base branch's [1.0.27]:
                 * **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
                 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
-        They are identical? 
+        They are identical?
 
         Actually, the base branch context for the [1.0.27] section shows:
             - * **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
@@ -297,22 +297,22 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
             - * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
             + * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
-        So no change? 
+        So no change?
 
-        But wait, the base branch context for the first hunk (which was the ancestor's [1.0.27]) was changed to [1.0.31] and the content changed. Then later, the base branch added a new [1.0.27] section? 
+        But wait, the base branch context for the first hunk (which was the ancestor's [1.0.27]) was changed to [1.0.31] and the content changed. Then later, the base branch added a new [1.0.27] section?
 
-        This suggests that the base branch has two sections for 1.0.27? 
+        This suggests that the base branch has two sections for 1.0.27?
 
         Given the confusion, and since the Git Diff (Head changes vs base) shows the base branch having only one [1.0.27] section at the location after the header (and it is unchanged from the ancestor), we will assume that the base branch's [1.0.27] section is the same as the ancestor's.
 
-   However, note that the head branch also has the [1.0.27] section? And the head branch did not change it? 
+   However, note that the head branch also has the [1.0.27] section? And the head branch did not change it?
 
         The head branch context shows:
             - ## [1.0.27] - 2026-05-11   [removed from the ancestor]
             + ... (then later) ...
             + ## [1.0.27] - 2026-05-11   [added back?]
 
-        And the content of the head branch's [1.0.27] section is the same as the ancestor's? 
+        And the content of the head branch's [1.0.27] section is the same as the ancestor's?
 
         The head branch context for the [1.0.27] section shows:
             - * **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
@@ -324,15 +324,15 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
 
    Therefore, the [1.0.27] section is the same in both branches and the same as the ancestor.
 
-   Now, what about the base branch's other changes? 
+   Now, what about the base branch's other changes?
 
         The base branch has changed the ancestor's [1.0.25] to [1.0.30] and modified the content, and similarly for [1.0.24] to [1.0.29], [1.0.23] to [1.0.28], and so on.
 
-   But note: the head branch has also changed the ancestor's [1.0.25] to [1.0.29]? 
+   But note: the head branch has also changed the ancestor's [1.0.25] to [1.0.29]?
 
         Head branch context:
             - ## [1.0.25] - 2026-05-04
-            +   [blank line?] 
+            +   [blank line?]
             + ## [1.0.29] - 2026-05-20
             + * **[Optimized]:** Replaced inline charset parsing in WebFetcher with the shared `extractCharset` utility to eliminate duplicate computation.
             + * **[Pruned]:** Removed unused `HttpError` export from `GoogleSearcher`.
@@ -347,7 +347,7 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
 
    How do we resolve this?
 
-   We are told: 
+   We are told:
         "When both modify the same code:
           - If they add different things (different imports, different functions), keep BOTH
           - If they modify the same logic, prefer the HEAD branch (PR author's intent) unless the base has an obvious bug fix or security patch"
@@ -356,11 +356,11 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
 
    We cannot keep both because they are mutually exclusive (one becomes 1.0.30 and the other becomes 1.0.29).
 
-   We must choose one? 
+   We must choose one?
 
    But note: the head branch also has a [1.0.30] section that it added at the top (which is new, not modified from an existing section). And the base branch has a [1.0.30] section that came from modifying the ancestor's [1.0.25].
 
-   So we have two different [1.0.30] sections? 
+   So we have two different [1.0.30] sections?
 
         Base branch's [1.0.30] (from modifying [1.0.25]):
             ## [1.0.30] - 2026-05-26
@@ -372,7 +372,7 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
             * **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
             * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
-   They are identical! 
+   They are identical!
 
    Similarly, let's check [1.0.29]:
 
@@ -406,9 +406,9 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
 
    So we can simply take the head branch's addition of the three versions (1.0.30, 1.0.29, 1.0.28) at the top and then the base branch's content from the [1.0.27] section downward.
 
-   But note: the base branch also has a [1.0.31] section at the very top? 
+   But note: the base branch also has a [1.0.31] section at the very top?
 
-        The base branch context shows that it changed the ancestor's [1.0.27] to [1.0.31]. 
+        The base branch context shows that it changed the ancestor's [1.0.27] to [1.0.31].
 
         The head branch did not change the ancestor's [1.0.27]? It left it as [1.0.27] (but then added three new versions on top).
 
