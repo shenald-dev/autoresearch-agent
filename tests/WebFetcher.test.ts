@@ -373,7 +373,6 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
-
 	it("should fallback to utf-8 if charset is unsupported", async () => {
 		const fetcher = new WebFetcher(3);
 		const originalFetch = global.fetch;
