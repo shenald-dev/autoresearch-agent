@@ -236,7 +236,7 @@ Aligned the test suite execution. Ran `npm update` to bump patch/minor dependenc
 ## 2026-05-26 — Assessment & Lifecycle
 
 **Observation / Pruned:**
-Observed that BOLT effectively optimized the system by enforcing a strict allowlist of text-based content types in `WebFetcher`, preventing the downloading of arbitrary large binaries. Also observed preemptive stripping of HTML comments to save context tokens. Checked for dead code using `knip` and found no dead code.
+Observed that BOLT successfully enforced a strict `Content-Type` allowlist in `WebFetcher` to prevent downloading arbitrary large binaries. Also observed preemptive stripping of HTML comments to save context tokens. Checked for dead code using `knip` and found no dead code.
 
 **Alignment / Deferred:**
-Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.32 to deploy these updates.
+Pinned `console-table-printer` to `2.15.0` to prevent a test failure during dependency updates. Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.32 to deploy these updates.
