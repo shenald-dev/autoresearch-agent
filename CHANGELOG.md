@@ -4,10 +4,13 @@ All notable changes to autoresearch-agent will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+<<<<<<< HEAD
+=======
 ## [1.0.31] - 2026-05-27
 * **[Security]:** Enforced strict Content-Type allowlist in WebFetcher to prevent downloading arbitrary large binaries.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
+>>>>>>> origin/master
 ## [1.0.30] - 2026-05-26
 * **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
@@ -18,9 +21,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **[Pruned]:** Removed unused `HttpError` export from `GoogleSearcher`.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
+<<<<<<< HEAD
+
 ## [1.0.28] - 2026-05-12
 * **[Pruned]:** Checked for dead code using `knip`. Pruned `resolve_changelog.js` and `resolve_warden.js` which are unused files, but preserved `bin/cli.js` as it is an essential entry point despite `knip` flagging it.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+=======
+## [1.0.28] - 2026-05-11
+* **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
+>>>>>>> origin/master
+
 ## [1.0.27] - 2026-05-11
 * **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
