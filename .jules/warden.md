@@ -1,454 +1,233 @@
-We are given a 3-way merge scenario for the file `.jules/warden.md`.
- We have:
-   - Base (master): target branch with changes (lines 1-251 changed, 142 lines)
-   - Head (warden-lifecycle-release-1.0.30-17510402287727930287): PR branch with changes (lines 227-234 changed, 8 lines)
-   - Ancestor: common base
+## 2026-05-03 — Assessment & Lifecycle
 
- The Git Diff (Head changes vs base) shows that the head branch added a new section (starting at line 224) after the existing content.
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the context formatting logic in `ResearchEngine` to skip empty or whitespace-only context chunks before adding them to the prompt context, avoiding bloated LLM prompts. Checked for dead code using `knip` and verified that `bin/cli.js` is an essential entry point despite being flagged. No dead code found. Added an explicit unit test to `tests/engine.test.ts` to verify the empty string skipping functionality.
 
- Specifically, the diff shows:
-   @@ -224,3 +224,10 @@
-        **Alignment / Deferred:**
-        Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.29 to deploy these updates.
-   +## 2026-05-25 — Assessment & Lifecycle
-   +
-   +**Observation / Pruned:**
-   +Observed that BOLT successfully optimized the HTML stripping logic by preemptively removing HTML comments to save context tokens. Checked for dead code using `knip`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
-   +
-   +**Alignment / Deferred:**
-   +Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.24 to deploy these updates.
 
- However, note that the base (master) branch has already changed the file significantly (142 lines changed from lines 1-251).
+## 2026-04-25 — Assessment & Lifecycle
 
- We are told that this is a TRUE CONFLICT because both branches modified the same file from the same ancestor.
+**Observation / Pruned:**
+Observed that BOLT securely patched an SSRF bypass where `dns.lookup({ all: true })` could return an empty array, evading internal network filters. Checked for dead code using `ts-prune` and the codebase remains completely clean.
 
- But note: the head branch changes are only in the lines 227-234 (which in the base branch are the last few lines of the file?).
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.17 to deploy these security updates.
 
- However, looking at the base branch version (master) we see that it ends with:
-   ## 2026-05-26 — Assessment & Lifecycle
-   ... (content for that date) ...
-   and then a section about removing `console-table-printer` and tagging release v1.0.32.
+## 2026-04-24 — Assessment & Lifecycle
 
- The head branch (PR) has:
-   - It starts with an ancestor that had a section for 2026-05-03 (which the base branch has updated to 2026-05-26 and then added more recent dates?).
-   - But the head branch in the PR has not updated the dates beyond 2026-05-03? Actually, the head branch version provided in the file versions shows:
-        ## 2026-05-03 — Assessment & Lifecycle
-        ... (then a lot of truncated content) ...
-        and then at the end: 
-          **Alignment / Deferred:**
-          Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
+**Observation / Pruned:**
+Observed that BOLT successfully hooked up the research engine progress callback to the CLI spinner using `s.message(msg)`, dynamically updating the UI without breaking formatting. Test coverage was also improved by mocking `process.exit` and `process.argv` to verify the CLI integration. Codebase remains clean.
 
- However, the Git Diff shows that the head branch (PR) is trying to add a new section for 2026-05-25 after the existing content that ends with the tagging of v1.0.29.
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing safely, confirming no regressions. Tagging release v1.0.16 to deploy these updates.
 
- But wait: the base branch (master) has already moved beyond 2026-05-03 and has sections for 2026-05-26 and then a final section about removing a dependency and tagging v1.0.32.
+## 2026-04-20 — Assessment & Lifecycle
 
- How to resolve?
+**Observation / Pruned:**
+Observed that BOLT effectively hardened the Dockerfile to build and run the container as the non-root `node` user, applying explicit `chown` instructions to prevent runtime volume permission issues and correctly configuring the CLI entrypoint. Codebase remains clean; ran `npx ts-prune` which confirmed no dead code or orphaned exports.
 
- According to the rules:
-   1. This is a TRUE CONFLICT -> both branches modified the same file from the same ancestor.
-   2. Keep ALL meaningful changes from BOTH branches.
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing safely, confirming no regressions. Tagging release v1.0.14 to deploy these updates.
 
- However, note that the head branch (PR) is based on an older version of the file (the ancestor) and then made changes (adding a section for 2026-05-25) but the base branch has already moved forward.
+## 2026-04-18 — Assessment & Lifecycle
 
- The Git Diff we are given is: Head changes vs base -> meaning what the head branch has that the base doesn't.
+**Observation / Pruned:**
+Observed that the codebase remains clean. Ran `npx ts-prune` which confirmed no dead code or orphaned exports.
 
- But note: the base branch has changes that the head branch does not have (because the head branch is an older branch that hasn't incorporated the base's changes).
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.12 to deploy these updates.
 
- Therefore, we must incorporate:
-   - All changes from the base branch (master) because it is the target and has newer changes from others.
-   - Plus the changes from the head branch that are not in the base.
+## 2026-04-16 — Assessment & Lifecycle
 
- However, the head branch changes (as per the diff) are an addition of a new section at the end (after the current end of the base branch?).
+**Observation / Pruned:**
+Observed that the codebase remains clean. Ran `npx ts-prune` which confirmed no dead code or orphaned exports.
 
- But wait: the base branch (master) ends with:
-   ## 2026-05-26 — Assessment & Lifecycle
-   ... (content for 2026-05-26) ...
-   and then a section about removing `console-table-printer` and tagging v1.0.32.
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.10 to deploy these updates.
 
- The head branch (PR) in its version ends with:
-   ... (content that seems to be from an older state) ...
-   and then a section for tagging v1.0.30.
+## 2026-04-08 — Assessment & Lifecycle
 
- The Git Diff shows that the head branch (PR) has, relative to the base, added a new section for 2026-05-25 after the point where the base branch has the section for 2026-05-26 and the dependency removal.
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the HTML stripping logic in `WebFetcher.fetchSingle` and fortified the cache by immediately deleting cached entries for URLs that fail SSRF validations or experience fetch errors, preventing invalid state from being permanently cached. Codebase remains clean; ran `npx ts-prune` which confirmed no dead code or orphaned exports.
 
- However, note that the base branch does not have the section for 2026-05-25 that the head branch is adding.
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. No regressions from the Bolt optimization. Tagging release v1.0.9 to deploy these optimizations and updates.
 
- Therefore, we want to keep the base branch's content (which includes the sections up to 2026-05-26 and the dependency removal and v1.0.32) and then add the head branch's new section (for 2026-05-25) at the appropriate place.
+## 2026-04-06 — Assessment & Lifecycle
 
- But note: the head branch's new section is for 2026-05-25, which is chronologically between 2026-05-03 and 2026-05-26? Actually:
-   2026-05-03 -> 2026-05-25 -> 2026-05-26
+**Observation / Pruned:**
+Observed that BOLT effectively optimized context string buffering in `ResearchEngine.run` by replacing simple string concatenation (`+=`) with an array-based string buffer (`push` and `join`). This prevents potential object allocation overhead and memory thrashing when aggregating context from a large number of scraped network payloads. Scanned for dead code via `ts-prune` but found none to eliminate. Codebase remains clean.
 
- However, the base branch has:
-   - 2026-05-26 (most recent)
-   - and then a final section (which is not dated? Actually, the base branch's final section is not under a date heading? Let me check the base branch version:
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. No regressions from the Bolt optimization. Tagging release v1.0.8 to deploy these optimizations and updates.
 
-   Base (master) ends with:
-        **Observation / Pruned:**
-        Observed that `console-table-printer` is an unused dependency in `package.json` according to `knip`. Removed it completely to fight codebase entropy.
+## 2026-04-02 — Assessment & Lifecycle
 
-        **Alignment / Deferred:**
-        Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.32 to deploy these updates.
+**Observation / Pruned:**
+Observed the introduction of array-based chunk buffering strategy in `WebFetcher` to optimize string concatenation of large streaming network responses, significantly reducing memory thrashing and O(N^2) allocations. No dead code detected via `ts-prune`. Codebase remains clean.
 
-   This section does not have a date heading. It seems that the base branch has appended a section without a date at the end.
+**Alignment / Deferred:**
+Ran `npm update` to bump patch/minor dependencies safely. All tests passing. No regressions from the Bolt optimization. Tagging release v1.0.7 to deploy these optimizations and updates.
 
-   The head branch (PR) in its version ends with a section that has a date? Actually, the head branch version provided in the file versions ends with:
-        **Alignment / Deferred:**
-        Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
+## 2026-04-01 — Assessment & Lifecycle
 
-   and that is under the date heading for 2026-05-03? Actually, the head branch version starts with:
-        ## 2026-05-03 — Assessment & Lifecycle
+**Observation / Pruned:**
+Observed that BOLT successfully identified and patched a socket exhaustion memory leak issue. By explicitly invoking `await response.body?.cancel().catch(() => {});` on discarded response streams (e.g., during error handling and manual redirect loops), it ensures unconsumed `fetch` sockets are closed efficiently. Ran `ts-prune` to check for orphaned logic, but found no further dead code to eliminate.
 
-   and then has a lot of content (truncated) and then ends with the above.
+**Alignment / Deferred:**
+Aligned the test suite by authoring an adversarial redirect loop test in `WebFetcher.test.ts` to actively verify `.cancel()` is triggered during manual redirect failures. Deferred any systemic shift documentation, as this is an explicit bug fix optimization. Cut the `1.0.6` patch release securely after syncing docs and performing safe dependency updates.
 
-   But note: the head branch (PR) also has, in the Git Diff, an addition of a new section for 2026-05-25 after the existing content (which in the base branch is the end of the file).
+## 2026-03-31 — Assessment & Lifecycle
 
-   However, the base branch has already moved on and has content after the point where the head branch's ancestor ended.
+**Observation / Pruned:**
+Observed that BOLT effectively fortified the SSRF mitigations by explicitly implementing manual HTTP redirect processing in `WebFetcher`. Node's native `fetch` auto-follows redirects by default, potentially bypassing validation; manual handling securely inspects the target `Location` header before each jump. Scanned for dead code via `ts-prune` but found none to eliminate.
 
-   How to merge?
+**Alignment / Deferred:**
+Validated the robustness of the updated module with `npm run test` and `npm run lint`. Deferred refactoring the redirect limit (MAX_REDIRECTS) to configuration since a hard-coded 5 limits infinite loops sufficiently. Safely bumped minor/patch dependencies via `npm update` and prepared the v1.0.5 release.
 
-   We are told to keep all meaningful changes from both branches.
+## 2026-03-30 — Assessment & Lifecycle
 
-   The base branch has:
-        - Updated the dates: changed 2026-05-03 to 2026-05-26, and then added sections for intermediate dates (as seen in the context) and finally a section without a date (the dependency removal) and tagged v1.0.32.
+**Observation / Pruned:**
+Observed that BOLT successfully optimized the web scraper concurrency to scale dynamically based on research depth rather than a static integer. Also observed that robust SSRF bounds checking (preventing AWS metadata access and catching zero-length IPs) were successfully implemented.
 
-   The head branch (PR) has:
-        - It has not updated the dates beyond 2026-05-03? Actually, the head branch version provided in the file versions shows that it still has the 2026-05-03 section at the top and then a lot of truncated content (which we assume includes the intermediate dates up to a point) and then ends with a section for v1.0.30.
+**Alignment / Deferred:**
+Aligned the `ARCHITECTURE.md` documentation to explicitly describe the dynamic concurrency limit. Verified that the test suite comprehensively covers the new loopback and metadata edge-cases by adding strict tests for `[::]` and `[::ffff:127.0.0.1]`. Minor/patch dependencies were safely updated via `npm update`.
 
-        But note: the head branch (PR) also has, as per the Git Diff, an addition of a new section for 2026-05-25 at the end (relative to the base branch).
+## 2026-03-28 — Assessment & Lifecycle (2)
 
-   However, the base branch already has a section for 2026-05-26 and then a final section (dependency removal) and v1.0.32.
+**Observation / Pruned:**
+Observed a TypeScript compilation issue (`LookupAddress` not exported) resulting from the DNS rebinding SSRF patch. Corrected it to use an inline type. Pruned an unused exported interface `SearchResult` from `GoogleSearcher.ts`.
 
-   The head branch's new section (for 2026-05-25) should be placed chronologically between 2026-05-03 and 2026-05-26.
+**Alignment / Deferred:**
+Aligned the code with TypeScript safety standards without changing the SSRF protection logic. Safe dependency minor/patch bumps were applied.
 
-   But the base branch has already rewritten the history to have:
-        ... (sections for 2026-05-03 updated to 2026-05-26, and then the intermediate dates as per the context) ...
+## 2026-03-28 — Assessment & Lifecycle
 
-   Actually, looking at the context provided for the base branch changes, we see that the base branch has changed multiple date sections:
+**Observation / Pruned:**
+Observed that the SSRF protection mechanism (hostname string matching) added by the previous agent was structurally functional and retained. Cleaned up significant dead code from previous migrations by removing obsolete Jest testing configurations (`jest.config.js`), leftover error logs, and unused mock files.
 
-        Base (master) changes:
-          - ## 2026-05-03 — Assessment & Lifecycle   -> changed to ## 2026-05-26 — Assessment & Lifecycle
-          - ## 2026-04-25 — Assessment & Lifecycle   -> changed to ## 2026-05-03 — Assessment & Lifecycle
-          - ## 2026-04-24 — Assessment & Lifecycle   -> changed to ## 2026-04-25 — Assessment & Lifecycle
-          - ... and so on ...
+**Alignment / Deferred:**
+Deferred fully comprehensive SSRF implementation (via asynchronous DNS resolution) as the current mitigation does not break functionality, and a complex implementation was not strictly necessary for stability. Applied safe minor/patch dependency bumps.
 
-   So the base branch has effectively shifted all the dates forward by about a month and updated the content accordingly.
+## 2026-03-27 — Assessment & Lifecycle
 
-   The head branch (PR) has not done this date shifting. It still has the old dates.
+**Observation / Pruned:**
+Observed that the system maintained its architectural integrity after recent SSRF optimization, but was carrying multiple minor code hygiene issues (e.g., untyped errors via `any`, non-explicit Node modules imports, and unordered imports). Addressed these minor entropy points to prevent future bugs.
 
-   Therefore, if we simply take the base branch and then add the head branch's new section (for 2026-05-25) at the end, we would be breaking the chronological order because:
-        base branch has: ... 2026-05-26 ... (then dependency removal) ...
-        and then we add: 2026-05-25 ... which is before 2026-05-26.
+**Alignment / Deferred:**
+Bumped minor/patch versions of dependencies (e.g., `vitest` to `4.1.2`, `vite` to `8.0.3`, `rolldown` to `1.0.0-rc.12`, `zod-to-json-schema` to `3.25.2`) using safe `npm update`. Refactored `any` typings to explicit `unknown` bounds to enforce strict checking and ensure the test suite is safe.
+## 2026-04-03 — Assessment & Lifecycle
 
-   Alternatively, we might need to reintegrate the head branch's changes into the base branch's timeline.
+**Observation / Pruned:**
+Observed the introduction of an array-based chunk buffering strategy in `src/core/engine.ts` (`ResearchEngine.run`) to optimize string concatenation of large context payloads, mitigating O(N^2) memory allocations and thrashing. Codebase remains clean; ran `npx ts-prune` which confirmed no dead code or orphaned exports.
 
-   However, note the resolution rule #3:
-        When both modify the same code:
-          - If they add different things (different imports, different functions), keep BOTH
-          - If they modify the same logic, prefer the HEAD branch (PR author's intent) unless the base has an obvious bug fix or security patch
-          - If the base added something the head doesn't have, incorporate it
+**Alignment / Deferred:**
+Applied safe minor/patch dependency bumps via `npm update`. Verified the integrity of the string optimization via the test suite (`npm run test`) and linter (`npm run lint`), which all passed perfectly. Prepared version 1.0.8 release with no deferred items.
 
-   In this case, the head branch is adding a new section (for 2026-05-25) and the base branch has modified existing sections (by changing the dates and content) and added a new section at the end (the dependency removal).
+## 2026-04-17 — Assessment & Lifecycle
 
-   They are not modifying the same lines of code in the sense of overlapping text? The head branch's addition is at the end of the file (in the base branch's view) and the base branch has changed the entire file.
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the fetch network calls timeout mechanism in `WebFetcher`. By hoisting the `AbortSignal.timeout(15000)` outside the redirect loop, it ensures the timeout correctly bounds the entire request chain rather than resetting per redirect. Additionally, ensuring `response` is accessible in the `catch` block allows `response?.body?.cancel()` to run on network errors, preventing socket exhaustion. Codebase remains clean; ran `npx ts-prune` which confirmed no dead code or orphaned exports.
 
-   But note: the base branch has changed the file so much that the point where the head branch's addition is being made (in the base branch) is actually after the base branch's current end? 
+**Alignment / Deferred:**
+Aligned the test suite execution. All tests pass safely, confirming no regressions. Prepared version 1.0.11 release with no deferred items.
 
-   Actually, the Git Diff (Head changes vs base) shows that the head branch has, relative to the base, added 7 lines (starting at line 224) after 3 lines of context.
+## 2026-04-20 — Assessment & Lifecycle
 
-   This implies that in the base branch, the file ends at line 226 (because the diff shows -224,3 meaning lines 224-226 in the base) and then the head branch has 10 lines (so it added 7 lines).
+**Observation / Pruned:**
+Observed that BOLT effectively fixed the unhandled exception error when safely cancelling locked `fetch` streams by keeping track of active `reader`s and cancelling those instead. Checked for dead code using `ts-prune` and verified the project remains clean.
 
-   Therefore, the base branch's file ends at line 226, and the head branch's file (if we were to look at it in the context of the base) would have the same lines 1-226 as the base, and then 7 additional lines.
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.13 to deploy these updates.
 
-   However, wait: the base branch version provided in the file versions shows that it has more content (it ends with a section about dependency removal and v1.0.32). And the head branch version provided in the file versions shows that it ends with a section for v1.0.30 (without the dependency removal).
+## 2026-04-23 — Assessment & Lifecycle
 
-   This suggests that the base branch has added the dependency removal section after the point where the head branch's ancestor ended.
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the deduplication logic in `WebFetcher.fetchBatch` by preemptively deduplicating URLs using a `Set` before further processing, directly addressing a performance overhead on the hot path without altering behavior. Removed unused `EngineConfig`, `StatusCallback`, and `AutoResearchConfig` exports and `ts-prune` devDependency after running `npx knip`.
 
-   Therefore, the base branch's file is longer than the head branch's file? Actually, the base branch has 142 lines changed (lines 1-251) meaning the file is at least 251 lines? And the head branch changed 8 lines (lines 227-234) meaning the head branch's file is at least 234 lines.
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.15 to deploy these updates.
+## 2026-04-26 — Assessment & Lifecycle
 
-   But note: the base branch's changes include lines 1-251, so the base branch's file is 251 lines or more? Actually, the changes are from line 1 to 251, meaning the base branch has modified up to line 251.
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the cache key logic in `WebFetcher`, strictly using the normalized URLs instead of redundant keys, preventing a memory leak and bloating the cache on hash fragments.
 
-   The head branch changed lines 227-234, so it has at least 234 lines.
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.18 to deploy these updates.
 
-   Now, the Git Diff (Head changes vs base) shows:
-        @@ -224,3 +224,10 @@
-        ... (3 lines from base: lines 224-226) ...
-        and then 10 lines in head (so 7 added).
 
-   This means that in the base branch, the lines 224-226 are:
-        **Alignment / Deferred:**
-        Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.29 to deploy these updates.
+## 2026-04-27 — Assessment & Lifecycle
 
-   And in the head branch, at the same position (lines 224-233) we have:
-        **Alignment / Deferred:**
-        Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.29 to deploy these updates.
-        ## 2026-05-25 — Assessment & Lifecycle
-        ... (the new section) ...
-        **Alignment / Deferred:**
-        Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the cache key logic in `WebFetcher`, strictly using the normalized URLs instead of redundant keys, preventing a memory leak and bloating the cache on hash fragments. Checked for dead code using `ts-prune` and `knip` and found none.
 
-   But wait: the base branch actually has, after line 226, more content? Because the base branch version shows that it has a section for 2026-05-26 and then a dependency removal section.
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.19 to deploy these updates.
 
-   This indicates that the base branch has inserted content between the point where the head branch's ancestor ended and the current end.
+## 2026-04-28 — Assessment & Lifecycle
 
-   Therefore, the base branch's file has:
-        ... [content up to line 226] ... 
-        then additional content (the 2026-05-26 section and the dependency removal section) 
-        and then the file ends.
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the cache key logic in `WebFetcher`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
 
-   The head branch's file (relative to the base) has:
-        ... [content up to line 226] ... 
-        then the new section (for 2026-05-25) 
-        and then the file ends.
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.20 to deploy these updates.
 
-   But note: the head branch does not have the base branch's additional content (the 2026-05-26 section and the dependency removal section).
+## 2026-04-29 — Assessment & Lifecycle
 
-   Therefore, to keep all changes from both branches, we must:
-        - Keep the base branch's additional content (the 2026-05-26 section and the dependency removal section) 
-        - And also insert the head branch's new section (for 2026-05-25) in the correct chronological place.
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the context deduplication logic in `ResearchEngine.run`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
 
-   However, the base branch has already rewritten the dates so that the section that was originally 2026-05-03 is now 2026-05-26, and so on.
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.21 to deploy these updates.
+## 2026-05-02 — Assessment & Lifecycle
 
-   The head branch's new section is for 2026-05-25, which in the base branch's timeline would be between the section that is now labeled 2026-05-03 (which originally was 2026-04-25) and the section that is now labeled 2026-05-26 (which originally was 2026-05-03)??? 
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the configuration reading logic in `ConfigManager` by introducing an in-memory `configPromise` cache. This prevents redundant file system reads and JSON parsing on subsequent calls to `getConfig()`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
 
-   This is getting very confusing.
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.22 to deploy these updates.
+## 2026-05-02 — Assessment & Lifecycle (2)
 
-   Let me try to reinterpret the base branch's changes:
+**Observation / Pruned:**
+Checked for dead code using `knip`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
 
-   The base branch has done a series of date shifts:
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.23 to deploy these updates.
+## 2026-05-04 — Assessment & Lifecycle
 
-        Original (ancestor) had:
-          ## 2026-05-03 — Assessment & Lifecycle   [A]
-          ## 2026-04-25 — Assessment & Lifecycle   [B]
-          ## 2026-04-24 — Assessment & Lifecycle   [C]
-          ## 2026-04-20 — Assessment & Lifecycle   [D]
-          ## 2026-04-18 — Assessment & Lifecycle   [E]
-          ## 2026-04-16 — Assessment & Lifecycle   [F]
-          ## 2026-04-08 — Assessment & Lifecycle   [G]
-          ## 2026-04-06 — Assessment & Lifecycle   [H]
+**Observation / Pruned:**
+Checked for dead code using `knip` and `ts-prune`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
 
-        Base branch changed them to:
-          ## 2026-05-26 — Assessment & Lifecycle   [A becomes 2026-05-26]
-          ## 2026-05-03 — Assessment & Lifecycle   [B becomes 2026-05-03]
-          ## 2026-04-25 — Assessment & Lifecycle   [C becomes 2026-04-25]
-          ## 2026-04-24 — Assessment & Lifecycle   [D becomes 2026-04-24]
-          ## 2026-04-20 — Assessment & Lifecycle   [E becomes 2026-04-20]
-          ## 2026-04-18 — Assessment & Lifecycle   [F becomes 2026-04-18]
-          ## 2026-04-16 — Assessment & Lifecycle   [G becomes 2026-04-16]
-          ## 2026-04-08 — Assessment & Lifecycle   [H becomes 2026-04-08]
-          and then added a new section at the end (without a date) for the dependency removal and v1.0.32.
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.25 to deploy these updates.
+## 2026-05-11 — Assessment & Lifecycle
 
-   The head branch (PR) has not done these date shifts. It still has the old dates.
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the system by reusing the ConfigManager instance across services to optimize file reads. Checked for dead code using knip and ts-prune. Verified that bin/cli.js is an essential entry point despite knip flagging it. No dead code found.
 
-   The head branch (PR) also added a new section for 2026-05-25 (which is a new date) at the end (relative to its own file).
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran npm update to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.27 to deploy these updates.
 
-   In the base branch's timeline, where should 2026-05-25 go?
+## 2026-05-11 — Assessment & Lifecycle (2)
 
-        The base branch has:
-          2026-05-26 (most recent)
-          2026-05-03
-          2026-04-25
-          2026-04-24
-          2026-04-20
-          2026-04-18
-          2026-04-16
-          2026-04-08
-          2026-04-06   [but note: the base branch changes only show up to 2026-04-06? Actually, the context shows the base branch changed the 2026-04-06 section to 2026-04-16? Wait, let me check the context:
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the system by reusing the ConfigManager instance. Pruned temporary resolution scripts `resolve_changelog.js` and `resolve_warden.js`.
 
-        Context for base branch:
-          - ## 2026-04-06 — Assessment & Lifecycle
-          + ## 2026-04-16 — Assessment & Lifecycle
+**Alignment / Deferred:**
+Aligned the test suite execution. All tests passing. Tagging release v1.0.28 to deploy these updates.
 
-        So the base branch has:
-          2026-05-26 (from 05-03)
-          2026-05-03 (from 04-25)
-          2026-04-25 (from 04-24)
-          2026-04-24 (from 04-20)
-          2026-04-20 (from 04-18)
-          2026-04-18 (from 04-16)
-          2026-04-16 (from 04-08)
-          2026-04-08 (from 04-06)   [but wait, the context shows the base branch changed the 04-06 to 04-16? Actually, no:
+## 2026-05-20 — Assessment & Lifecycle
 
-          The context says:
-            - ## 2026-04-06 — Assessment & Lifecycle
-            + ## 2026-04-16 — Assessment & Lifecycle
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the `WebFetcher` charset extraction by replacing the inline regex parsing logic with a direct call to the shared `extractCharset` utility from `src/utils/http.ts`. This eliminates redundant logic and ensures consistent decoding behavior across the codebase. Checked for dead code using `knip` and discovered `HttpError` was unnecessarily exported in `src/tools/GoogleSearcher.ts`. Removed the unused export.
 
-          So the section that was originally 2026-04-06 is now 2026-04-16.
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.29 to deploy these updates.
+## 2026-05-25 — Assessment & Lifecycle
 
-          And then what about the section that was originally 2026-04-08? The context shows:
-            - ## 2026-04-08 — Assessment & Lifecycle
-            + ## 2026-04-16 — Assessment & Lifecycle   [Wait, no, let me read carefully:
+**Observation / Pruned:**
+Observed that BOLT successfully optimized the HTML stripping logic by preemptively removing HTML comments to save context tokens. Checked for dead code using `knip`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
 
-          Actually, the context provided in the problem is a bit messy because it shows multiple changes at once.
-
-          Let me extract the date changes from the context:
-
-          Base (master) changes (left side) vs Head (warden-...) (right side):
-
-          - ## 2026-05-03 — Assessment & Lifecycle
-          + ## 2026-05-26 — Assessment & Lifecycle
-
-          - ## 2026-04-25 — Assessment & Lifecycle
-          + ## 2026-05-03 — Assessment & Lifecycle
-
-          - ## 2026-04-24 — Assessment & Lifecycle
-          + ## 2026-04-25 — Assessment & Lifecycle
-
-          - ## 2026-04-20 — Assessment & Lifecycle
-          + ## 2026-04-24 — Assessment & Lifecycle
-
-          - ## 2026-04-18 — Assessment & Lifecycle
-          + ## 2026-04-20 — Assessment & Lifecycle
-
-          - ## 2026-04-16 — Assessment & Lifecycle
-          + ## 2026-04-18 — Assessment & Lifecycle
-
-          - ## 2026-04-08 — Assessment & Lifecycle
-          + ## 2026-04-16 — Assessment & Lifecycle
-
-          - ## 2026-04-06 — Assessment & Lifecycle
-          + ## 2026-04-08 — Assessment & Lifecycle   [Wait, the context says for 04-06: 
-                - ## 2026-04-06 — Assessment & Lifecycle
-                + ## 2026-04-08 — Assessment & Lifecycle   ??? 
-
-          But looking at the context provided:
-
-          "  - ## 2026-04-06 — Assessment & Lifecycle
-          + ## 2026-04-08 — Assessment & Lifecycle"
-
-          Actually, the context has:
-
-          ... 
-          - ## 2026-04-08 — Assessment & Lifecycle
-          + ## 2026-04-16 — Assessment & Lifecycle
-          
-          - ## 2026-04-06 — Assessment & Lifecycle
-          + ## 2026-04-08 — Assessment & Lifecycle
-
-          So the base branch has:
-            Original 04-06 -> becomes 04-08
-            Original 04-08 -> becomes 04-16
-            Original 04-16 -> becomes 04-18
-            Original 04-18 -> becomes 04-20
-            Original 04-20 -> becomes 04-24
-            Original 04-24 -> becomes 04-25
-            Original 04-25 -> becomes 05-03
-            Original 05-03 -> becomes 05-26
-
-          And then the base branch added a new section at the end (after all these) for the dependency removal and v1.0.32.
-
-   Now, the head branch (PR) has added a new section for 2026-05-25. In the original timeline (ancestor), where would 2026-05-25 fit?
-
-        The ancestor had sections for:
-          05-03, 04-25, 04-24, 04-20, 04-18, 04-16, 04-08, 04-06
-
-        So 2026-05-25 would be between 05-03 and 04-25? Actually, no: 05-03 is May 3, 04-25 is April 25 -> so May 3 is after April 25.
-
-        Therefore, in the ancestor, the order from oldest to newest is:
-          04-06, 04-08, 04-16, 04-18, 04-20, 04-24, 04-25, 05-03
-
-        So 2026-05-25 would be between 04-25 and 05-03? Actually, 04-25 is April 25, 05-03 is May 3 -> so May 25 is after May 3.
-
-        Therefore, in the ancestor, the newest section is 05-03 (May 3), and then we would have 05-25 (May 25) after that.
-
-   In the base branch, the sections have been shifted forward by about a month, so:
-
-        The ancestor's 05-03 becomes base's 05-26
-        The ancestor's 04-25 becomes base's 05-03
-        The ancestor's 04-24 becomes base's 04-25
-        ... and so on.
-
-        Therefore, the ancestor's 05-25 (which is not present in the ancestor) would, in the base branch's timeline, be:
-
-          We need to find what the base branch's date would be for an ancestor date of 05-25.
-
-          The base branch has added approximately 23 days to each date? (from 04-06 to 04-29? but let's see: 
-            ancestor 04-06 -> base 04-08: +2 days
-            ancestor 04-08 -> base 04-16: +8 days
-            ... it's not uniform.
-
-        Alternatively, note that the base branch has effectively renamed each section to a date that is about 23 days later? 
-          ancestor 05-03 -> base 05-26: 23 days later.
-
-        So if we apply the same shift: 
-          ancestor 05-25 + 23 days = 06-17.
-
-        But wait, the base branch does not have a section for 06-17.
-
-   However, the head branch (PR) is adding the section for 2026-05-25 at the end of its file (which in the ancestor timeline would be after the 05-03 section).
-
-   In the base branch's file, the section that corresponds to the ancestor's 05-03 is now labeled 05-26 and is the first section.
-
-   Therefore, to place the head branch's new section (for 2026-05-25) in the base branch's timeline, we would put it after the section that is labeled 05-26 (which is the ancestor's 05-03) and before the section that is labeled 05-03 (which is the ancestor's 04-25)? 
-
-   But note: in the base branch, the sections are in descending order of date (most recent first):
-
-        05-26 (most recent)
-        05-03
-        04-25
-        04-24
-        04-20
-        04-18
-        04-16
-        04-08
-        04-06   [but wait, the base branch changes show that the original 04-06 became 04-08? and the original 04-08 became 04-16? ...]
-
-   Actually, the base branch has:
-
-        Section 1: 2026-05-26   [from ancestor's 05-03]
-        Section 2: 2026-05-03   [from ancestor's 04-25]
-        Section 3: 2026-04-25   [from ancestor's 04-24]
-        Section 4: 2026-04-24   [from ancestor's 04-20]
-        Section 5: 2026-04-20   [from ancestor's 04-18]
-        Section 6: 2026-04-18   [from ancestor's 04-16]
-        Section 7: 2026-04-16   [from ancestor's 04-08]
-        Section 8: 2026-04-08   [from ancestor's 04-06]
-
-   And then the dependency removal section.
-
-   The head branch's new section (for 2026-05-25) in the ancestor timeline would be placed after the ancestor's 05-03 section (which is the most recent in the ancestor) and before the ancestor's 04-25 section.
-
-   In the base branch's timeline, the ancestor's 05-03 section is now the first section (labeled 05-26) and the ancestor's 04-25 section is now the second section (labeled 05-03).
-
-   Therefore, to maintain chronological order (most recent first) in the base branch, we should insert the head branch's new section between the first and second sections.
-
-   That is, after the section for 2026-05-26 and before the section for 2026-05-03.
-
-   However, note that the base branch has already changed the file so that the first section is 2026-05-26 and the second is 2026-05-03.
-
-   So the resolved file should have:
-
-        ## 2026-05-26 — Assessment & Lifecycle
-        ... (content for that section from base) ...
-        ## 2026-05-25 — Assessment & Lifecycle   [inserted from head]
-        ... (content for that section from head) ...
-        ## 2026-05-03 — Assessment & Lifecycle
-        ... (content for that section from base) ...
-        and so on.
-
-   But wait: the head branch's new section content is:
-
-        **Observation / Pruned:**
-        Observed that BOLT successfully optimized the HTML stripping logic by preemptively removing HTML comments to save context tokens. Checked for dead code using `knip`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
-
-        **Alignment / Deferred:**
-        Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
-
-   However, note that the base branch already has a section for 2026-05-26 that contains:
-
-        **Observation / Pruned:**
-        Observed that BOLT effectively optimized HTML stripping in `WebFetcher` to preemptively remove HTML comments to save context tokens. Checked for dead code using `knip` and verified that `bin/cli.js` is an essential entry point. Added an explicit unit test to `tests/WebFetcher.test.ts` to verify the HTML comment stripping functionality.
-
-        **Alignment / Deferred:**
-        Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
-
-   And then the base branch has more sections.
-
-   The head branch's new section is very similar to the base branch's 2026-05-26 section, but with slight differences in the observation and the tagging version (v1.0.30 vs v1.0.30? Actually, both say v1.0.30 in the alignment section?).
-
-   Let me compare:
-
-        Base branch's 2026-05-26 section observation:
-          "Observed that BOLT effectively optimized HTML stripping in `WebFetcher` to preemptively remove HTML comments to save context tokens. Checked for dead code using `knip` and verified that `bin/cli.js` is an essential entry point. Added an explicit unit test to `tests/WebFetcher.test.ts` to verify the HTML comment stripping functionality."
-
-        Head branch's new section observation:
-          "Observed that BOLT successfully optimized the HTML stripping logic by preemptively removing HTML comments to save context tokens. Checked for dead code using `knip`. Verified
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
