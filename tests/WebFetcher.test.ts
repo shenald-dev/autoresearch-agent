@@ -10,8 +10,6 @@ describe("WebFetcher", () => {
 		(fetcher as any).cache.clear();
 	});
 
-});
-
 	it("should reject domains that resolve to empty address arrays", async () => {
 		const dnsPromises = require("node:dns/promises");
 		const originalLookup = dnsPromises.lookup;
@@ -310,9 +308,48 @@ describe("WebFetcher", () => {
 	});
 
 
+	it("should not strip content inside semantic structural tags like header or aside", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => `<header>Header Content</header>
+<aside>Aside Content</aside>
+<article>Article Content</article>
+<p>Main content</p>`
+			};
+		});
 
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-semantic-tags");
+		expect(result).toBe("Header Content Aside Content Article Content Main content");
 
+		global.fetch = originalFetch;
+	});
 
+	it("should correctly strip boilerplate tags in edge cases like attributes, nested elements, and self-closing variants", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => `<nav class="nav" id="test">Nav</nav>
+<footer data-test="true">Footer</footer>
+<iframe src="test"></iframe>
+<noscript><span>No JS</span></noscript>
+<form><input type="text" /></form>
+<broken<tag>
+<p>Main content</p>`
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-edge-cases");
+		expect(result).toBe("Main content");
+
+		global.fetch = originalFetch;
+	});
 	it("should decode response body correctly using charset from Content-Type", async () => {
 		const fetcher = new WebFetcher(3);
 		const originalFetch = global.fetch;
@@ -394,5 +431,6 @@ describe("WebFetcher", () => {
 		expect(result).toBe("Before After");
 
 		global.fetch = originalFetch;
-	});
+
+});
 });
