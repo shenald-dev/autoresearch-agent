@@ -308,6 +308,7 @@ describe("WebFetcher", () => {
 	});
 
 
+
 	it("should decode response body correctly using charset from Content-Type", async () => {
 		const fetcher = new WebFetcher(3);
 		const originalFetch = global.fetch;
@@ -369,6 +370,26 @@ describe("WebFetcher", () => {
 
 		const result = await (fetcher as any).fetchSingle("https://example.com/fallback-test");
 		expect(result).toBe("a");
+
+		global.fetch = originalFetch;
+	});
+
+	it("should strip HTML comments to save context tokens", async () => {
+		const fetcher = new WebFetcher(3);
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "<p>Before</p><!-- This is a large HTML comment that should be removed --><p>After</p>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-comment-strip");
+		expect(result).toBe("Before After");
+
+		global.fetch = originalFetch;
 	});
 
 	it("should handle quoted charsets and extra whitespace", async () => {
@@ -396,6 +417,7 @@ describe("WebFetcher", () => {
 			};
 		});
 
+		const fetcher = new WebFetcher(3);
 		const resultQuoted = await (fetcher as any).fetchSingle("https://example.com/quoted");
 		expect(resultQuoted).toBe("é");
 
@@ -449,29 +471,12 @@ describe("WebFetcher", () => {
 			};
 		});
 
+		const fetcher = new WebFetcher(3);
 		const resultNoHeader = await (fetcher as any).fetchSingle("https://example.com/noheader");
 		expect(resultNoHeader).toBe("abc");
 
 		const resultNoCharset = await (fetcher as any).fetchSingle("https://example.com/nocharset");
 		expect(resultNoCharset).toBe("abc");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should strip HTML comments to save context tokens", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-				text: async () => "<p>Before</p><!-- This is a large HTML comment that should be removed --><p>After</p>"
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/test-comment-strip");
-		expect(result).toBe("Before After");
 
 		global.fetch = originalFetch;
 	});
