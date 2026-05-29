@@ -247,4 +247,4 @@ Pinned `console-table-printer` to `2.15.0` to prevent a test failure during depe
 Successfully resolved compounding merge conflicts with master, absorbing and protecting the strict `Content-Type` allowlist and the HTML comment stripping regex, ensuring no regressions to recent optimizations.
 
 **Alignment / Deferred:**
-Aligned the test suite execution. Tagging release v1.0.36 to cleanly push the consolidated state.
+Aligned the test suite execution. Tagging release v1.0.37 to cleanly push the consolidated state.
