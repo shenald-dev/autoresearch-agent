@@ -10,6 +10,8 @@ describe("WebFetcher", () => {
 		(fetcher as any).cache.clear();
 	});
 
+});
+
 	it("should reject domains that resolve to empty address arrays", async () => {
 		const dnsPromises = require("node:dns/promises");
 		const originalLookup = dnsPromises.lookup;
@@ -306,6 +308,8 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+
+
 
 
 
