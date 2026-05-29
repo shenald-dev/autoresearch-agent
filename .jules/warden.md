@@ -116,7 +116,7 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
         -1,3   meaning base had 3 lines starting at line 1
         +1,11  meaning head has 11 lines starting at line 1 -> so head added 8 lines at the beginning.
 
-   - At the end: 
+   - At the end:
         -208,3   meaning base had 3 lines starting at line 208
         +216,27  meaning head has 27 lines starting at line 216 -> so head added 24 lines (because 27 - 3 = 24) but note the line numbers shifted.
 
@@ -230,21 +230,21 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
 
  But note: the problem also gives us the "What Changed" for base and head, and they are different.
 
- How can both be true? 
+ How can both be true?
 
  Let me look at the "What Changed" for base and head:
 
-   Base (master): 
+   Base (master):
         - It changed the date from 2026-05-03 to 2026-05-26 at the top, and then made a series of changes in the middle and at the end.
 
    Head (PR branch):
         - It also changed the date from 2026-05-03 to 2026-05-26 at the top, and then made a series of changes in the middle and at the end.
 
- But the Git Diff (Head changes vs base) shows that the head branch has added two new sections at the end (starting at what was line 208 in the base) and also changed the top section? 
+ But the Git Diff (Head changes vs base) shows that the head branch has added two new sections at the end (starting at what was line 208 in the base) and also changed the top section?
 
  Actually, the Git Diff shows:
 
-   At the top: 
+   At the top:
         Base had:
           ## 2026-05-03 — Assessment & Lifecycle
           **Observation / Pruned:**
@@ -253,22 +253,22 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
         Head has:
           ## 2026-05-26 — Assessment & Lifecycle
           **Observation / Pruned:**
-          Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ... 
+          Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ...
           **Alignment / Deferred:**
           Aligned the test suite execution. Ran `npm update` ... Tagging release v1.0.30 ...
           ## 2026-05-03 — Assessment & Lifecycle
           ... (then the same as base's top section?)
 
-   So it looks like the head branch has inserted a new section for 2026-05-26 at the very top, and then kept the 2026-05-03 section that was in the base branch? 
+   So it looks like the head branch has inserted a new section for 2026-05-26 at the very top, and then kept the 2026-05-03 section that was in the base branch?
 
-   But wait, the base branch (master) already had the 2026-05-26 section at the top? 
+   But wait, the base branch (master) already had the 2026-05-26 section at the top?
 
    Let me read the base branch version:
 
         Base (master) — target branch:
           ## 2026-05-26 — Assessment & Lifecycle
           **Observation / Pruned:**
-          Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ... 
+          Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ...
 
    So the base branch already has the 2026-05-26 section at the top.
 
@@ -276,7 +276,7 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
 
         @@ -1,3 +1,11 @@
         +## 2026-05-26 — Assessment & Lifecycle
-        + ... 
+        + ...
         +## 2026-05-03 — Assessment & Lifecycle
 
    This suggests that in the base branch, the first 3 lines were:
@@ -289,7 +289,7 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
 
         ## 2026-05-26 — Assessment & Lifecycle
         **Observation / Pruned:**
-        Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ... 
+        Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ...
         **Alignment / Deferred:**
         Aligned the test suite execution. Ran `npm update` ... Tagging release v1.0.30 ...
         ## 2026-05-03 — Assessment & Lifecycle
@@ -298,26 +298,26 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
 
    So the base branch started with the 2026-05-03 section, and the head branch has added a new 2026-05-26 section at the top and then kept the 2026-05-03 section.
 
-   However, the base branch (master) already has the 2026-05-26 section at the top? 
+   However, the base branch (master) already has the 2026-05-26 section at the top?
 
    This is confusing.
 
    Let me compare:
 
-        Ancestor: 
+        Ancestor:
           ## 2026-05-03 — Assessment & Lifecycle
           **Observation / Pruned:**
           Observed that BOLT effectively optimized the context formatting logic in `ResearchEn
 
-        Base (master): 
+        Base (master):
           ## 2026-05-26 — Assessment & Lifecycle
           **Observation / Pruned:**
-          Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ... 
+          Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ...
 
         Head (PR branch):
           ## 2026-05-26 — Assessment & Lifecycle
           **Observation / Pruned:**
-          Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ... 
+          Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ...
           **Alignment / Deferred:**
           Aligned the test suite execution. Ran `npm update` ... Tagging release v1.0.30 ...
           ## 2026-05-03 — Assessment & Lifecycle
@@ -326,11 +326,11 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
 
    So:
 
-        Ancestor -> Base: 
+        Ancestor -> Base:
             Changed the top section from 2026-05-03 to 2026-05-26 and updated the observation.
 
         Ancestor -> Head:
-            Added a new top section for 2026-05-26 (with observation about HTML stripping and alignment for v1.0.30) and then kept the original 2026-05-03 section (which was in the ancestor) but note: the head branch's 2026-05-03 section is the same as the ancestor's? 
+            Added a new top section for 2026-05-26 (with observation about HTML stripping and alignment for v1.0.30) and then kept the original 2026-05-03 section (which was in the ancestor) but note: the head branch's 2026-05-03 section is the same as the ancestor's?
 
         However, the base branch changed the 2026-05-03 section to 2026-05-26 and updated the observation.
 
@@ -339,12 +339,12 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
         Base branch has at the top:
             ## 2026-05-26 — Assessment & Lifecycle
             **Observation / Pruned:**
-            Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ... 
+            Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ...
 
         Head branch has at the top:
             ## 2026-05-26 — Assessment & Lifecycle
             **Observation / Pruned:**
-            Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ... 
+            Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ...
             **Alignment / Deferred:**
             Aligned the test suite execution. Ran `npm update` ... Tagging release v1.0.30 ...
             ## 2026-05-03 — Assessment & Lifecycle
@@ -353,7 +353,7 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
 
    So the head branch, relative to the base branch, has:
 
-        - Kept the base branch's top section (the 2026-05-26 section) 
+        - Kept the base branch's top section (the 2026-05-26 section)
         - Then added the alignment/deferred part for that section (which the base branch didn't have? but wait, the base branch's section might have had an alignment/deferred part? we don't know from the truncation)
 
         - Then added a new section for 2026-05-03 (which the base branch does not have at this point because the base branch changed the ancestor's 2026-05-03 section to 2026-05-26)
@@ -382,7 +382,7 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
         + Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
         +
         + ## 2026-05-03 — Assessment & Lifecycle
-        + 
+        +
         + **Observation / Pruned:**
         + Observed that BOLT effectively optimized the context formatting logic in `ResearchEngine` to skip empty or whitespace-only context chunks before adding them to the prompt context, avoiding bloated LLM prompts. Checked for dead code using `knip` and verified that `bin/cli.js` is an essential entry point despite being flagged. No dead code found. Added an explicit unit test to `tests/engine.test.ts` to verify the empty string skipping functionality.
         +
@@ -391,7 +391,7 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
         +
         ## 2026-05-03 — Assessment & Lifecycle
 
-   This is confusing because it shows the head branch having two sections: one for 2026-05-26 and one for 2026-05-03, and then the base branch's section for 2026-05-03? 
+   This is confusing because it shows the head branch having two sections: one for 2026-05-26 and one for 2026-05-03, and then the base branch's section for 2026-05-03?
 
    But wait, the base branch's version (as given) starts with 2026-05-26, so the base branch does not have a 2026-05-03 section at the top.
 
@@ -422,7 +422,7 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
         In the base branch, at the beginning, there were 3 lines that are:
             Line 1: ## 2026-05-03 — Assessment & Lifecycle   [but wait, the base branch we are given starts with 2026-05-26]
 
-   This suggests that the Git Diff (Head changes vs base) is not against the base branch version that we are given in the "Base (master) — target branch" section, but against the ancestor? 
+   This suggests that the Git Diff (Head changes vs base) is not against the base branch version that we are given in the "Base (master) — target branch" section, but against the ancestor?
 
    But the problem says: "Git Diff (Head changes vs base)"
 
@@ -441,7 +441,7 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
         + Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
         +
         + ## 2026-05-03 — Assessment & Lifecycle
-        + 
+        +
         + **Observation / Pruned:**
         + Observed that BOLT effectively optimized the context formatting logic in `ResearchEngine` to skip empty or whitespace-only context chunks before adding them to the prompt context, avoiding bloated LLM prompts. Checked for dead code using `knip` and verified that `bin/cli.js` is an essential entry point despite being flagged. No dead code found. Added an explicit unit test to `tests/engine.test.ts` to verify the empty string skipping functionality.
         +
@@ -458,7 +458,7 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
 
    and in the head branch, the first 11 lines are the block above, and then the base branch's line 4 onward is shown as the last line of the diff: "## 2026-05-03 — Assessment & Lifecycle"
 
-   But wait, the diff has at the very end: "## 2026-05-03 — Assessment & Lifecycle" without a '+', meaning that line is in both? 
+   But wait, the diff has at the very end: "## 2026-05-03 — Assessment & Lifecycle" without a '+', meaning that line is in both?
 
    Actually, the diff format:
 
@@ -476,18 +476,18 @@ We are given a 3-way merge scenario for the file `.jules/warden.md`.
         Head branch has at the beginning:
           Line 1: ## 2026-05-26 — Assessment & Lifecycle
           Line 2: **Observation / Pruned:**
-          Line 3: Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ... 
-          Line 4: 
+          Line 3: Observed that BOLT effectively optimized HTML stripping in `WebFetcher` ...
+          Line 4:
           Line 5: **Alignment / Deferred:**
           Line 6: Aligned the test suite execution. Ran `npm update` ... Tagging release v1.0.30 ...
-          Line 7: 
+          Line 7:
           Line 8: ## 2026-05-03 — Assessment & Lifecycle
-          Line 9: 
+          Line 9:
           Line 10: **Observation / Pruned:**
-          Line 11: Observed that BOLT effectively optimized the context formatting logic in `ResearchEngine` ... 
+          Line 11: Observed that BOLT effectively optimized the context formatting logic in `ResearchEngine` ...
           ... and then it continues.
 
-        And then the diff shows that after the head branch's added block, the base branch's line 4 onward is the same as the head branch's line 12 onward? 
+        And then the diff shows that after the head branch's added block, the base branch's line 4 onward is the same as the head branch's line 12 onward?
 
         But the diff ends with: "## 2026-05-03 — Assessment & Lifecycle" without a '+', meaning that line is present in both and is context.
 
