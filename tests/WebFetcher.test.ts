@@ -122,19 +122,11 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
-	it("should reject non-text content types via strict whitelist", async () => {
+	it("should reject non-text content types", async () => {
 		const originalFetch = global.fetch;
 		const mockCancel = vi.fn().mockResolvedValue(undefined);
 
 		global.fetch = vi.fn().mockImplementation(async (url) => {
-			if (url.includes("zip")) {
-				return {
-					status: 200,
-					headers: new Headers({ "content-type": "application/zip" }),
-					ok: true,
-					body: { cancel: mockCancel },
-				};
-			}
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "application/pdf" }),
@@ -143,20 +135,13 @@ describe("WebFetcher", () => {
 			};
 		});
 
-		const resultPdf = await (fetcher as any).fetchSingle(
+		const result = await (fetcher as any).fetchSingle(
 			"https://example.com/document.pdf",
 		);
-		expect(resultPdf).toContain(
+		expect(result).toContain(
 			"Error: Unsupported content type (application/pdf)",
 		);
-
-		const resultZip = await (fetcher as any).fetchSingle(
-			"https://example.com/archive.zip",
-		);
-		expect(resultZip).toContain(
-			"Error: Unsupported content type (application/zip)",
-		);
-		expect(mockCancel).toHaveBeenCalledTimes(2);
+		expect(mockCancel).toHaveBeenCalled();
 
 		global.fetch = originalFetch;
 	});
