@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 ## 2026-05-12 — Assessment & Lifecycle
 
@@ -11,6 +12,8 @@ Aligned the test suite execution. Ran `npm update` to bump patch/minor dependenc
 =======
 =======
 >>>>>>> origin/master
+=======
+>>>>>>> origin/master
 ## 2026-05-26 — Assessment & Lifecycle
 
 **Observation / Pruned:**
@@ -19,6 +22,9 @@ Observed that BOLT effectively optimized HTML stripping in `WebFetcher` to preem
 **Alignment / Deferred:**
 Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> origin/master
+=======
 >>>>>>> origin/master
 =======
 >>>>>>> origin/master
@@ -250,7 +256,10 @@ Observed that BOLT effectively optimized the `WebFetcher` charset extraction by 
 **Alignment / Deferred:**
 Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.29 to deploy these updates.
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> origin/master
 
 ## 2026-05-27 — Assessment & Lifecycle
 
@@ -259,4 +268,15 @@ Observed that BOLT successfully enforced a strict `Content-Type` allowlist in `W
 
 **Alignment / Deferred:**
 Pinned `console-table-printer` to `2.15.0` to prevent a test failure during dependency updates. Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.31 to deploy these updates.
+<<<<<<< HEAD
+>>>>>>> origin/master
+=======
+
+## 2026-05-28 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that `console-table-printer` is an unused dependency in `package.json` according to `knip`. Removed it completely to fight codebase entropy.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.32 to deploy these updates.
 >>>>>>> origin/master
