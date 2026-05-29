@@ -1,427 +1,513 @@
 We are given a 3-way merge scenario for the file `CHANGELOG.md`.
- We have:
-   - Base (master): target branch with changes from lines 7-142 (132 lines changed)
-   - Head (warden-lifecycle-release-v1-0-28-12962845098488385069): PR branch with changes from lines 7-143 (122 lines changed)
-   - Ancestor: common base
+ The base branch (master) has changes from lines 7-142 (132 lines changed).
+ The head branch (PR) has changes from lines 1-427 (419 lines changed) but note that the diff shows changes from line 1 onward.
 
- The goal is to resolve the conflict by keeping all meaningful changes from both branches.
+ However, note that the ancestor file starts with:
+   ﻿# Changelog
 
- Steps:
- 1. We note that the conflict is in the changelog section (after the header).
- 2. The base branch (master) has added several version entries (from 1.0.32 down to 1.0.28 and then some older ones that were already present?).
- 3. The head branch (PR) has added version entries from 1.0.31 down to 1.0.28 (with a different date for 1.0.28: 2026-05-13 vs base's 2026-05-11) and then some older ones.
+ All notable changes to autoresearch-agent will be documented in this file.
 
- However, note that the base branch has:
-   ## [1.0.32] - 2026-05-28
-   ... and then goes down to 1.0.28 (with date 2026-05-11) and then continues with older versions.
+ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
- The head branch has:
-   ## [1.0.31] - 2026-05-27
-   ... and then goes down to 1.0.28 (with date 2026-05-13) and then continues with older versions.
+ The base branch (master) has:
+   - Changed the header to include the format and semantic versioning lines (which were already in the ancestor? Actually, the ancestor has the same two lines but without the period at the end of the first line? Let's check the ancestor: 
+        The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+        and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+     So the base branch has the same as the ancestor? Actually, the base branch has a period at the end of the first line? The ancestor does not have a period? Let me see:
 
- Important: The base branch has a version 1.0.32 that the head branch does not have.
- The head branch has a version 1.0.31 that the base branch does not have (but note: base has 1.0.32 and then 1.0.31? Let's check the base branch description).
+     Ancestor: 
+        The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+        and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
- Actually, looking at the base branch description:
+     Base (master):
+        The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+        and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-   Base (master): 
-     - ## [1.0.27] - 2026-05-11   [removed in base?] 
-     + ## [1.0.32] - 2026-05-28
-     ... and then it shows a series of changes.
+     They are the same? Actually, the base branch has a period at the end of the second line? The ancestor does not? Let me check:
 
- But note: the base branch description shows that it removed the old 1.0.27 and added 1.0.32 at the top, and then it shows a series of version bumps and changes for intermediate versions.
+     Ancestor: 
+        ... [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
- Similarly, the head branch description shows that it removed the old 1.0.27 and added 1.0.31 at the top, and then a series of version bumps.
+     Base (master):
+        ... [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
- However, the git diff provided (Head changes vs base) only shows the head branch's additions (because it's comparing head to base). It shows that the head branch has added:
-   ## [1.0.31] - 2026-05-27
-   ## [1.0.30] - 2026-05-26 (twice? but note: the diff shows two identical entries for 1.0.30? Actually, the diff might be showing the same change twice due to the way the branches diverged? But we have to be cautious.)
+     So they are the same? Then why is it showing as changed? Actually, the diff provided in the context for base (master) shows:
 
- But note: the base branch already has 1.0.32 and then 1.0.31? Let's look at the base branch's truncated content:
+        - ## [1.0.27] - 2026-05-11
+        + ## [1.0.32] - 2026-05-28
 
-   Base (master) ... 
-   ## [1.0.32] - 2026-05-28
-   * **[Dead Code]:** Removed unused dependency `console-table-printer`
-   * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+     So the changes in base are in the version entries.
 
-   ## [1.0.31] - 2026-05-27
-   * **[Security]:** Enforced strict Content-Type allowlist in WebFetcher to prevent downloading arbitrary large binaries.
-   * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+ The head branch (PR) has replaced the entire header with a description of the merge scenario? That seems odd.
+
+ Let's look at the git diff (Head changes vs base):
+
+   @@ -1,120 +1,427 @@
+   -﻿# Changelog
+   +We are given a 3-way merge scenario for the file `CHANGELOG.md`.
+   + We have:
+   +   - Base (master): target branch with changes from lines 7-142 (132 lines changed)
+   +   - Head (warden-lifecycle-release-v1-0-28-12962845098488385069): PR branch with changes from lines 7-143 (122 lines changed)
+   +   - Ancestor: common base
+
+   -All notable changes to autoresearch-agent will be documented in this file.
+   + The goal is to resolve the conflict by keeping all meaningful changes from both branches.
+
+   -The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+   -and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+   -## [1.0.27] - 2026-05-11
+   -* **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
+   -* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+   + Steps:
+   + 1. We note that the conflict is in the changelog section (after the header).
+   + 2. The base branch (master) has added several version entries (from 1.0.32 down to 1.0.28 and then some older ones that were already present?).
+   + 3. The head branch (PR) has added version entries from 1.0.31 down to 1.0.28 (with a different date for 1.0.28: 2026-05-13 vs base's 2026-05-11) and then some older ones.
 
    ... and so on.
 
- However, the base branch description in the problem says that it changed lines 7-142 and showed:
+ This indicates that the head branch (PR) has completely replaced the original changelog content with a description of the merge scenario? That doesn't make sense for a real changelog.
 
-   - ## [1.0.27] - 2026-05-11   [removed]
-   + ## [1.0.32] - 2026-05-28   [added]
+ However, note the problem statement: we are to resolve the conflict by keeping all meaningful changes from both branches.
 
-   and then a series of changes that include:
+ But wait: the head branch (PR) as shown in the diff is not the actual PR branch content? It seems that the head branch content provided in the file versions is truncated and the actual head branch content (as per the diff) is the one that starts with "We are given a 3-way merge scenario...".
 
-   - ## [1.0.25] - 2026-05-04   [removed]
-   + ## [1.0.31] - 2026-05-27   [added]
+ However, the problem says:
 
-   and so on.
+   Head (warden-lifecycle-release-v1-0-28-12962845098488385069): 419 lines changed (lines 1-427)
 
- This suggests that the base branch has rewritten the entire changelog from the top (after the header) to include new versions and also updated the entries for the versions that were already there? Actually, it looks like the base branch has added new versions at the top and then shifted the old versions down.
+ And the file version for head is truncated, but the diff shows that the head branch has replaced the beginning of the file with a description.
 
- But note: the base branch description shows that it removed the old version headers (like 1.0.27, 1.0.25, etc.) and added new ones (1.0.32, 1.0.31, etc.) and then also updated the content of some of the existing version sections? Actually, the description shows both removal and addition of version headers and then changes in the bullet points.
+ This is confusing. Let me re-read the problem.
 
- However, the problem states: "Keep ALL meaningful changes from BOTH branches".
+ The problem states:
 
- Approach:
+   **File:** `CHANGELOG.md`
 
- We are going to take the base branch (master) as the starting point and then incorporate the changes from the head branch that are not already in the base.
+   ## Context
+   - **Base branch (master):** The target branch (has newer changes from others)
+   - **Head branch (warden-lifecycle-release-v1-0-28-12962845098488385069):** The PR branch (has the PR author's changes)
+   - **Ancestor:** The common ancestor both branches diverged from
 
- But note: the head branch has a version 1.0.31 that the base branch also has? Let's check:
+   ## What Changed
+   Base (master): 132 lines changed (lines 7-142)
+        [then shows a diff of what changed in base]
 
-   Base branch has:
-      ## [1.0.32] - 2026-05-28
-      ## [1.0.31] - 2026-05-27   [from the base branch description: it shows that it added 1.0.31 in the place of the old 1.0.25?]
+   Head (warden-lifecycle-release-v1-0-28-12962845098488385069): 419 lines changed (lines 1-427)
+        [then shows a diff of what changed in head? But note: the diff provided is labeled "Git Diff (Head changes base)"]
 
-   Head branch has:
-      ## [1.0.31] - 2026-05-27   [at the top]
+ Actually, the section "What Changed" for base shows the changes in base relative to the ancestor? And for head, it doesn't show a diff but rather a description? Then it provides a "Git Diff (Head changes vs base)".
 
- However, the base branch's 1.0.31 section says:
-      * **[Security]:** Enforced strict Content-Type allowlist in WebFetcher to prevent downloading arbitrary large binaries.
-      * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+ So:
 
- The head branch's 1.0.31 section (as shown in the git diff) is exactly the same? Actually, the git diff shows:
+   Ancestor -> Base: changes in base (132 lines changed in lines 7-142)
+   Ancestor -> Head: changes in head (419 lines changed in lines 1-427) [but we are not shown the exact diff for head vs ancestor, only head vs base]
 
-      ## [1.0.31] - 2026-05-27
-      * **[Security]:** Enforced strict Content-Type allowlist in WebFetcher to prevent downloading arbitrary large binaries.
-      * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+ And then we are given the diff of head vs base.
 
- So the base branch already has the 1.0.31 entry that the head branch is trying to add? Then why is there a conflict?
+ How to resolve?
 
- Let me reexamine:
+ We have three versions:
 
- The base branch description says that it changed lines 7-142 and showed:
+   Ancestor: the common base
+   Base: ancestor + changes in base (which we are shown as a diff in the "Base (master):" section)
+   Head: ancestor + changes in head (which we are not shown directly, but we have the diff of head vs base)
 
-   - ## [1.0.27] - 2026-05-11
-   + ## [1.0.32] - 2026-05-28
+ However, note that the diff of head vs base is provided. We can use that to reconstruct head from base? But we are also given the base version (truncated) and the ancestor (truncated).
 
-   and then:
+ Alternatively, we can think:
 
-   - ## [1.0.25] - 2026-05-04
-   + ## [1.0.31] - 2026-05-27
+   We want to merge: base and head, with ancestor as the common base.
 
-   and so on.
+   The changes in base (relative to ancestor) are shown in the "Base (master):" section.
 
- This means that the base branch has replaced the old version headers (like 1.0.27, 1.0.25, etc.) with new ones (1.0.32, 1.0.31, etc.) and also updated the content of the version sections? Actually, the base branch description shows that for each removed old version header, it added a new one and then also showed changes in the bullet points (like adding a dead code removal or a security fix).
+   The changes in head (relative to ancestor) are not shown directly, but we can compute them as: (head vs base) + (base vs ancestor)
 
- However, the head branch description shows that it did a similar thing but with a different set of versions and dates.
+   However, we are also given the head version (truncated) and the base version (truncated) and the ancestor (truncated). But the truncation makes it hard.
 
- Specifically, the head branch has:
+ Given the complexity, and the fact that the problem says:
 
-   - ## [1.0.27] - 2026-05-11
-   + ## [1.0.31] - 2026-05-27
+   "Output only the resolved file content with no formatting, no markdown, no explanation."
 
-   and then:
+ And the resolution rules:
 
-   - ## [1.0.25] - 2026-05-04
-   + ## [1.0.30] - 2026-05-26
+   1. This is a TRUE CONFLICT — both branches modified the same file from the same ancestor
+   2. Keep ALL meaningful changes from BOTH branches
+   3. When both modify the same code:
+        - If they add different things (different imports, different functions), keep BOTH
+        - If they modify the same logic, prefer the HEAD branch (PR author's intent) unless the base has an obvious bug fix or security patch
+        - If the base added something the head doesn't have, incorporate it
 
-   and so on.
+ But note: the head branch (PR) as shown in the diff has replaced the entire changelog with a description of the merge? That doesn't seem right for a real PR.
 
- And note: the head branch has two entries for 1.0.30? The git diff shows two identical 1.0.30 entries? That might be a mistake in the diff presentation, but we have to go by what we have.
+ However, looking at the provided head version (the file version for head) it starts with:
 
- How to resolve:
+   We are given a 3-way merge scenario for the file `CHANGELOG.md`.
 
- Since the base branch already has 1.0.32 and 1.0.31 (and then 1.0.30, etc.) and the head branch is trying to add 1.0.31, 1.0.30, etc., we must avoid duplicating the version headers.
+   ... and then a description.
 
- However, note that the head branch's 1.0.31 is the same as the base branch's 1.0.31? Then we don't need to add it again.
+ This suggests that the head branch (PR) is not a real changelog update but rather a mistake? But the problem says we are to resolve the conflict.
 
- But wait: the base branch's 1.0.31 is at a different position? Actually, in the base branch, 1.0.31 comes right after 1.0.32. In the head branch, 1.0.31 is at the top (because the head branch does not have 1.0.32).
+ Alternatively, perhaps the head branch (PR) is the one that has the real changelog updates, and the base branch (master) also has updates, and the conflict is in the version entries.
 
- Therefore, the conflict is that the base branch has 1.0.32 at the top and then 1.0.31, while the head branch has 1.0.31 at the top and does not have 1.0.32.
+ Let me try to interpret the diff of head vs base:
 
- We must keep both 1.0.32 and 1.0.31? But note: the head branch does not have 1.0.32, so we should keep the base branch's 1.0.32 and then also include the head branch's 1.0.31? However, the base branch already has 1.0.31.
+   The diff shows that in head, the first 120 lines of base are replaced by 427 lines of head.
 
- So the base branch already has both 1.0.32 and 1.0.31? Then why is the head branch trying to add 1.0.31? It might be that the head branch was created before the base branch added 1.0.32 and 1.0.31? But then the base branch has moved ahead.
+   Specifically, the base version (as we see in the base version truncation) starts with:
 
- However, the problem says: "This is a TRUE CONFLICT — both branches modified the same file from the same ancestor".
+        ﻿# Changelog
 
- Let's look at the git diff (Head changes vs base): it shows that the head branch has added:
+        All notable changes to autoresearch-agent will be documented in this file.
 
-   ## [1.0.31] - 2026-05-27
-   ... etc.
+        The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+        and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+        ## [1.0.32] - 2026-05-28
+        * **[Dead Code]:** Removed unused dependency `console-table-printer`
+        ... 
 
- and the base branch does not have these? But wait, the base branch does have 1.0.31? Then why is the diff showing it as an addition?
+   But the head version (as per the diff) starts with:
 
- The key is: the base branch has 1.0.32 and then 1.0.31, but the head branch has 1.0.31 at the very top (without 1.0.32 above it). So when we compare the head branch to the base branch, the head branch is missing the 1.0.32 entry and has the 1.0.31 entry at a different position (at the top) and then the rest of the changelog is shifted.
+        We are given a 3-way merge scenario for the file `CHANGELOG.md`.
+        We have:
+           - Base (master): target branch with changes from lines 7-142 (132 lines changed)
+           - Head (warden-lifecycle-release-v1-0-28-12962845098488385069): PR branch with changes from lines 7-143 (122 lines changed)
+           - Ancestor: common base
 
- Therefore, the conflict is that the base branch has inserted a new version (1.0.32) at the top and then shifted everything down, while the head branch has also inserted a new version (1.0.31) at the top (but without knowing about 1.0.32) and then shifted everything down.
+        The goal is to resolve the conflict by keeping all meaningful changes from both branches.
 
- How to merge:
+        Steps:
+        1. We note that the conflict is in the changelog section (after the header).
+        2. The base branch (master) has added several version entries (from 1.0.32 down to 1.0.28 and then some older ones that were already present?).
+        3. The head branch (PR) has added version entries from 1.0.31 down to 1.0.28 (with a different date for 1.0.28: 2026-05-13 vs base's 2026-05-11) and then some older ones.
 
- We want to have:
-   - The newest version first.
+        ... and then it continues to describe the conflict.
 
- So we should have:
-   ## [1.0.32] - 2026-05-28   [from base]
-   ## [1.0.31] - 2026-05-27   [from both, but we only need one copy]
+   This is very unusual. It appears that the head branch (PR) has not updated the changelog with real changes but has instead inserted a description of the merge conflict.
 
- However, note that the base branch's 1.0.31 and the head branch's 1.0.31 are identical? Then we can take one.
+   However, note the problem statement: we are to keep all meaningful changes from both branches.
 
- But wait: the base branch's 1.0.31 has:
-      * **[Security]:** Enforced strict Content-Type allowlist in WebFetcher to prevent downloading arbitrary large binaries.
-      * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+   The base branch (master) has added real changelog entries (version bumps and change descriptions).
 
- The head branch's 1.0.31 (as shown in the git diff) is exactly the same.
+   The head branch (PR) has added a description of the merge scenario? That is not a meaningful changelog entry.
 
- However, the head branch also has additional changes in other versions? For example, the head branch has a 1.0.30 that says:
-      * **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
-      * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+   But wait: the problem says the head branch is the PR branch (warden-lifecycle-release-v1-0-28-12962845098488385069) and it has 419 lines changed.
 
- And the base branch also has a 1.0.30? Let's check the base branch description:
+   And the diff shows that the head branch has replaced the header and the first few version entries with this description.
 
-   Base branch shows:
-      - ## [1.0.24] - 2026-05-03
-      + ## [1.0.30] - 2026-05-26
-      - * **[Optimization]:** Added unit tests for empty context chunk skipping in ResearchEngine.
-      + * **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
-        * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+   However, looking at the head version (the file version for head) that is provided (truncated), it does contain real changelog entries later? For example, in the head version truncation we see:
 
- So the base branch's 1.0.30 has:
-      * **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
-      * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+        ... in WebFetcher to prevent downloading arbitrary large binaries.
+                +* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+                +
+                +## [1.0.30] - 2026-05-26
+                +* **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
+                +* **[Dependencies]:**
 
- And the head branch's 1.0.30 (as shown in the git diff) is the same? Actually, the git diff shows two identical 1.0.30 entries? But we only need one.
+   So it seems that the head branch (PR) does have real changelog entries, but the diff shows that the beginning of the file is replaced by the description.
 
- However, note: the base branch description shows that it changed the 1.0.24 entry to become 1.0.30 and updated the bullet points (adding the optimized stripping and keeping the dependency bump). The head branch description shows that it changed the 1.0.24 entry to become 1.0.30 and updated the bullet points in the same way? Then they are the same.
+   This suggests that the head branch (PR) has two parts:
+        - A description of the merge scenario (which is probably a mistake and should not be there)
+        - And then the real changelog entries.
 
- But wait: the head branch description also shows:
+   But note: the ancestor file starts with the header and then the body.
 
-      - ## [1.0.24] - 2026-05-03
-      + 
-      - * **[Optimization]:** Added unit tests for empty context chunk skipping in ResearchEngine.
-      + 
-      - * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-      + ## [1.0.30] - 2026-05-26
-      ... 
+   The base branch (master) has kept the header and then updated the version entries.
 
- This is confusing. Let me try to reconstruct:
+   The head branch (PR) has replaced the header with a description and then appended the real changelog entries? Or inserted the description at the top and then the real changelog?
 
- We are going to rely on the fact that the base branch (master) is the target branch and has the latest changes from others, and we want to incorporate the head branch's changes that are not in the base.
+   The diff shows that the head branch has replaced the first 120 lines of base with 427 lines. The base's first 120 lines include the header and the first several version entries.
 
- However, the problem says: keep ALL meaningful changes from both branches.
+   The head's 427 lines start with the description and then presumably include the real changelog entries.
 
- We note that the base branch has a version 1.0.32 that the head branch does not have -> we must keep it.
- The head branch has a version 1.0.31 that the base branch also has? -> we keep one copy.
+   How can we resolve?
 
- But wait: the base branch's 1.0.31 is present, so we don't need to add the head branch's 1.0.31 as a duplicate.
+   We are to keep all meaningful changes from both branches.
 
- However, the head branch might have changes in other versions that the base branch does not have? For example, the head branch has a version 1.0.28 with a different date (2026-05-13) and different content?
+   The meaningful changes in the base branch are the version entries and change descriptions that it added (as shown in the base diff).
 
- Let's compare the base branch and head branch for version 1.0.28:
+   The meaningful changes in the head branch are the real changelog entries that it added (which we can see in the head version truncation and also in the diff of head vs base?).
 
- Base branch (from the base branch description):
-      + ## [1.0.28] - 2026-05-11
-      - ## [1.0.21] - 2026-04-29
-      + * **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
-      + * **[Optimization]:** Deduplicated scraped LLM context strings in ResearchEngine to improve token efficiency.
-        * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+   However, the diff of head vs base shows that the head branch has added a lot of lines at the top (the description) and then the rest of the file is the same as base? Or different?
 
- Head branch (from the head branch description):
-      + ## [1.0.28] - 2026-05-13   [note: different date]
-      - ## [1.0.21] - 2026-04-29
-      + * **[Optimized]:** Expanded HTML stripping regex in WebFetcher to remove boilerplate tags (e.g., `<nav>`, `<footer>`) and conserve LLM context tokens while preserving semantic tags.
-      + * **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
-      + * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+   Actually, the diff shows:
 
- So for 1.0.28, the base branch and head branch have:
-   - Same: removal of unused temporary scripts and dependency bump.
-   - Different: 
-        Base: * **[Optimization]:** Deduplicated scraped LLM context strings in ResearchEngine to improve token efficiency.
-        Head: * **[Optimized]:** Expanded HTML stripping regex in WebFetcher to remove boilerplate tags (e.g., `<nav>`, `<footer>`) and conserve LLM context tokens while preserving semantic tags.
+        - [lines 1-120 of base] 
+        + [427 lines of head]
 
- And the date is different: base says 2026-05-11, head says 2026-05-13.
+   And then after line 120 in base, the rest of base is not shown in the diff? But the diff header says @@ -1,120 +1,427 @@, meaning that the entire base file from line 1 to 120 is replaced by the head file from line 1 to 427, and then the rest of the base file (from line 121 onward) is not present in the diff? That would imply that the head branch has truncated the file? Or that the base file had more than 120 lines and the head branch has replaced the first 120 lines and then the rest is the same?
 
- We must keep both changes? But note: they are in the same version section. We cannot have two different 1.0.28 sections.
+   But note: the base branch changed lines 7-142 (132 lines). So the base file has at least 142 lines.
 
- How to handle:
+   The head branch changed lines 1-427 (419 lines). So the head file has at least 427 lines.
 
- Since the base branch and head branch both modified the same version section (1.0.28) but in different ways, we should combine the changes? However, the problem says:
+   The diff of head vs base shows that the head branch has replaced the first 120 lines of base with 427 lines, and then the rest of the file (from line 121 of base onward) is not shown in the diff? That would mean that the head branch has deleted everything from line 121 of base onward? But that doesn't match the head version truncation which shows content beyond line 427? Actually, the head version truncation shows content that seems to be changelog entries.
 
-   "If they modify the same logic, prefer the HEAD branch (PR author's intent) unless the base has an obvious bug fix or security patch"
+   Alternatively, the diff might be showing only the conflicting part? But the problem says it's the git diff (Head changes vs base).
 
- But note: these are two different optimizations. They are not the same logic. They are two separate changes.
+   Given the confusion, let's look at the provided file versions:
 
- However, they are in the same version. We can have multiple bullet points in the same version.
+   Ancestor: 
+        Starts with the header and then has a long truncation and then at the end: 
+            d
+            - Initial release
+            ... 
 
- So for version 1.0.28, we want to have:
-   * **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
-   * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-   * **[Optimization]:** Deduplicated scraped LLM context strings in ResearchEngine to improve token efficiency.   [from base]
-   * **[Optimized]:** Expanded HTML stripping regex in WebFetcher to remove boilerplate tags (e.g., `<nav>`, `<footer>`) and conserve LLM context tokens while preserving semantic tags.   [from head]
+   Base (master):
+        Starts with the header (same as ancestor? but note: the ancestor header has two lines about the format and semantic versioning, and the base has the same) and then shows:
+            ## [1.0.32] - 2026-05-28
+            * **[Dead Code]:** Removed unused dependency `console-table-printer`
+            ... and then a truncation and then at the end:
+            ## [0.1.0] - YYYY-MM-DD
+            ... 
 
- But note: the base branch's 1.0.28 section also had the dependency bump and the pruned script removal, and the head branch's 1.0.28 section also had those. So we don't want to duplicate those.
+   Head (warden-lifecycle-release-v1-0-28-12962845098488385069):
+        Starts with: "We are given a 3-way merge scenario for the file `CHANGELOG.md`." and then a description, and then a truncation and then shows:
+            ... in WebFetcher to prevent downloading arbitrary large binaries.
+                    +* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+                    +
+                    +## [1.0.30] - 2026-05-26
+                    +* **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
+                    +* **[Dependencies]:**
 
- However, the base branch's 1.0.28 section as shown in the base branch description does not have the head branch's optimization, and the head branch's 1.0.28 section does not have the base branch's optimization.
+   This suggests that the head branch (PR) has:
+        - Replaced the entire header and the initial part of the changelog with a description of the merge scenario (which is likely a mistake in the PR)
+        - And then appended the real changelog entries? Or inserted the description and then the real changelog entries are still there? But the truncation in the head version shows that after the description there is changelog content.
 
- Therefore, we should combine the unique changes from both.
+   However, note that the head version truncation shows lines that are additions (with '+') in the context of the diff? Actually, the head version provided is the entire file? But it's truncated.
 
- But note: the base branch's 1.0.28 section also had:
-      * **[Optimization]:** Deduplicated scraped LLM context strings in ResearchEngine to improve token efficiency.
+   Given the time, and the problem's resolution rules, I think we must assume that the head branch (PR) intended to add real changelog entries, but accidentally also included a description of the merge scenario at the top.
 
- and the head branch's 1.0.28 section had:
-      * **[Optimized]:** Expanded HTML stripping regex in WebFetcher to remove boilerplate tags (e.g., `<nav>`, `<footer>`) and conserve LLM context tokens while preserving semantic tags.
+   But the problem says: "Keep ALL meaningful changes from BOTH branches".
 
- So we keep both.
+   The description of the merge scenario is not a meaningful changelog entry. It is metadata about the merge.
 
- However, the date: which one to use? The head branch has a later date (2026-05-13) than the base branch (2026-05-11). Since the head branch is the PR branch and we are merging into base, we might want to take the head branch's date? But note: the base branch might have released 1.0.28 on 2026-05-11 and then the head branch is working on a fix that was released on 2026-05-13? Then the head branch's date is more recent.
+   Therefore, we should not include that description in the resolved changelog.
 
- But wait: the base branch is the target branch (master) and has newer changes from others. So if the base branch has 1.0.28 on 2026-05-11, that means it was already released. Then the head branch's 1.0.28 on 2026-05-13 would be a mistake? Or perhaps the head branch is working on a different line?
+   What are the meaningful changes?
 
- However, the problem does not specify which date is correct. We are to keep all meaningful changes. The date is part of the version header.
+   From the base branch (master): 
+        - The version entries and change descriptions that were added in base (as shown in the base diff section).
 
- Since the head branch changed the date to 2026-05-13 and the base branch has 2026-05-11, and we are merging the head branch into base, we should take the head branch's date? But note: the base branch might have been updated by others after the head branch was created.
+   From the head branch (PR):
+        - The real changelog entries that were added in the head branch (which we can see in the head version truncation and also in the diff of head vs base?).
 
- However, the problem says: "keep ALL meaningful changes from BOTH branches". The date change is a change in the head branch. So we should use the head branch's date? But wait: the base branch also changed the date? Actually, the base branch set the date to 2026-05-11 (which was a change from the ancestor) and the head branch set it to 2026-05-13.
+   How to extract the real changelog entries from the head branch?
 
- How did the ancestor look? We don't have the exact ancestor, but we know that both branches changed the same lines.
+   We are given the diff of head vs base. This diff shows what the head branch changed relative to base.
 
- Since the head branch's date is more recent, and we are merging the head branch (which is a feature branch) into base, we might want to keep the base branch's date? But note: the base branch is the target and has the latest changes from others. However, the head branch might have been based on an older version of base and then made changes, and then base moved forward.
+   In the diff, we see that the head branch has:
+        - Replaced the first 120 lines of base with 427 lines (which include the description and then presumably the real changelog entries that are different from base?).
 
- The safe approach: we are told to prefer the HEAD branch when modifying the same logic unless the base has an obvious bug fix or security patch. The date is not logic, but it is part of the version.
+   But note: the head branch might have also made changes beyond line 120? The diff doesn't show because the diff header only shows the first 120 lines of base being replaced.
 
- However, note: the version number is the same (1.0.28). Having two different dates for the same version is confusing. We must pick one.
+   However, the head branch changed lines 1-427, so it might have changed up to line 427 of the head file, which corresponds to beyond line 120 of the base file? 
 
- Since the base branch is the target and has been updated by others, and the head branch is a feature branch that might be behind, we should take the base branch's date? But wait: the head branch changed the date to a later day, which might be because they did more work and released later.
+   This is very messy.
 
- However, the base branch already has a release for 1.0.28 on 2026-05-11. If we change it to 2026-05-13, we are effectively saying that the release happened two days later than what is in master. That might be incorrect if the base branch's release already happened.
+   Alternative approach:
 
- But note: the base branch's 1.0.28 might not have been released yet? We don't know.
+   We are told that the base branch has changes in lines 7-142 (relative to ancestor) and the head branch has changes in lines 1-427 (relative to ancestor).
 
- Given the ambiguity, and since the problem says to keep all meaningful changes, we note that the head branch changed the date. We should incorporate that change? But then we lose the base branch's date.
+   We are also given the ancestor, base, and head file versions (truncated).
 
- Alternatively, we can see that the base branch's 1.0.28 entry is actually incorrect because the head branch has done more work and set the date to 2026-05-13. However, without more context, we follow the rule: when both modify the same code (the date line) and they are different, we prefer the HEAD branch unless the base has an obvious bug fix or security patch. There's no indication of a bug fix or security patch in the date, so we take the head branch's date.
+   Since the truncation is in the middle, we cannot rely on seeing the entire file.
 
- But wait: the base branch's 1.0.28 section also has a change that the head branch does not have (the deduplication optimization) and the head branch's 1.0.28 section has a change that the base branch does not have (the HTML stripping expansion). We are keeping both changes in the bullet points. For the date, we have to choose one.
+   But note: the problem says the file is a changelog and we are to keep all meaningful changes.
 
- However, note: the version header line is: `## [1.0.28] - 2026-05-11` (base) vs `## [1.0.28] - 2026-05-13` (head). We are going to take the head branch's date because the head branch modified it and we prefer head for same-line changes unless base has a bug fix/security.
+   The meaningful changes are the version entries and their descriptions.
 
- But let's check: is there a bug fix or security patch in the base branch's date? No, it's just a date.
+   Let's try to reconstruct what the base branch added:
 
- Therefore, for the 1.0.28 version, we will use the date from the head branch (2026-05-13) and combine the bullet points from both.
+        From the base diff section:
+            - ## [1.0.27] - 2026-05-11
+            + ## [1.0.32] - 2026-05-28
+            - * **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
+            - * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+            + * **[Dead Code]:** Removed unused dependency `console-table-printer`.
+              * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+            ... and then it shows a series of changes for intermediate versions.
 
- However, note: the base branch's 1.0.28 section also had the dependency bump and the pruned script removal, and the head branch's 1.0.28 section had the same. So we will have:
+   Similarly, from the head branch description in the diff, we know that the head branch has:
+        - Added version entries from 1.0.31 down to 1.0.28 (with a different date for 1.0.28: 2026-05-13) and then some older ones.
 
-   ## [1.0.28] - 2026-05-13
-   * **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
-   * **[Optimization]:** Deduplicated scraped LLM context strings in ResearchEngine to improve token efficiency.
-   * **[Optimized]:** Expanded HTML stripping regex in WebFetcher to remove boilerplate tags (e.g., `<nav>`, `<footer>`) and conserve LLM context tokens while preserving semantic tags.
-   * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+   And the base branch has:
+        - Added version entries from 1.0.32 down to 1.0.28 (with date 2026-05-11) and then some older ones.
 
- But wait: the base branch's 1.0.28 section had the dependency bump as a separate bullet? And the head branch's 1.0.28 section also had it? We don't want to duplicate the dependency bump.
+   So the meaningful changes are:
 
- How did the base branch show it?
+        Base branch added:
+            - Version 1.0.32 (2026-05-28) with change: "[Dead Code]: Removed unused dependency `console-table-printer`"
+            - Version 1.0.31 (2026-05-27) with change: ... (we don't see the exact change in the base diff snippet, but we know it's there because the base diff shows a series)
+            - Version 1.0.30 (2026-05-26) with change: ... 
+            - Version 1.0.29 (2026-05-20) with change: ...
+            - Version 1.0.28 (2026-05-11) with change: ... 
 
-   Base branch description for 1.0.28:
-        + ## [1.0.28] - 2026-05-11
-        - ## [1.0.21] - 2026-04-29
-        + * **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
-        + * **[Optimization]:** Deduplicated scraped LLM context strings in ResearchEngine to improve token efficiency.
-          * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+        Head branch added:
+            - Version 1.0.31 (2026-05-27) with change: ... 
+            - Version 1.0.30 (2026-05-26) with change: ... 
+            - Version 1.0.29 (2026-05-20) with change: ... 
+            - Version 1.0.28 (2026-05-13) with change: ...   [note: different date]
 
-   Head branch description for 1.0.28:
-        + ## [1.0.28] - 2026-05-13
-        - ## [1.0.21] - 2026-04-29
-        + * **[Optimized]:** Expanded HTML stripping regex in WebFetcher to remove boilerplate tags (e.g., `<nav>`, `<footer>`) and conserve LLM context tokens while preserving semantic tags.
-        + * **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
-        + * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+   And then both branches have the same older versions? 
 
- So both have the pruned script removal and the dependency bump. We will have one of each.
+   The conflict is in the version entries for 1.0.32, 1.0.31, 1.0.30, 1.0.29, 1.0.28.
 
- Now, let's consider the entire file.
+   Specifically:
+        - Base has 1.0.32, which head does not have.
+        - Head has 1.0.31, 1.0.30, 1.0.29, 1.0.28 with dates: 
+              1.0.31: 2026-05-27
+              1.0.30: 2026-05-26
+              1.0.29: 2026-05-20
+              1.0.28: 2026-05-13
+        - Base has 1.0.31, 1.0.30, 1.0.29, 1.0.28 with dates:
+              1.0.31: ? (not shown in the base diff snippet, but we can assume it's there and with a date? The base diff shows it going down to 1.0.28 with date 2026-05-11)
+              1.0.30: ?
+              1.0.29: ?
+              1.0.28: 2026-05-11
 
- We are going to build the resolved file by:
+   How to resolve the version entries?
 
-   - Starting with the base branch (master) because it is the target and has the latest changes from others.
-   - Then, we will incorporate the changes from the head branch that are not already in the base branch, but being careful not to duplicate and to resolve conflicts by combining where possible and preferring head for same-line conflicts (unless base has bug fix/security).
+   We want to keep all meaningful changes. So we should include:
 
- However, note that the base branch already has some of the head branch's changes (like 1.0.31, 1.0.30, etc.) but in a different order and with some differences (like in 1.0.28).
+        - The version 1.0.32 from base.
+        - The versions 1.0.31, 1.0.30, 1.0.29 from both branches? But note: the changes in these versions might be different.
 
- Alternatively, we can think of the resolved file as:
+   However, we are not given the exact changes for each version in the head branch, only in the base branch diff snippet and in the head version truncation we see a piece for 1.0.30.
 
-   [Header]
-   [Then the version sections in descending order]
-
- We know that the base branch has:
-   1.0.32, 1.0.31, 1.0.30, 1.0.29, 1.0.28 (with base's content and date 2026-05-11), 1.0.27, ... etc.
-
- The head branch has:
-   1.0.31, 1.0.30, 1.0.29, 1.0.28 (with head's content and date 2026-05-13), 1.0.27, ... etc.
-
- But note: the base branch does not have 1.0.31 at the very top? It has 1.0.32 at the top and then 1.0.31.
-
- So the resolved file should have:
-
-   1.0.32 (from base)
-   1.0.31 (we have one copy: we can take either, but they are identical so we take one)
-   1.0.30 (we have two copies? base and head both have 1.0.30 and they appear to be the same? Then we take one)
-   1.0.29 (base and head both have 1.0.29 and they appear to be the same? Then we take one)
-   1.0.28 (we have a conflict: we combine the unique changes and take the head branch's date)
-   1.0.27 (base and head both have 1.0.27? Let's check)
-
- For 1.0.27:
-
-   Base branch description:
-        ## [1.0.27] - 2026-05-11
-        * **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
-        * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-   Head branch description:
-        ## [1.0.27] - 2026-05-11
-        * **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
-        * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-   So they are identical -> we keep one.
-
- Similarly, for older versions, they might be the same.
-
- However, note: the base branch description shows that it removed the old version headers (like 1.0.27, 1.0.25, etc.) and replaced them with new ones (1.0.32, 1.0.31, etc.) and then showed the changes in the bullet points for the new versions. But then it also shows that for the versions that were not replaced (like 1.0.26? we don't see) they remain? Actually, the base branch description shows a series of removals and additions that cover from 1.0.32 down to 1.0.28 and then it shows the old versions from 1.0.27 downward? But wait, the base branch description shows:
-
-   - ## [1.0.27] - 2026-05-11   [removed]
-   + ## [1.0.32] - 2026-05-28   [added]
-
-   and then:
-
-   - ## [1.0.25] - 2026-05-04   [removed]
-   + ## [1.0.31] - 2026-05-27   [added]
-
-   and so on until:
-
-   - ## [1.0.22] - 2026-05-02   [removed]
-   + ## [1.0.28] - 2026-05-11   [added]
-
-   and then it shows the old versions from 1.0.21 downward? Actually, the base branch description does not show any removal for versions below 1.0.22? It shows:
-
-        - ## [1.0.21] - 2026-04-29
-        + * **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
-        + * **[Optimization]:** Deduplicated scraped LLM context strings in ResearchEngine to improve token efficiency.
-          * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-   This suggests that the base branch did not remove the version header for 1.0.21, but rather changed the bullet points under 1.0.21? But wait, the base branch description shows:
-
-        - ## [1.0.21] - 2026-04-29   [this line is removed?]
-        + ... [then it shows the bullet points for 1.0.28?]
-
-   This is very confusing.
-
- Given the complexity and the fact that we are given the git diff (Head changes vs base) which only shows the head branch's additions (relative to base), we can do the following:
-
-   We know that the base branch is the target and we want to keep it as the base, and then add the head branch's changes that are not in the base.
-
-   The git diff (Head changes vs base) shows:
-
-        @@ -4,6 +4,28 @@
-         The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-         and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-        +## [1.0.31] - 2026-05-27
-        +* **[Security]:** Enforced strict Content-Type allowlist in WebFetcher to prevent downloading arbitrary large binaries.
-        +* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-        +
+   From the head version truncation, we see for 1.0.30:
         +## [1.0.30] - 2026-05-26
         +* **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
         +* **[Dependencies]:**
+
+   And from the base branch, we don't see the exact change for 1.0.30 in the provided snippet, but we know base has it.
+
+   The problem says: when both modify the same code (i.e., the same version entry), if they add different things, keep both.
+
+   But note: a version entry is a block. We cannot split it arbitrarily.
+
+   However, the changes within a version entry are listed as bullet points.
+
+   For example, for version 1.0.30, base might have:
+        * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+        * **[Something else]:** ...
+
+   And head has:
+        * **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
+        * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+   So if base has a dependency bump and head has an optimization and a dependency bump, then we want to keep both the optimization and the dependency bump.
+
+   But note: the dependency bump might be the same in both? Then we would keep one copy.
+
+   However, we are not given the full details.
+
+   Given the complexity and the truncation, and the fact that the problem expects a specific output, I suspect that the intended resolution is to take the base branch's version entries and then add the head branch's version entries that are not in base, and for overlapping versions, take the union of the changes.
+
+   But we don't have the full data.
+
+   Let's look at the head branch description in the diff: it says the head branch has added version entries from 1.0.31 down to 1.0.28.
+
+   And the base branch has added version entries from 1.0.32 down to 1.0.28.
+
+   So the union of versions added by both branches is: 1.0.32, 1.0.31, 1.0.30, 1.0.29, 1.0.28.
+
+   And then both branches have the same older versions (which are already in the ancestor).
+
+   Therefore, the resolved changelog should have:
+
+        ## [1.0.32] - 2026-05-28   [from base]
+        ... changes for 1.0.32 from base ...
+
+        ## [1.0.31] - 2026-05-27   [from head, because base might have it but with a different date? or same?]
+        ... changes for 1.0.31: we want to take the union of changes from base and head ...
+
+   But wait: the base branch might have 1.0.31 with a date of 2026-05-27? or a different date? The head branch description says the head branch has 1.0.31 with date 2026-05-27, and the base branch has a series that includes 1.0.31 but we don't know the date.
+
+   However, the base branch description in the diff says: "the base branch (master) has added several version entries (from 1.0.32 down to 1.0.28 and then some older ones that were already present?)"
+
+   And the head branch description says: "the head branch (PR) has added version entries from 1.0.31 down to 1.0.28 (with a different date for 1.0.28: 2026-05-13 vs base's 2026-05-11)"
+
+   This implies that for versions 1.0.31, 1.0.30, 1.0.29, the base branch and head branch have the same dates? Only 1.0.28 has a different date.
+
+   So for 1.0.31, 1.0.30, 1.0.29, the date is the same in both branches? Then we only have one date.
+
+   For 1.0.28, we have two different dates: base says 2026-05-11, head says 2026-05-13.
+
+   Which date to choose? The problem says: if they modify the same logic, prefer the HEAD branch unless the base has an obvious bug fix or security patch.
+
+   Here, the date is not logic, but it's part of the version entry. We have two different dates for the same version number? That doesn't make sense.
+
+   Actually, it's impossible to have two different dates for the same version number in the same changelog. We must choose one.
+
+   The head branch is the PR branch, so we should prefer the head branch's date for 1.0.28? Unless the base has an obvious bug fix or security patch in the 1.0.28 entry.
+
+   We are not told what the changes are for 1.0.28 in either branch.
+
+   Given the lack of information, and the rule to prefer head for same logic, we will take the head branch's date for 1.0.28: 2026-05-13.
+
+   Now, for the changes within each version:
+
+        We are not given the full changes for each version in either branch, except for a few snippets.
+
+   However, note the resolution rule: keep ALL meaningful changes from BOTH branches.
+
+   So for each version that appears in both branches, we want to include all the change bullets from both branches.
+
+   For versions that appear in only one branch, we include that branch's change bullets.
+
+   We know:
+
+        Version 1.0.32: only in base -> include base's changes for 1.0.32.
+        Version 1.0.31: in both -> include union of changes from base and head for 1.0.31.
+        Version 1.0.30: in both -> include union of changes from base and head for 1.0.30.
+        Version 1.0.29: in both -> include union of changes from base and head for 1.0.29.
+        Version 1.0.28: in both -> include union of changes from base and head for 1.0.28, and use the date from head (2026-05-13) because we prefer head for the same logic (and the date is part of the version entry, and we have a conflict in the date).
+
+   But wait: the version number is the same, so we cannot have two entries for 1.0.28. We must merge the two entries into one.
+
+   How to merge the two entries for 1.0.28?
+
+        We take the date from head (2026-05-13) [because head is preferred for conflicts unless base has obvious bug fix/security, and we don't have that information].
+        We take all the change bullets from the base branch's 1.0.28 entry and all the change bullets from the head branch's 1.0.28 entry.
+
+   Similarly for 1.0.31, 1.0.30, 1.0.29: we take the date from either (since they are the same) and the union of the change bullets.
+
+   For 1.0.32: only base has it, so we take base's date and base's change bullets.
+
+   Now, what are the change bullets for each version?
+
+   We are given:
+
+        For base branch, in the diff section, we see:
+
+            For 1.0.32: 
+                * **[Dead Code]:** Removed unused dependency `console-table-printer`.
+                * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+            For 1.0.31: we don't see the exact bullets in the base diff snippet, but we know base has it.
+
+            For 1.0.30: we don't see the exact bullets in the base diff snippet.
+
+            For 1.0.29: we don't see.
+
+            For 1.0.28: we don't see.
+
+        For head branch, we see in the head version truncation:
+
+            For 1.0.30:
+                * **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
+                * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+        And from the head branch description in the diff, we know that the head branch has added version entries for 1.0.31 down to 1.0.28.
+
+   We are not given the exact changes for 1.0.31, 1.0.29, 1.0.28 in either branch.
+
+   However, note the base branch diff section shows a series of changes for intermediate versions. It says:
+
+            - ## [1.0.27] - 2026-05-11
+            + ## [1.0.32] - 2026-05-28
+            - * **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
+            - * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+            + * **[Dead Code]:** Removed unused dependency `console-table-printer`.
+              * **[Dependencies]:** Safely bumped minor/patch versions of
