@@ -10,6 +10,10 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
 =======
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.0.32] - 2026-05-28
+* **[Dead Code]:** Removed unused dependency `console-table-printer`.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 ## [1.0.31] - 2026-05-27
 * **[Security]:** Enforced strict Content-Type allowlist in WebFetcher to prevent downloading arbitrary large binaries.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
