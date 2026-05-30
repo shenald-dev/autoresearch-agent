@@ -4,6 +4,10 @@ All notable changes to autoresearch-agent will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.0.34] - 2026-05-30
+* **[Fixed]:** Verified stability and optimized dependency management.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via npm update.
+
 ## [1.0.33] - 2026-05-29
 * **[Fixed]:** Fixed unhandled Promise rejection in `cliPromise` when awaiting `ResearchEngine.run` by resolving async test concurrency issues and correctly awaiting the CLI execution in tests.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
