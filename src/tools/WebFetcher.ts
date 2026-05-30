@@ -185,10 +185,13 @@ export class WebFetcher {
 				const contentType = (
 					response.headers.get("content-type") || ""
 				).toLowerCase();
+				// Enforce strict allowlist of text-based content types to prevent downloading arbitrary large binaries
 				if (
-					contentType.includes("application/pdf") ||
-					contentType.includes("image/") ||
-					contentType.includes("video/")
+					contentType &&
+					!contentType.includes("text/") &&
+					!contentType.includes("application/json") &&
+					!contentType.includes("application/xml") &&
+					!contentType.includes("application/xhtml")
 				) {
 					await response.body?.cancel().catch((err) => {
 						console.warn("WebFetcher cancel error:", err);
