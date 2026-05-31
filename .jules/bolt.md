@@ -1,9 +1,7 @@
-## 2026-03-31 — Caching Network API Calls
-
-Learning:
-When caching network-heavy API calls like `GoogleSearcher.search()`, caching the `Promise` immediately rather than awaiting the result effectively implements Promise Coalescing, preventing cache stampedes from concurrent identical requests.
+ed text. Semantic structural tags like `<header>` and `<aside>` should be preserved as they frequently contain essential content.
 
 Action:
+Expanded the HTML stripping regex in `WebFetcher` to safely remove complete and unclosed boilerplate tags without touching semantic tags to save LLM context window tokens and improve API efficiency.
 Ensure rejected promises are caught and removed from the cache using `.catch()` or `try-catch` blocks within the async closure to prevent transient errors from being permanently cached. Do not commit temporary script files like `patch.js`.
 
 ## 2026-04-01 — Streaming External Payloads to Prevent OOM
@@ -120,3 +118,70 @@ Unnecessary boilerplate elements such as `<nav>`, `<footer>`, `<iframe>`, and `<
 
 Action:
 Expanded the HTML stripping regex in `WebFetcher` to safely remove complete and unclosed boilerplate tags without touching semantic tags to save LLM context window tokens and improve API efficiency.
+
+## 2026-05-18 — TextDecoder Charset Optimization
+
+Learning:
+When decoding fetched HTTP response bodies using `TextDecoder`, defaulting to `utf-8` without extracting the `charset` from the `Content-Type` header can lead to corrupted text. Always extracting the `charset` and wrapping the `TextDecoder` instantiation in a `try...catch` block prevents runtime crashes from invalid or unsupported character sets.
+
+Action:
+Ensure `TextDecoder` uses the `charset` extracted from the `Content-Type` header (handling optional quotes via regex) and falls back to `utf-8` if the charset is invalid or unsupported. To prevent Biome linting errors, explicitly declare the `decoder` variable with its type (e.g., `let decoder: TextDecoder;`) before the `try...catch` block.
+
+## 2026-05-21 — Preemptive HTML Comment Stripping
+Learning: Web documents frequently contain massive HTML comments that may harbor nested, unbroken, or malformed tags, which can trigger parsing anomalies and waste substantial LLM context tokens.
+Action: Preemptively strip all HTML comments using regex before standard boilerplate tag cleanup during document processing.
+
+## 2025-05-19 — Dynamic Charset Decoding
+Learning: Hardcoding TextDecoder() without extracting the charset from Content-Type can lead to runtime crashes or incorrect decoding when fetching non-utf-8 web content.
+Action: Always extract the charset using a regex on Content-Type and wrap TextDecoder instantiation in a try-catch fallback to utf-8.
+Action: Always extract the charset using a regex on Content-Type and wrap TextDecoder instantiation in a try-catch fallback to utf-8, catching only specific errors.
+## 2024-05-16 — TextDecoder Charset Optimization
+
+Learning:
+When decoding HTTP response bodies using `TextDecoder`, assuming `utf-8` by default can lead to incorrect decoding and silent failures for sites using other character sets (like ISO-8859-1).
+
+Action:
+Extract the `charset` from the `Content-Type` header using a regex that handles optional quotes to instantiate `TextDecoder(charset)`. Always wrap this in a `try...catch` block with a fallback to `new TextDecoder('utf-8')` to prevent runtime crashes from invalid or unsupported character sets.
+## 2026-05-12 — TextDecoder Custom Charset Parsing
+
+Learning:
+When decoding fetched HTTP response bodies using `TextDecoder`, assuming `utf-8` by default can corrupt textual data from servers returning other encodings (e.g., `iso-8859-1` or `windows-1252`), breaking HTML parsing and LLM context extraction.
+
+Action:
+Extract the `charset` from the `Content-Type` header using a regex that handles optional quotes (e.g., `contentType.match(/charset=['"]?([\w-]+)['"]?/i)`) to instantiate `TextDecoder(charset)`. Always wrap this instantiation in a `try...catch` block with a fallback to `new TextDecoder('utf-8')` to prevent runtime crashes from invalid or unsupported character sets.
+
+## 2025-05-19 — Dynamic Charset Decoding
+Learning: Hardcoding TextDecoder() without extracting the charset from Content-Type can lead to runtime crashes or incorrect decoding when fetching non-utf-8 web content.
+Action: Always extract the charset using a regex on Content-Type and wrap TextDecoder instantiation in a try-catch fallback to utf-8.
+## 2026-05-21 — Preemptive HTML Comment Stripping
+Learning: Web documents frequently contain massive HTML comments that may harbor nested, unbroken, or malformed tags, which can trigger parsing anomalies and waste substantial LLM context tokens.
+Action: Preemptively strip all HTML comments using regex before standard boilerplate tag cleanup during document processing.
+
+## 2026-05-26 — Strict Allowlist for Fetch Content Types
+Learning: A blocklist approach for rejecting non-text payloads (e.g., matching 'pdf', 'image/', 'video/') allows other arbitrary binaries (like zip, exe, audio) to be downloaded up to the 500KB limit, wasting bandwidth, memory, and CPU decoding garbage data.
+Action: Implemented a strict allowlist in WebFetcher that only processes `text/`, `application/json`, `application/xml`, and `application/xhtml`, aggressively aborting streams for all other binary formats early.
+
+## 2024-05-14 — Fetcher Character Encoding Fix
+
+Learning:
+When fetching web content, assuming `utf-8` by default can lead to garbled text or crashes if the server responds with a different character set. `TextDecoder` should dynamically parse the `Content-Type` header.
+
+Action:
+Always extract the `charset` from `Content-Type` and wrap `new TextDecoder(charset)` in a try/catch block with a safe fallback to prevent crashes.
+## 2026-05-26 — Strict Allowlist for Fetch Content Types
+Learning: A blocklist approach for rejecting non-text payloads (e.g., matching 'pdf', 'image/', 'video/') allows other arbitrary binaries (like zip, exe, audio) to be downloaded up to the 500KB limit, wasting bandwidth, memory, and CPU decoding garbage data.
+Action: Implemented a strict allowlist in WebFetcher that only processes `text/`, `application/json`, `application/xml`, and `application/xhtml`, aggressively aborting streams for all other binary formats early.
+## 2026-05-30 — Awaiting Commander Commands in Tests
+
+Learning:
+When testing a Node CLI entry point that uses `commander` with async actions, calling `program.parse()` and waiting via `setTimeout` in the test leads to race conditions and test flakiness.
+
+Action:
+Export the result of `program.parseAsync()` from the entry point and `await` it explicitly in the test to ensure all async actions complete before making assertions.
+## 2026-06-03 — Self-Closing HTML Tags Truncation
+
+Learning:
+When stripping boilerplate HTML tags using a regex designed to remove complete and unclosed blocks (e.g., `/<tag\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi`), encountering a self-closing tag (like `<script src="..." />`) causes the regex to incorrectly consume and discard the entire remainder of the document because it never finds the closing tag.
+
+Action:
+Preemptively strip self-closing boilerplate tags using a targeted regex (e.g., `/<tag\b[^>]*\/>/gi`) before applying the full boilerplate regex to prevent massive data loss during extraction.
