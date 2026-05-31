@@ -391,6 +391,8 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+<<<<<<< HEAD
+=======
 
 	it("should correctly handle self-closing boilerplate tags without truncating the document", async () => {
 		const fetcher = new WebFetcher(3);
@@ -409,4 +411,5 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+>>>>>>> origin/master
 });
