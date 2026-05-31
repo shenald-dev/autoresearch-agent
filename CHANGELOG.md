@@ -4,6 +4,10 @@ All notable changes to autoresearch-agent will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.0.30] - 2026-05-25
+* **[Optimized]:** BOLT successfully optimized the HTML stripping logic by preemptively removing HTML comments to save context tokens.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 ## [1.0.34] - 2026-05-30
 * **[Fixed]:** Verified stability and optimized dependency management.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via npm update.
