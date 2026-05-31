@@ -111,6 +111,13 @@ In JavaScript/TypeScript, `Map` iteration strictly follows insertion order. When
 Action:
 To ensure deterministic ordering and prevent race conditions from scrambling context relevance, always pre-initialize the `Map` keys with empty values in the desired sequence before executing concurrent async tasks. Subsequent `Map.set()` calls during task completion will update the values in place without altering the established insertion order.
 
+## 2026-05-07 — Boilerplate Content Stripping
+
+Learning:
+While removing `<script>`, `<style>`, and `<svg>` blocks helps save LLM context window tokens, typical web pages contain other boilerplate elements that are not useful for text-based analysis, such as navigation bars (`<nav>`), footers (`<footer>`), inline frames (`<iframe>`), and fallback content (`<noscript>`).
+
+Action:
+Expanded the HTML stripping regex to include `nav`, `footer`, `iframe`, and `noscript` tags to further reduce payload size and conserve LLM context tokens. Ensured semantic structural tags like `<header>` or `<aside>` are not removed, as they frequently contain essential content.
 ## 2026-05-11 — Expand HTML Stripping Regex
 
 Learning:

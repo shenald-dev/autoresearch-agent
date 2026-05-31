@@ -235,13 +235,16 @@ export class WebFetcher {
 					text = await response.text();
 				}
 
-				// Robust HTML to Text stripping using Cheerio
-				// First safely strip comments to ensure proper spacing if elements were only separated by comments
-				const htmlWithoutComments = text.replace(/<!--[\s\S]*?-->/g, " ");
-				const $ = load(htmlWithoutComments);
-				$("script, style, svg, nav, footer, iframe, noscript").remove();
-				// Use .text() but add spaces between block elements to avoid concatenating text from different tags
-				const strippedText = $("body").text().replace(/\s+/g, " ").trim();
+				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
+				const strippedText = text
+					.replace(/<!--[\s\S]*?-->/g, "")
+					.replace(
+						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
+						"",
+					) // Remove complete and unclosed script/style/svg/nav/footer/iframe/noscript blocks
+					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag
+					.replace(/\s+/g, " ")
+					.trim();
 				const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
 				return truncated;
 			} catch (error: unknown) {

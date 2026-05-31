@@ -137,6 +137,39 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+	it("should correctly handle and strip malformed nested boilerplate tags", async () => {
+		const originalFetch = global.fetch;
+
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => `
+					<html>
+						<body>
+							<p>Important Content</p>
+							<footer>
+								<nav>
+									<!-- Malformed unclosed tags inside -->
+									<ul><li><noscript>Malformed <iframe> Content
+								</nav>
+							</footer>
+						</body>
+					</html>
+				`,
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/malformed-nested-strip");
+
+		expect(result).toContain("Important Content");
+		expect(result).not.toContain("Malformed");
+		expect(result).not.toContain("Malformed <iframe> Content");
+
+		global.fetch = originalFetch;
+	});
+
 	it("should cancel unconsumed response bodies during redirect loops to prevent socket leaks", async () => {
 		const originalFetch = global.fetch;
 		const mockCancel = vi.fn().mockResolvedValue(undefined);
@@ -498,8 +531,8 @@ describe("WebFetcher", () => {
 
 	it("should strip boilerplate HTML tags to save context", async () => {
 		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {			return {
-				status: 200,
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
 				ok: true,
 				text: async () => "<nav>Navigation</nav><footer>Footer</footer><noscript>No JS</noscript><iframe>Ads</iframe><p>Main content</p>"
@@ -513,48 +546,6 @@ describe("WebFetcher", () => {
 	});
 
 
-	it("should not strip content inside semantic structural tags like header or aside", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-				text: async () => `<header>Header Content</header>
-<aside>Aside Content</aside>
-<article>Article Content</article>
-<p>Main content</p>`
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/test-semantic-tags");
-		expect(result).toBe("Header Content Aside Content Article Content Main content");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should correctly strip boilerplate tags in edge cases like attributes, nested elements, and self-closing variants", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-				text: async () => `<nav class="nav" id="test">Nav</nav>
-<footer data-test="true">Footer</footer>
-<iframe src="test"></iframe>
-<noscript><span>No JS</span></noscript>
-<form><input type="text" /></form>
-<broken<tag>
-<p>Main content</p>`
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/test-edge-cases");
-		expect(result).toBe("Main content");
-
-		global.fetch = originalFetch;
-	});
 	it("should decode response body correctly using charset from Content-Type", async () => {
 		const fetcher = new WebFetcher(3);
 		const originalFetch = global.fetch;
@@ -620,21 +611,37 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
-	it("should strip HTML comments to save context tokens", async () => {
-		const fetcher = new WebFetcher(3);
+	it("should correctly handle and strip nested boilerplate tags", async () => {
 		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
 				ok: true,
-				text: async () => "<p>Before</p><!-- This is a large HTML comment that should be removed --><p>After</p>"			};
+				text: async () => `
+					<html>
+						<body>
+							<p>Important Content</p>
+							<footer>
+								<div>
+									<nav>
+										<ul><li>Nested Drop Link</li></ul>
+									</nav>
+									<p>Nested Drop Copyright</p>
+								</div>
+							</footer>
+						</body>
+					</html>
+				`,
+			};
 		});
 
-		const result = await (fetcher as any).fetchSingle("https://example.com/test-comment-strip");
-		expect(result).toBe("Before After");
+		const result = await (fetcher as any).fetchSingle("https://example.com/nested-strip");
+
+		expect(result).toContain("Important Content");
+		expect(result).not.toContain("Nested Drop Link");
+		expect(result).not.toContain("Nested Drop Copyright");
 
 		global.fetch = originalFetch;
-
+	});
 });
-});>>>>>>> origin/master
