@@ -236,13 +236,16 @@ export class WebFetcher {
 				}
 
 				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
+				// Note: Regex-based HTML stripping is limited and can struggle with severely malformed HTML.
+				// However, for the scope of extracting textual context for LLMs, these non-greedy regexes
+				// combined with the 500KB payload limit provide excellent performance and sufficient reliability
+				// without introducing large DOM parsing dependencies (which would impact startup time).
 				const strippedText = text
 					.replace(/<!--[\s\S]*?-->/g, "")
 					.replace(
-						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
+						/<(script|style|svg|nav|footer|iframe|noscript)\b(?:[^>]*\/>|[^>]*>[\s\S]*?(?:<\/\1>|$))/gi,
 						"",
-					) // Remove complete and unclosed script/style/svg/nav/footer/iframe/noscript blocks
-					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag
+					) // Remove complete, unclosed, and self-closing boilerplate blocks					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag
 					.replace(/\s+/g, " ")
 					.trim();
 				const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
