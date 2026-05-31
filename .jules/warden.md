@@ -566,6 +566,13 @@ Observed that BOLT successfully enforced a strict `Content-Type` allowlist in `W
 **Alignment / Deferred:**
 Pinned `console-table-printer` to `2.15.0` to prevent a test failure during dependency updates. Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.31 to deploy these updates.
 
+## 2026-05-22 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized `WebFetcher` to preemptively strip HTML comments before boilerplate tags. Checked for dead code using `knip` and found none. Codebase remains secure and functionally sound.
+
+**Alignment / Deferred:**
+Aligned the test suite execution to verify the changes didn't introduce regressions. All tests passing. Tagging release v1.0.30 to deploy these updates.
 ## 2026-05-28 — Assessment & Lifecycle
 
 **Observation / Pruned:**

@@ -391,4 +391,4 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
-=======});
+});
