@@ -68,6 +68,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.30] - 2026-05-26
 * **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 * **[Lifecycle]:** Assured codebase stability and aligned tests after BOLT's HTML comment stripping optimization. Verified no new regressions.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
@@ -79,6 +81,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.29] - 2026-05-20
 * **[Optimized]:** Replaced inline charset parsing in WebFetcher with the shared `extractCharset` utility to eliminate duplicate computation.
 * **[Pruned]:** Removed unused `HttpError` export from `GoogleSearcher`.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.28] - 2026-05-13
+* **[Optimized]:** Expanded HTML stripping regex in WebFetcher to remove boilerplate tags (e.g., `<nav>`, `<footer>`) and conserve LLM context tokens while preserving semantic tags.
+* **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
 ## [1.0.28] - 2026-05-14
