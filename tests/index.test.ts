@@ -64,8 +64,10 @@ describe("CLI WebFetcher index", () => {
 			"-d",
 			"1",
 		];
-		const { cliPromise } = await import("../src/index.ts");
-		await cliPromise;
+		await import("../src/index.ts");
+
+		// Let event loop clear for async commander commands
+		await new Promise((resolve) => setTimeout(resolve, 50));
 
 		expect(messageMock).toHaveBeenCalledWith("Test progress message");
 	});

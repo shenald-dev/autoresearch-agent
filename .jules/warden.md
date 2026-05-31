@@ -1,11 +1,3 @@
-## 2026-05-26 — Assessment & Lifecycle
-
-**Observation / Pruned:**
-Observed that BOLT effectively optimized HTML stripping in `WebFetcher` to preemptively remove HTML comments to save context tokens. Checked for dead code using `knip` and verified that `bin/cli.js` is an essential entry point. Added an explicit unit test to `tests/WebFetcher.test.ts` to verify the HTML comment stripping functionality.
-
-**Alignment / Deferred:**
-Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
-
 ## 2026-05-03 — Assessment & Lifecycle
 
 **Observation / Pruned:**
@@ -239,32 +231,3 @@ Observed that BOLT successfully optimized the HTML stripping logic by preemptive
 
 **Alignment / Deferred:**
 Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
-
-## 2026-05-27 — Assessment & Lifecycle
-
-**Observation / Pruned:**
-Observed that BOLT successfully enforced a strict `Content-Type` allowlist in `WebFetcher` to prevent downloading arbitrary large binaries. Checked for dead code using `knip` and verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
-
-**Alignment / Deferred:**
-Pinned `console-table-printer` to `2.15.0` to prevent a test failure during dependency updates. Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.31 to deploy these updates.
-
-## 2026-05-28 — Assessment & Lifecycle
-
-**Observation / Pruned:**
-Observed that `console-table-printer` is an unused dependency in `package.json` according to `knip`. Removed it completely to fight codebase entropy.
-
-**Alignment / Deferred:**
-Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.32 to deploy these updates.
-## 2026-05-29 — Assessment & Lifecycle
-**Observation / Pruned:**
-No massive dead system to remove today. The optimization done on the CLI (awaiting `cliPromise` correctly) handles flaky tests and improves coverage. Removed unused file via `npm update` and checked `bin/cli.js` (a false positive flagged by knip).
-
-**Alignment / Deferred:**
-Updated dependencies explicitly using `npm update`, updated the CHANGELOG accordingly, mapped async fixes and bumped project versions (from 1.0.32 to 1.0.33). Deferred major version updates since they would require breaking manual architectural migration.
-## 2026-05-30 — Assessment & Lifecycle
-
-**Observation / Pruned:**
-No massive dead system to remove today. Verified the optimizations. Checked `bin/cli.js` (a false positive flagged by knip).
-
-**Alignment / Deferred:**
-Updated dependencies explicitly using `npm update`, updated the CHANGELOG accordingly, bumped project version (from 1.0.33 to 1.0.34).

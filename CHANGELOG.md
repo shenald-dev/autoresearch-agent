@@ -8,27 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **[Optimized]:** BOLT successfully optimized the HTML stripping logic by preemptively removing HTML comments to save context tokens.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
-## [1.0.34] - 2026-05-30
-* **[Fixed]:** Verified stability and optimized dependency management.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via npm update.
-
-## [1.0.33] - 2026-05-29
-* **[Fixed]:** Fixed unhandled Promise rejection in `cliPromise` when awaiting `ResearchEngine.run` by resolving async test concurrency issues and correctly awaiting the CLI execution in tests.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.32] - 2026-05-28
-* **[Dead Code]:** Removed unused dependency `console-table-printer`.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.31] - 2026-05-27
-* **[Security]:** Enforced strict Content-Type allowlist in WebFetcher to prevent downloading arbitrary large binaries.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.30] - 2026-05-26
-* **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-
 ## [1.0.29] - 2026-05-20
 * **[Optimized]:** Replaced inline charset parsing in WebFetcher with the shared `extractCharset` utility to eliminate duplicate computation.
 * **[Pruned]:** Removed unused `HttpError` export from `GoogleSearcher`.

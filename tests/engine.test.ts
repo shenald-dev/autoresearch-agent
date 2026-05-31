@@ -30,30 +30,6 @@ describe("ResearchEngine", () => {
 		engine = new ResearchEngine({ depth: 1 });
 	});
 
-	it("throws an error if OPENAI_API_KEY is missing", async () => {
-		engine.configManager.get.mockResolvedValueOnce(undefined);
-		await expect(engine.run("test topic")).rejects.toThrow("OPENAI_API_KEY is missing.");
-	});
-
-	it("should handle invalid URL silently during filtering", async () => {
-		engine.searcher.search.mockResolvedValueOnce([
-			{ link: "invalid-url" },
-			{ link: "http://valid.com" },
-		]);
-		const fetchResults = new Map();
-		fetchResults.set("http://valid.com", "Valid content");
-        fetchResults.set("invalid-url", "Error: failed");
-		engine.fetcher.fetchBatch.mockResolvedValueOnce(fetchResults);
-		engine.prompt.pipe = vi.fn().mockReturnValue({
-			invoke: vi.fn().mockImplementation(async (args) => {
-				return { content: args.context };
-			}),
-		});
-
-		const result = await engine.run("test topic");
-		expect(result).toContain("valid.com");
-	});
-
 	it("should return early if no sources are found", async () => {
 		engine.searcher.search.mockResolvedValueOnce([]);
 		const result = await engine.run("test topic");

@@ -170,4 +170,4 @@ program
 		}
 	});
 
-export const cliPromise = program.parseAsync();
+program.parse();
