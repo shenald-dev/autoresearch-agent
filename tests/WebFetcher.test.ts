@@ -639,6 +639,43 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+
+	it("should strip HTML comments safely", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "<!-- <div> hidden > text --> <p>Main content</p>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-strip-comments");
+		expect(result).toBe("Main content");
+
+		global.fetch = originalFetch;
+	});
+
+
+	it("should correctly handle HTML comments within script tags without corrupting them", async () => {
+		const fetcher = new WebFetcher(3);
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "<script>\n<!--\nconsole.log('test');\n//-->\n</script><p>Main content</p>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-script-comments");
+		expect(result).toBe("Main content");
+
+		global.fetch = originalFetch;
+	});
+
 	it("should strip boilerplate HTML tags to save context", async () => {
 		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
