@@ -1,7 +1,7 @@
 {
   "name": "autoresearch-agent",
-  "version": "1.0.29",  "description": "Enterprise-grade autonomous AI research framework.",
-  "main": "dist/index.js",
+  "version": "1.0.29",
+  "description": "Enterprise-grade autonomous AI research framework.",  "main": "dist/index.js",
   "scripts": {    "start": "tsx src/index.ts",
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
@@ -22,6 +22,7 @@
     "@langchain/core": "^0.3.80",
     "@langchain/openai": "^0.3.17",
     "commander": "^12.1.0",
+    "console-table-printer": "2.15.0",
     "ipaddr.js": "^2.3.0",
     "p-limit": "^7.3.0",
     "picocolors": "^1.1.1",

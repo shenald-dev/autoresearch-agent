@@ -576,3 +576,10 @@ describe("WebFetcher", () => {
 
 		const result = await (fetcher as any).fetchSingle("https://example.com/fallback-test");
 		expect(result).toBe("a");
+<<<<<<< HEAD
+
+		global.fetch = originalFetch;
+	});
+});
+=======
+>>>>>>> origin/master
