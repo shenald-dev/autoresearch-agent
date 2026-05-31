@@ -47,6 +47,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **[Optimized]:** Reused `ConfigManager` instance across CLI and core services to optimize file reads.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
+## [1.0.35] - 2026-05-31
+
+* **[Dead Code]:** Removed unused `console-table-printer` dependency and removed orphaned helper scripts.
+* **[Dependencies]:** Safely bumped minor and patch dependencies.
+
 ## [1.0.33] - 2026-05-29
 * **[Fixed]:** Fixed unhandled Promise rejection in `cliPromise` when awaiting `ResearchEngine.run` by resolving async test concurrency issues and correctly awaiting the CLI execution in tests.
 ## [1.0.39] - 2026-05-28
