@@ -83,9 +83,14 @@ export class WebFetcher {
 
 			this.hostValidationCache.set(hostname, validationPromise);
 
-			validationPromise.finally(() => {
-				this.hostValidationCache.delete(hostname);
-			});
+			// Retain DNS validation in cache to prevent redundant lookups for same hostname
+			// Prevent unbounded memory growth by limiting cache size (e.g., 10,000 entries)
+			if (this.hostValidationCache.size > 10000) {
+				const firstKey = this.hostValidationCache.keys().next().value;
+				if (firstKey !== undefined) {
+					this.hostValidationCache.delete(firstKey);
+				}
+			}
 
 			return validationPromise;
 		} catch {
@@ -180,10 +185,13 @@ export class WebFetcher {
 				const contentType = (
 					response.headers.get("content-type") || ""
 				).toLowerCase();
+				// Enforce strict allowlist of text-based content types to prevent downloading arbitrary large binaries
 				if (
-					contentType.includes("application/pdf") ||
-					contentType.includes("image/") ||
-					contentType.includes("video/")
+					contentType &&
+					!contentType.includes("text/") &&
+					!contentType.includes("application/json") &&
+					!contentType.includes("application/xml") &&
+					!contentType.includes("application/xhtml")
 				) {
 					await response.body?.cancel().catch((err) => {
 						console.warn("WebFetcher cancel error:", err);
@@ -201,8 +209,7 @@ export class WebFetcher {
 						decoder = new TextDecoder(extractCharset(contentType));
 					} catch {
 						decoder = new TextDecoder("utf-8");
-					}
-					let totalBytes = 0;
+					}					let totalBytes = 0;
 					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM
 					const chunks: string[] = [];
 
@@ -228,8 +235,10 @@ export class WebFetcher {
 				}
 
 				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
+				// Note: HTML comments are preemptively stripped here to save context tokens and prevent parsing anomalies.
 				const strippedText = text
-					.replace(
+					.replace(/<!--[\s\S]*?-->/g, "")
+=======					.replace(
 						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
 						"",
 					) // Remove complete and unclosed boilerplate blocks

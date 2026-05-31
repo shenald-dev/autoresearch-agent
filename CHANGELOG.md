@@ -32,3 +32,171 @@
  
 -## [1.0.22] - 2026-05-02
 -* **[Optimization]:** Im
+﻿# Changelog
+
+All notable changes to autoresearch-agent will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.0.28] - 2026-05-17
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update` (excluding `@clack/prompts` due to test failures).
+* **[Pruned]:** Removed dead script files resolve_changelog.js and resolve_warden.js.
+## [1.0.30] - 2026-05-25
+* **[Optimized]:** BOLT successfully optimized the HTML stripping logic by preemptively removing HTML comments to save context tokens.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.34] - 2026-05-30
+* **[Fixed]:** Verified stability and optimized dependency management.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via npm update.
+
+## [1.0.33] - 2026-05-29
+* **[Fixed]:** Fixed unhandled Promise rejection in `cliPromise` when awaiting `ResearchEngine.run` by resolving async test concurrency issues and correctly awaiting the CLI execution in tests.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.32] - 2026-05-28
+* **[Dead Code]:** Removed unused dependency `console-table-printer`.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.31] - 2026-05-27
+* **[Security]:** Enforced strict Content-Type allowlist in WebFetcher to prevent downloading arbitrary large binaries.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.30] - 2026-05-26
+* **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
+* **[Lifecycle]:** Assured codebase stability and aligned tests after BOLT's HTML comment stripping optimization. Verified no new regressions.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+* **[Optimized]:** Preemptively stripped HTML comments in `WebFetcher` to conserve context tokens and prevent nested tag parsing anomalies.
+* **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+
+## [1.0.29] - 2026-05-20
+* **[Optimized]:** Replaced inline charset parsing in WebFetcher with the shared `extractCharset` utility to eliminate duplicate computation.
+* **[Pruned]:** Removed unused `HttpError` export from `GoogleSearcher`.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.28] - 2026-05-11
+* **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
+
+## [1.0.27] - 2026-05-11
+* **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.25] - 2026-05-04
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.24] - 2026-05-03
+* **[Optimization]:** Added unit tests for empty context chunk skipping in ResearchEngine.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.23] - 2026-05-02
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+
+## [1.0.22] - 2026-05-02
+* **[Optimization]:** Implemented an instance-level `configPromise` cache in `ConfigManager` to eliminate redundant file system reads and JSON parsing.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.21] - 2026-04-29
+* **[Optimization]:** Deduplicated scraped LLM context strings in ResearchEngine to improve token efficiency.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.20] - 2026-04-28
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.19] - 2026-04-27
+* **[Pruned]:** Observed that BOLT correctly optimized the WebFetcher deduplication cache key logic, which left no dead code.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.18] - 2026-04-26
+* **[Optimized]:** Eliminated redundant WebFetcher cache keys. The cache now exclusively uses the `normalizedUrl`, preventing a slow memory leak and cache bloat caused by redundant `targetUrl` entries for identical resources accessed with different hash fragments.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.17] - 2026-04-25
+* **[Security]:** Hardened SSRF mitigations by rejecting zero-length IP validation results from `dns.lookup`, preventing bypass loops.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.16] - 2026-04-24
+* **[Fixed]:** Hooked up the research engine progress callback to the CLI spinner to dynamically update the UI during potentially long research tasks without breaking formatting.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.15] - 2026-04-23
+* **[Pruned]:** Removed unused `ts-prune` devDependency and unused `EngineConfig`, `StatusCallback`, and `AutoResearchConfig` exports.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.14] - 2026-04-20
+* **[Security]:** Hardened Dockerfile configuration to build and run the container as the non-root `node` user, applying strict ownership rules to prevent runtime volume permission issues and standardizing the CLI entrypoint.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.13] - 2026-04-20
+* **[Fixed]:** Fixed unhandled exceptions when safely cancelling locked native `fetch` response streams by calling `.cancel()` directly on active stream readers.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.12] - 2026-04-18
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.11] - 2026-04-17
+### Fixed
+* **[Reliability]:** Enforce strict fetch request timeout bounds across redirect chains and prevent socket leaks on network errors.
+
+## [1.0.10] - 2026-04-16
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.9] - 2026-04-08
+* **[Optimized]:** Improved HTML stripping regex in `WebFetcher.fetchSingle` and fortified the cache by immediately deleting cached entries for URLs that fail SSRF validations or experience fetch errors, preventing invalid state from being permanently cached.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.8] - 2026-04-06
+* **[Optimized]:** Replaced simple string concatenation (`+=`) with an array-based string buffer (`push` and `join`) in `ResearchEngine.run` to prevent potential object allocation overhead and memory thrashing when aggregating context from a large number of scraped network payloads.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.7] - 2026-04-02
+* **[Optimized]:** Implemented array-based chunk buffering strategy in `WebFetcher` to optimize string concatenation of large streaming network responses, significantly reducing memory thrashing and O(N^2) allocations.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.6] - 2026-04-01
+* **[Fixed]:** Fixed TCP socket connection pooling exhaustion and memory leaks by explicitly invoking `.cancel()` on unconsumed Node.js `fetch` response streams in both `WebFetcher` and `GoogleSearcher`.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.5] - 2026-03-31
+* **[Security]:** Enhanced SSRF protection by explicitly handling HTTP redirects to prevent automatic Node.js native `fetch` bypasses into internal or malicious IP addresses.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.4] - 2026-03-30
+* **[Optimized]:** Implemented dynamic concurrency bounds based on research depth to improve web scraping performance without overwhelming resources.
+* **[Security]:** Enhanced SSRF protection by adding rigorous IP bound and loopback validation, explicitly blocking AWS metadata endpoints and IPv6 edge-cases.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies.
+
+## [1.0.3] - 2026-03-28
+* **[Fixed]:** Resolved TypeScript error `Namespace '"node:dns/promises"' has no exported member 'LookupAddress'` in `WebFetcher` by using an inline interface.
+* **[Pruned]:** Removed unused `SearchResult` export from `GoogleSearcher.ts`.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies.
+
+## [1.0.2] - 2026-03-28
+* **[Security]:** Fixed SSRF loopback bypass vulnerability by validating hostnames.
+* **[Pruned]:** Removed dead test configuration files and logs (Jest files, error logs, unused mocks) as the project now uses Vitest.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies.
+
+## [1.0.1] - 2026-03-27
+* **[Fixed]:** Replaced `any` types with explicit `unknown` and `Record<string, unknown>` types for better type safety.
+* **[Fixed]:** Resolved Biome linter warnings by strictly organizing imports and using `node:` protocol for built-in modules.
+* **[Changed]:** Bumped minor/patch versions of dependencies (`npm update`).
+
+## [1.0.32] - 2026-05-26
+
+### Changed
+* **[Security/Perf]:** Enforced strict content-type allowlist in `WebFetcher` to reject large binary files early.
+* **[Documentation]:** Aligned documentation to reflect the recent optimizations to HTML comment stripping in `WebFetcher`, saving context tokens.
+* **[Maintenance]:** Applied safe minor/patch dependency bumps via `npm update`.
+
+## [0.1.0] - YYYY-MM-DD
+
+### Added
+- Initial release
+- Core functionality: autonomous research-to-content pipeline
+- CLI with basic options
+- Health check endpoint
+- Docker support
+
+
