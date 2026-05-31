@@ -239,13 +239,8 @@ export class WebFetcher {
 				// Note: HTML comments are preemptively stripped here to save context tokens and prevent parsing anomalies.
 				const strippedText = text
 					.replace(/<!--[\s\S]*?-->/g, "")
-<<<<<<< HEAD
 =======
-					.replace(
-						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*\/>/gi,
-						"",
-					) // Remove self-closing boilerplate tags
->>>>>>> origin/master
+<<<<<<< HEAD>>>>>>> origin/master
 					.replace(
 						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
 						"",
