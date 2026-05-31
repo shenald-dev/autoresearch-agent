@@ -128,18 +128,20 @@ describe("WebFetcher", () => {
 
 		global.fetch = vi.fn().mockImplementation(async (url) => {
 			return {
-				status: 200,
-				headers: new Headers({ "content-type": "application/pdf" }),
 				ok: true,
+				status: 200,
+				headers: new Headers({
+					"content-type": "application/zip",
+				}),
 				body: { cancel: mockCancel },
 			};
 		});
 
 		const result = await (fetcher as any).fetchSingle(
-			"https://example.com/document.pdf",
+			"https://example.com/archive.zip",
 		);
 		expect(result).toContain(
-			"Error: Unsupported content type (application/pdf)",
+			"Error: Unsupported content type (application/zip)",
 		);
 		expect(mockCancel).toHaveBeenCalled();
 
@@ -307,4 +309,88 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
+
+
+	it("should decode response body correctly using charset from Content-Type", async () => {
+		const fetcher = new WebFetcher(3);
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=ISO-8859-1" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let done = false;
+						return {
+							read: async () => {
+								if (!done) {
+									done = true;
+									// 0xe9 is 'é' in ISO-8859-1
+									return { done: false, value: new Uint8Array([0xe9]) };
+								}
+								return { done: true, value: undefined };
+							},
+							cancel: async () => {},
+						};
+					},
+				},
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/iso-test");
+		expect(result).toBe("é");
+
+		global.fetch = originalFetch;
+	});
+
+	it("should fallback to utf-8 if charset is unsupported", async () => {
+		const fetcher = new WebFetcher(3);
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=unsupported-charset" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let done = false;
+						return {
+							read: async () => {
+								if (!done) {
+									done = true;
+									return { done: false, value: new Uint8Array([0x61]) }; // 'a'
+								}
+								return { done: true, value: undefined };
+							},
+							cancel: async () => {},
+						};
+					},
+				},
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/fallback-test");
+		expect(result).toBe("a");
+
+		global.fetch = originalFetch;
+	});
+
+	it("should strip HTML comments to save context tokens", async () => {
+		const fetcher = new WebFetcher(3);
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "<p>Before</p><!-- This is a large HTML comment that should be removed --><p>After</p>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-comment-strip");
+		expect(result).toBe("Before After");
+
+		global.fetch = originalFetch;
+	});
 });

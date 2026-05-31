@@ -120,3 +120,28 @@ Unnecessary boilerplate elements such as `<nav>`, `<footer>`, `<iframe>`, and `<
 
 Action:
 Expanded the HTML stripping regex in `WebFetcher` to safely remove complete and unclosed boilerplate tags without touching semantic tags to save LLM context window tokens and improve API efficiency.
+
+## 2025-05-19 — Dynamic Charset Decoding
+Learning: Hardcoding TextDecoder() without extracting the charset from Content-Type can lead to runtime crashes or incorrect decoding when fetching non-utf-8 web content.
+Action: Always extract the charset using a regex on Content-Type and wrap TextDecoder instantiation in a try-catch fallback to utf-8.
+## 2026-05-21 — Preemptive HTML Comment Stripping
+Learning: Web documents frequently contain massive HTML comments that may harbor nested, unbroken, or malformed tags, which can trigger parsing anomalies and waste substantial LLM context tokens.
+Action: Preemptively strip all HTML comments using regex before standard boilerplate tag cleanup during document processing.
+## 2026-05-26 — Strict Allowlist for Fetch Content Types
+Learning: A blocklist approach for rejecting non-text payloads (e.g., matching 'pdf', 'image/', 'video/') allows other arbitrary binaries (like zip, exe, audio) to be downloaded up to the 500KB limit, wasting bandwidth, memory, and CPU decoding garbage data.
+Action: Implemented a strict allowlist in WebFetcher that only processes `text/`, `application/json`, `application/xml`, and `application/xhtml`, aggressively aborting streams for all other binary formats early.
+
+## 2026-05-30 — Awaiting Commander Commands in Tests
+
+Learning:
+When testing a Node CLI entry point that uses `commander` with async actions, calling `program.parse()` and waiting via `setTimeout` in the test leads to race conditions and test flakiness.
+
+Action:
+Export the result of `program.parseAsync()` from the entry point and `await` it explicitly in the test to ensure all async actions complete before making assertions.
+## 2026-06-03 — Self-Closing HTML Tags Truncation
+
+Learning:
+When stripping boilerplate HTML tags using a regex designed to remove complete and unclosed blocks (e.g., `/<tag\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi`), encountering a self-closing tag (like `<script src="..." />`) causes the regex to incorrectly consume and discard the entire remainder of the document because it never finds the closing tag.
+
+Action:
+Preemptively strip self-closing boilerplate tags using a targeted regex (e.g., `/<tag\b[^>]*\/>/gi`) before applying the full boilerplate regex to prevent massive data loss during extraction.
