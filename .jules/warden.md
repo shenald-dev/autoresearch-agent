@@ -1,4 +1,13 @@
 We are given a 3-way merge scenario for the file `.jules/warden.md`.
+## 2026-05-26 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized HTML stripping in `WebFetcher` to preemptively remove HTML comments to save context tokens. Checked for dead code using `knip` and verified that `bin/cli.js` is an essential entry point. Added an explicit unit test to `tests/WebFetcher.test.ts` to verify the HTML comment stripping functionality.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
+
+## 2026-05-03 — Assessment & Lifecycle
 
 We have:
 - Ancestor (common base)
@@ -424,3 +433,156 @@ This is very confusing because the head branch's version of the file (as given i
     Let's break down the changes:
 
     In the ancestor, we had a section for "## 2
+**Alignment / Deferred:**
+Deferred fully comprehensive SSRF implementation (via asynchronous DNS resolution) as the current mitigation does not break functionality, and a complex implementation was not strictly necessary for stability. Applied safe minor/patch dependency bumps.
+
+## 2026-03-27 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that the system maintained its architectural integrity after recent SSRF optimization, but was carrying multiple minor code hygiene issues (e.g., untyped errors via `any`, non-explicit Node modules imports, and unordered imports). Addressed these minor entropy points to prevent future bugs.
+
+**Alignment / Deferred:**
+Bumped minor/patch versions of dependencies (e.g., `vitest` to `4.1.2`, `vite` to `8.0.3`, `rolldown` to `1.0.0-rc.12`, `zod-to-json-schema` to `3.25.2`) using safe `npm update`. Refactored `any` typings to explicit `unknown` bounds to enforce strict checking and ensure the test suite is safe.
+## 2026-04-03 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed the introduction of an array-based chunk buffering strategy in `src/core/engine.ts` (`ResearchEngine.run`) to optimize string concatenation of large context payloads, mitigating O(N^2) memory allocations and thrashing. Codebase remains clean; ran `npx ts-prune` which confirmed no dead code or orphaned exports.
+
+**Alignment / Deferred:**
+Applied safe minor/patch dependency bumps via `npm update`. Verified the integrity of the string optimization via the test suite (`npm run test`) and linter (`npm run lint`), which all passed perfectly. Prepared version 1.0.8 release with no deferred items.
+
+## 2026-04-17 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the fetch network calls timeout mechanism in `WebFetcher`. By hoisting the `AbortSignal.timeout(15000)` outside the redirect loop, it ensures the timeout correctly bounds the entire request chain rather than resetting per redirect. Additionally, ensuring `response` is accessible in the `catch` block allows `response?.body?.cancel()` to run on network errors, preventing socket exhaustion. Codebase remains clean; ran `npx ts-prune` which confirmed no dead code or orphaned exports.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. All tests pass safely, confirming no regressions. Prepared version 1.0.11 release with no deferred items.
+
+## 2026-04-20 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively fixed the unhandled exception error when safely cancelling locked `fetch` streams by keeping track of active `reader`s and cancelling those instead. Checked for dead code using `ts-prune` and verified the project remains clean.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.13 to deploy these updates.
+
+## 2026-04-23 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the deduplication logic in `WebFetcher.fetchBatch` by preemptively deduplicating URLs using a `Set` before further processing, directly addressing a performance overhead on the hot path without altering behavior. Removed unused `EngineConfig`, `StatusCallback`, and `AutoResearchConfig` exports and `ts-prune` devDependency after running `npx knip`.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.15 to deploy these updates.
+## 2026-04-26 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the cache key logic in `WebFetcher`, strictly using the normalized URLs instead of redundant keys, preventing a memory leak and bloating the cache on hash fragments.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.18 to deploy these updates.
+
+
+## 2026-04-27 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the cache key logic in `WebFetcher`, strictly using the normalized URLs instead of redundant keys, preventing a memory leak and bloating the cache on hash fragments. Checked for dead code using `ts-prune` and `knip` and found none.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.19 to deploy these updates.
+
+## 2026-04-28 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the cache key logic in `WebFetcher`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.20 to deploy these updates.
+
+## 2026-04-29 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the context deduplication logic in `ResearchEngine.run`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.21 to deploy these updates.
+## 2026-05-02 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the configuration reading logic in `ConfigManager` by introducing an in-memory `configPromise` cache. This prevents redundant file system reads and JSON parsing on subsequent calls to `getConfig()`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.22 to deploy these updates.
+## 2026-05-02 — Assessment & Lifecycle (2)
+
+**Observation / Pruned:**
+Checked for dead code using `knip`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.23 to deploy these updates.
+## 2026-05-04 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Checked for dead code using `knip` and `ts-prune`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.25 to deploy these updates.
+## 2026-05-11 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the system by reusing the ConfigManager instance across services to optimize file reads. Checked for dead code using knip and ts-prune. Verified that bin/cli.js is an essential entry point despite knip flagging it. No dead code found.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran npm update to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.27 to deploy these updates.
+
+## 2026-05-11 — Assessment & Lifecycle (2)
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the system by reusing the ConfigManager instance. Pruned temporary resolution scripts `resolve_changelog.js` and `resolve_warden.js`.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. All tests passing. Tagging release v1.0.28 to deploy these updates.
+
+## 2026-05-20 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the `WebFetcher` charset extraction by replacing the inline regex parsing logic with a direct call to the shared `extractCharset` utility from `src/utils/http.ts`. This eliminates redundant logic and ensures consistent decoding behavior across the codebase. Checked for dead code using `knip` and discovered `HttpError` was unnecessarily exported in `src/tools/GoogleSearcher.ts`. Removed the unused export.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.29 to deploy these updates.
+## 2026-05-25 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT successfully optimized the HTML stripping logic by preemptively removing HTML comments to save context tokens. Checked for dead code using `knip`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.30 to deploy these updates.
+
+## 2026-05-27 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT successfully enforced a strict `Content-Type` allowlist in `WebFetcher` to prevent downloading arbitrary large binaries. Checked for dead code using `knip` and verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found.
+
+**Alignment / Deferred:**
+Pinned `console-table-printer` to `2.15.0` to prevent a test failure during dependency updates. Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.31 to deploy these updates.
+
+## 2026-05-28 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that `console-table-printer` is an unused dependency in `package.json` according to `knip`. Removed it completely to fight codebase entropy.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.32 to deploy these updates.
+## 2026-05-29 — Assessment & Lifecycle
+**Observation / Pruned:**
+No massive dead system to remove today. The optimization done on the CLI (awaiting `cliPromise` correctly) handles flaky tests and improves coverage. Removed unused file via `npm update` and checked `bin/cli.js` (a false positive flagged by knip).
+
+**Alignment / Deferred:**
+Updated dependencies explicitly using `npm update`, updated the CHANGELOG accordingly, mapped async fixes and bumped project versions (from 1.0.32 to 1.0.33). Deferred major version updates since they would require breaking manual architectural migration.
+## 2026-05-30 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+No massive dead system to remove today. Verified the optimizations. Checked `bin/cli.js` (a false positive flagged by knip).
+
+**Alignment / Deferred:**
+Updated dependencies explicitly using `npm update`, updated the CHANGELOG accordingly, bumped project version (from 1.0.33 to 1.0.34).

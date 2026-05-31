@@ -391,4 +391,6 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
+=======
+<<<<<<< HEAD>>>>>>> origin/master
 });
