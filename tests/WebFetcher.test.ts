@@ -643,8 +643,8 @@ describe("WebFetcher", () => {
 		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
 			return {
-				status: 200,				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),				ok: true,
 				text: async () => "<nav>Navigation</nav><footer>Footer</footer><noscript>No JS</noscript><iframe>Ads</iframe><p>Main content</p>"
 			};
 		});
@@ -655,7 +655,6 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
-=======
 
 >>>>>>> origin/master
 	it("should decode response body correctly using charset from Content-Type", async () => {
@@ -723,12 +722,9 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
-<<<<<<< HEAD
-
-
 	it("should strip HTML comments to save context tokens", async () => {
-		const fetcher = new WebFetcher(3);		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
+		const fetcher = new WebFetcher(3);
+		const originalFetch = global.fetch;		global.fetch = vi.fn().mockImplementation(async () => {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
@@ -742,5 +738,4 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
-
 });
