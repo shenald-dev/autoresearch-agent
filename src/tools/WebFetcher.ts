@@ -83,14 +83,9 @@ export class WebFetcher {
 
 			this.hostValidationCache.set(hostname, validationPromise);
 
-			// Retain DNS validation in cache to prevent redundant lookups for same hostname
-			// Prevent unbounded memory growth by limiting cache size (e.g., 10,000 entries)
-			if (this.hostValidationCache.size > 10000) {
-				const firstKey = this.hostValidationCache.keys().next().value;
-				if (firstKey !== undefined) {
-					this.hostValidationCache.delete(firstKey);
-				}
-			}
+			validationPromise.finally(() => {
+				this.hostValidationCache.delete(hostname);
+			});
 
 			return validationPromise;
 		} catch {
@@ -208,9 +203,11 @@ export class WebFetcher {
 					try {
 						decoder = new TextDecoder(extractCharset(contentType));
 					} catch {
-						decoder = new TextDecoder("utf-8");					}
+						decoder = new TextDecoder("utf-8");
+					}
 					let totalBytes = 0;
-					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM					const chunks: string[] = [];
+					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM
+					const chunks: string[] = [];
 
 					while (true) {
 						const { done, value } = await reader.read();
@@ -234,13 +231,13 @@ export class WebFetcher {
 				}
 
 				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
-				// Note: HTML comments are preemptively stripped here to save context tokens and prevent parsing anomalies.
 				const strippedText = text
 					.replace(/<!--[\s\S]*?-->/g, "")
 					.replace(
 						/<(script|style|svg|nav|footer|iframe)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
 						"",
-					) // Remove complete and unclosed boilerplate/non-content blocks					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag
+					) // Remove complete and unclosed boilerplate/non-content blocks
+					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag
 					.replace(/\s+/g, " ")
 					.trim();
 
