@@ -206,8 +206,8 @@ export class WebFetcher {
 					reader = response.body.getReader();
 					let decoder: TextDecoder;
 					try {
-						decoder = new TextDecoder(extractCharset(contentType));
-					} catch {
+						const charset = extractCharset(contentType);
+						decoder = new TextDecoder(charset.trim().toLowerCase());					} catch {
 						decoder = new TextDecoder("utf-8");
 					}
 					let totalBytes = 0;
