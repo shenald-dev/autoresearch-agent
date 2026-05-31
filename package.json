@@ -20,12 +20,10 @@
   "author": "shenald.dev",
   "license": "MIT",
   "dependencies": {
-    "@clack/prompts": "1.2.0",
+    "@clack/prompts": "^1.2.0",
     "@langchain/core": "^0.3.80",
     "@langchain/openai": "^0.3.17",
-    "cheerio": "^1.2.0",
     "commander": "^12.1.0",
-    "console-table-printer": "2.15.0",
     "ipaddr.js": "^2.3.0",
     "p-limit": "^7.3.0",
     "picocolors": "^1.1.1",
