@@ -234,6 +234,10 @@ export class WebFetcher {
 				const strippedText = text
 					.replace(/<!--[\s\S]*?-->/g, "")
 					.replace(
+						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*\/>/gi,
+						"",
+					) // Remove self-closing boilerplate tags
+					.replace(
 						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
 						"",
 					) // Remove complete and unclosed boilerplate blocks
