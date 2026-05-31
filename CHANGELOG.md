@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
 ## [1.0.30] - 2026-05-26
+* **[Optimized]:** Preemptively stripped HTML comments in `WebFetcher` to conserve context tokens and prevent nested tag parsing anomalies.
 * **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
