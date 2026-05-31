@@ -693,86 +693,111 @@ describe("WebFetcher", () => {
 	});
 
 
->>>>>>> origin/master
-	it("should decode response body correctly using charset from Content-Type", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
+it("should decode different charsets correctly and fallback to utf-8 safely", async () => {
+	const originalFetch = global.fetch;
+	global.fetch = vi.fn().mockImplementation(async (url) => {
+		if (url.includes("iso")) {
 			return {
 				status: 200,
-				headers: new Headers({ "content-type": "text/html; charset=ISO-8859-1" }),
+				headers: new Headers({ "content-type": "text/html; charset=iso-8859-1" }),
 				ok: true,
 				body: {
 					getReader: () => {
+						const text = "H\xe9llo W\xf6rld";
+						const uint8Array = new Uint8Array(text.length);
+						for (let i = 0; i < text.length; i++) {
+							uint8Array[i] = text.charCodeAt(i);
+						}
 						let done = false;
 						return {
 							read: async () => {
-								if (!done) {
-									done = true;
-									// 0xe9 is 'é' in ISO-8859-1
-									return { done: false, value: new Uint8Array([0xe9]) };
-								}
-								return { done: true, value: undefined };
+								if (done) return { done: true, value: undefined };
+								done = true;
+								return { done: false, value: uint8Array };
 							},
-							cancel: async () => {},
+							cancel: vi.fn()
 						};
-					},
-				},
+					}
+				}
 			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/iso-test");
-		expect(result).toBe("é");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should fallback to utf-8 if charset is unsupported", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
+		} else if (url.includes("unsupported")) {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html; charset=unsupported-charset" }),
 				ok: true,
 				body: {
 					getReader: () => {
+						const text = "Fallback to UTF-8";
+						const uint8Array = new Uint8Array(text.length);
+						for (let i = 0; i < text.length; i++) {
+							uint8Array[i] = text.charCodeAt(i);
+						}
 						let done = false;
 						return {
 							read: async () => {
-								if (!done) {
-									done = true;
-									return { done: false, value: new Uint8Array([0x61]) }; // 'a'
-								}
-								return { done: true, value: undefined };
+								if (done) return { done: true, value: undefined };
+								done = true;
+								return { done: false, value: uint8Array };
 							},
-							cancel: async () => {},
+							cancel: vi.fn()
 						};
-					},
-				},
+					}
+				}
 			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/fallback-test");
-		expect(result).toBe("a");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should strip HTML comments to save context tokens", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;		global.fetch = vi.fn().mockImplementation(async () => {
+		} else {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
 				ok: true,
-				text: async () => "<p>Before</p><!-- This is a large HTML comment that should be removed --><p>After</p>"
+				body: {
+					getReader: () => {
+						const text = "No charset provided";
+						const uint8Array = new Uint8Array(text.length);
+						for (let i = 0; i < text.length; i++) {
+							uint8Array[i] = text.charCodeAt(i);
+						}
+						let done = false;
+						return {
+							read: async () => {
+								if (done) return { done: true, value: undefined };
+								done = true;
+								return { done: false, value: uint8Array };
+							},
+							cancel: vi.fn()
+						};
+					}
+				}
 			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/test-comment-strip");
-		expect(result).toBe("Before After");
-
-		global.fetch = originalFetch;
+		}
 	});
+
+	const resultIso = await (fetcher as any).fetchSingle("https://example.com/iso");
+	expect(resultIso).toContain("Héllo Wörld");
+
+	const resultUnsupported = await (fetcher as any).fetchSingle("https://example.com/unsupported");
+	expect(resultUnsupported).toContain("Fallback to UTF-8");
+
+	const resultNoCharset = await (fetcher as any).fetchSingle("https://example.com/no-charset");
+	expect(resultNoCharset).toContain("No charset provided");
+
+	global.fetch = originalFetch;
+});
+});
+
+it("should strip HTML comments to save context tokens", async () => {
+	const fetcher = new WebFetcher(3);
+	const originalFetch = global.fetch;
+	global.fetch = vi.fn().mockImplementation(async () => {
+		return {
+			status: 200,
+			headers: new Headers({ "content-type": "text/html" }),
+			ok: true,
+			text: async () => "<p>Before</p><!-- This is a large HTML comment that should be removed --><p>After</p>"
+		};
+	});
+
+	const result = await (fetcher as any).fetchSingle("https://example.com/test-comment-strip");
+	expect(result).toBe("Before After");
+
+	global.fetch = originalFetch;
 });
