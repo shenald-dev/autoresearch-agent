@@ -43,6 +43,8 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
  However, note that the base branch has a version 1.0.31 (which is newer than the head's 1.0.30) and the head branch has versions 1.0.29 and 1.0.28 that are not in the base.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.0.33] - 2026-05-29
+* **[Fixed]:** Fixed unhandled Promise rejection in `cliPromise` when awaiting `ResearchEngine.run` by resolving async test concurrency issues and correctly awaiting the CLI execution in tests.
 ## [1.0.39] - 2026-05-28
 * **[Fixed]:** Successfully resolved cascading merge conflicts with the `master` branch, protecting the strict `Content-Type` allowlist, the preemptive HTML comment stripping, and all previously consolidated optimizations for HTTP fetching and charset decoding.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
@@ -67,6 +69,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **[Pruned]:** Removed unused `HttpError` export from `GoogleSearcher`.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
+* **Lifecycle:** Verified BOLT optimizations (HTML stripping context deduction, fetch concurrency). Pruned dead resolve script files and applied safe dependency minor/patch updates. Prepared v1.0.28 release.
+* **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
 ## [1.0.28] - 2026-05-11
 * **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
 

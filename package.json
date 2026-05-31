@@ -1,11 +1,12 @@
 {
   "name": "autoresearch-agent",
-  "version": "1.0.32",
+  "version": "1.0.33",
   "description": "Enterprise-grade autonomous AI research framework.",
   "main": "dist/index.js",
   "scripts": {
     "start": "tsx src/index.ts",
-    "build": "tsc",    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
     "test": "vitest run",
     "lint": "biome check src/",
     "format": "biome format --write src/"
