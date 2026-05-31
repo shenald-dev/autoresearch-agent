@@ -1,8 +1,10 @@
 {
   "name": "autoresearch-agent",
-  "version": "1.0.29",  "description": "Enterprise-grade autonomous AI research framework.",
+  "version": "1.0.29",
+  "description": "Enterprise-grade autonomous AI research framework.",
   "main": "dist/index.js",
-  "scripts": {    "start": "tsx src/index.ts",
+  "scripts": {
+    "start": "tsx src/index.ts",
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
     "test": "vitest run",
@@ -18,7 +20,7 @@
   "author": "shenald.dev",
   "license": "MIT",
   "dependencies": {
-    "@clack/prompts": "1.2.0",
+    "@clack/prompts": "^1.2.0",
     "@langchain/core": "^0.3.80",
     "@langchain/openai": "^0.3.17",
     "commander": "^12.1.0",

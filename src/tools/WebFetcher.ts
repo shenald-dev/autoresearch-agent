@@ -83,14 +83,9 @@ export class WebFetcher {
 
 			this.hostValidationCache.set(hostname, validationPromise);
 
-			// Retain DNS validation in cache to prevent redundant lookups for same hostname
-			// Prevent unbounded memory growth by limiting cache size (e.g., 10,000 entries)
-			if (this.hostValidationCache.size > 10000) {
-				const firstKey = this.hostValidationCache.keys().next().value;
-				if (firstKey !== undefined) {
-					this.hostValidationCache.delete(firstKey);
-				}
-			}
+			validationPromise.finally(() => {
+				this.hostValidationCache.delete(hostname);
+			});
 
 			return validationPromise;
 		} catch {
@@ -215,7 +210,8 @@ export class WebFetcher {
 							decoder = new TextDecoder("utf-8");
 						} else {
 							throw e;
-						}					}
+						}
+					}
 					let totalBytes = 0;
 					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM
 					const chunks: string[] = [];
@@ -242,10 +238,9 @@ export class WebFetcher {
 				}
 
 				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
-				// Note: HTML comments are preemptively stripped here to save context tokens and prevent parsing anomalies.
 				const strippedText = text
 					.replace(/<!--[\s\S]*?-->/g, "")
-=======					.replace(
+					.replace(
 						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
 						"",
 					) // Remove complete and unclosed boilerplate blocks
