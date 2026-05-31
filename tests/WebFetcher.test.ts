@@ -503,8 +503,7 @@ describe("WebFetcher", () => {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
 				ok: true,
-				text: async () => "<nav>Navigation</nav><footer>Footer</footer><noscript>No JS</noscript><iframe>Ads</iframe><p>Main content</p>"
-			};
+				text: async () => "<nav>Navigation</nav><footer>Footer</footer><iframe>Ads</iframe><p>Main content</p>"			};
 		});
 
 		const result = await (fetcher as any).fetchSingle("https://example.com/test-strip");
@@ -514,14 +513,29 @@ describe("WebFetcher", () => {
 	});
 
 
-
-	it("should decode response body correctly using charset from Content-Type", async () => {
-		const fetcher = new WebFetcher(3);
+	it("should preserve actual content when stripping boilerplate tags", async () => {
 		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
 			return {
-				status: 200,				headers: new Headers({ "content-type": "text/html; charset=ISO-8859-1" }),
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
 				ok: true,
+				text: async () => "<nav>Navigation</nav><article><h1>The Real Story</h1><p>Here is some text.</p></article><footer>Footer</footer><iframe>Ads</iframe>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-preserve");
+		expect(result).toBe("The Real Story Here is some text.");
+
+		global.fetch = originalFetch;
+	});
+
+	it("should decode response body correctly using charset from Content-Type", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=ISO-8859-1" }),				ok: true,
 				body: {
 					getReader: () => {
 						let done = false;
@@ -547,11 +561,26 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
-=======
-=======>>>>>>> origin/master
->>>>>>> origin/master
-	it("should fallback to utf-8 if charset is unsupported", async () => {
+	it("should gracefully handle malformed HTML without blowing up the context", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "<nav>Broken Nav</nav> <p>Real Content</p> <script>alert(1);<script> <p>More Content</p>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-malformed");
+		expect(result).toContain("Real Content");
+
+		global.fetch = originalFetch;
+	});
+
+	it("should fallback to utf-8 if charset is unsupported", async () => {	it("should fallback to utf-8 if charset is unsupported", async () => {
 		const fetcher = new WebFetcher(3);
+>>>>>>> origin/master
 		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
 			return {
@@ -582,9 +611,24 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
-	it("should strip HTML comments to save context tokens", async () => {
-		const fetcher = new WebFetcher(3);
+	it("should preserve noscript fallback content while stripping the tags", async () => {
 		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				text: async () => "<noscript>This site requires JS</noscript><article>Main content</article>"
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-noscript-content");
+        expect(result).toContain("This site requires JS");
+
+		global.fetch = originalFetch;
+	});
+
+	it("should strip HTML comments to save context tokens", async () => {		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
 			return {
 				status: 200,
@@ -599,6 +643,4 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
-<<<<<<< HEAD});
-=======
->>>>>>> origin/master
+});>>>>>>> origin/master
