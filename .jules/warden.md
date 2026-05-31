@@ -588,6 +588,14 @@ Checked for dead code using `knip` and `ts-prune`. Verified that `bin/cli.js` is
 
 **Alignment / Deferred:**
 Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.25 to deploy these updates.
+
+## 2026-05-06 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the configuration reading logic by initializing and reusing the `ConfigManager` instance in `src/index.ts` and passing it to `ResearchEngine` and `GoogleSearcher`. This prevents redundant file system reads and cache misses. Checked for dead code using `knip` and found none.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.27 to deploy these updates.
 ## 2026-05-06 — Assessment & Lifecycle
 
 **Observation / Pruned:**

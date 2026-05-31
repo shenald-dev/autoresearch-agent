@@ -729,7 +729,6 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
-
 	it("should strip HTML comments safely", async () => {
 		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
@@ -746,7 +745,6 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
-
 
 	it("should correctly handle HTML comments within script tags without corrupting them", async () => {
 		const fetcher = new WebFetcher(3);

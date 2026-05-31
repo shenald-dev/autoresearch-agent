@@ -43,6 +43,10 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
  However, note that the base branch has a version 1.0.31 (which is newer than the head's 1.0.30) and the head branch has versions 1.0.29 and 1.0.28 that are not in the base.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.0.27] - 2026-05-06
+* **[Optimized]:** Reused `ConfigManager` instance across CLI and core services to optimize file reads.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 ## [1.0.33] - 2026-05-29
 * **[Fixed]:** Fixed unhandled Promise rejection in `cliPromise` when awaiting `ResearchEngine.run` by resolving async test concurrency issues and correctly awaiting the CLI execution in tests.
 ## [1.0.39] - 2026-05-28
