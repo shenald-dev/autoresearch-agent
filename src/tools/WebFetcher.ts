@@ -84,9 +84,14 @@ export class WebFetcher {
 
 			this.hostValidationCache.set(hostname, validationPromise);
 
-			validationPromise.finally(() => {
-				this.hostValidationCache.delete(hostname);
-			});
+			// Retain DNS validation in cache to prevent redundant lookups for same hostname
+			// Prevent unbounded memory growth by limiting cache size (e.g., 10,000 entries)
+			if (this.hostValidationCache.size > 10000) {
+				const firstKey = this.hostValidationCache.keys().next().value;
+				if (firstKey !== undefined) {
+					this.hostValidationCache.delete(firstKey);
+				}
+			}
 
 			return validationPromise;
 		} catch {
@@ -209,7 +214,6 @@ export class WebFetcher {
 					let totalBytes = 0;
 					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM
 					const chunks: string[] = [];
-
 					while (true) {
 						const { done, value } = await reader.read();
 						if (done) break;
@@ -238,7 +242,6 @@ export class WebFetcher {
 				$("script, style, svg, nav, footer, iframe, noscript").remove();
 				// Use .text() but add spaces between block elements to avoid concatenating text from different tags
 				const strippedText = $("body").text().replace(/\s+/g, " ").trim();
-
 				const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
 				return truncated;
 			} catch (error: unknown) {
