@@ -550,6 +550,11 @@ Observed that BOLT effectively optimized the `WebFetcher` charset extraction by 
 
 **Alignment / Deferred:**
 Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.29 to deploy these updates.
+
+## 2026-05-26 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT successfully enforced a strict `Content-Type` allowlist in `WebFetcher` to prevent downloading arbitrary large binaries. Also observed preemptive stripping of HTML comments to save context tokens. Checked for dead code using `knip` and found no dead code.
 ## 2026-05-25 — Assessment & Lifecycle
 
 **Observation / Pruned:**
@@ -579,6 +584,7 @@ Aligned the test suite execution to verify the changes didn't introduce regressi
 Observed that `console-table-printer` is an unused dependency in `package.json` according to `knip`. Removed it completely to fight codebase entropy.
 
 **Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.33 to deploy these updates.
 Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.32 to deploy these updates.
 ## 2026-05-29 — Assessment & Lifecycle
 **Observation / Pruned:**
