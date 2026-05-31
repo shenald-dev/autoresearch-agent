@@ -206,7 +206,6 @@ export class WebFetcher {
 				if (response.body) {
 					reader = response.body.getReader();
 					let decoder: TextDecoder;
-					const charsetMatch = contentType.match(/charset=['"]?([\w-]+)['"]?/i);
 					try {
 						decoder = new TextDecoder(extractCharset(contentType));
 					} catch {
