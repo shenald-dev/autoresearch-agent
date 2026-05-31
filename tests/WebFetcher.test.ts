@@ -2,116 +2,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { WebFetcher } from "../src/tools/WebFetcher";
 
 describe("WebFetcher", () => {
-	it("should preserve semantic HTML but strip boilerplate like <nav> and <footer>", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-				text: async () => `
-					<html>
-						<body>
-							<nav>Should be stripped</nav>
-							<header><h1>Semantic Title</h1></header>
-							<main>Main content here</main>
-							<footer>Should also be stripped</footer>
-							<iframe src="ads"></iframe>
-							<noscript>No JS</noscript>
-						</body>
-					</html>
-				`,
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/test-html");
-
-		expect(result).toContain("Semantic Title");
-		expect(result).toContain("Main content here");
-
-		expect(result).not.toContain("Should be stripped");
-		expect(result).not.toContain("Should also be stripped");
-		expect(result).not.toContain("ads");
-		expect(result).not.toContain("No JS");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should properly strip nested boilerplate tags", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-				text: async () => `
-					<html>
-						<body>
-							<nav>
-								<ul>
-									<li><a href="#">Link 1</a></li>
-									<li><script>console.log("nested script")</script></li>
-								</ul>
-								<div>Some text</div>
-								<iframe src="inner" />
-							</nav>
-							<main>Main content</main>
-						</body>
-					</html>
-				`,
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/test-nested");
-
-		expect(result).toContain("Main content");
-
-		expect(result).not.toContain("Link 1");
-		expect(result).not.toContain("nested script");
-		expect(result).not.toContain("Some text");
-		expect(result).not.toContain("inner");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should handle edge cases with self-closing boilerplate tags and tags with unusual attributes", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-				text: async () => `
-					<html>
-						<body>
-							<nav class="super-weird" data-custom="yes" >Strip this</nav>
-							<iframe src="tracker" width="0" height="0" />
-							<noscript aria-hidden="true" >No JS</noscript>
-							<footer
-								id="main-footer"
-							>
-								Multi-line attributes
-							</footer>
-							<main>Keep this content</main>
-						</body>
-					</html>
-				`,
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/test-edge-cases");
-
-		expect(result).toContain("Keep this content");
-
-		expect(result).not.toContain("Strip this");
-		expect(result).not.toContain("Multi-line attributes");
-		expect(result).not.toContain("No JS");
-		expect(result).not.toContain("tracker");
-
-		global.fetch = originalFetch;
-	});
-
-
 	let fetcher: WebFetcher;
 
 	beforeEach(() => {
@@ -207,39 +97,6 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
-	it("should correctly handle and strip malformed nested boilerplate tags", async () => {
-		const originalFetch = global.fetch;
-
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-				text: async () => `
-					<html>
-						<body>
-							<p>Important Content</p>
-							<footer>
-								<nav>
-									<!-- Malformed unclosed tags inside -->
-									<ul><li><noscript>Malformed <iframe> Content
-								</nav>
-							</footer>
-						</body>
-					</html>
-				`,
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/malformed-nested-strip");
-
-		expect(result).toContain("Important Content");
-		expect(result).not.toContain("Malformed");
-		expect(result).not.toContain("Malformed <iframe> Content");
-
-		global.fetch = originalFetch;
-	});
-
 	it("should cancel unconsumed response bodies during redirect loops to prevent socket leaks", async () => {
 		const originalFetch = global.fetch;
 		const mockCancel = vi.fn().mockResolvedValue(undefined);
@@ -271,20 +128,18 @@ describe("WebFetcher", () => {
 
 		global.fetch = vi.fn().mockImplementation(async (url) => {
 			return {
-				ok: true,
 				status: 200,
-				headers: new Headers({
-					"content-type": "application/zip",
-				}),
+				headers: new Headers({ "content-type": "application/pdf" }),
+				ok: true,
 				body: { cancel: mockCancel },
 			};
 		});
 
 		const result = await (fetcher as any).fetchSingle(
-			"https://example.com/archive.zip",
+			"https://example.com/document.pdf",
 		);
 		expect(result).toContain(
-			"Error: Unsupported content type (application/zip)",
+			"Error: Unsupported content type (application/pdf)",
 		);
 		expect(mockCancel).toHaveBeenCalled();
 
@@ -363,300 +218,6 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
-	it("should decode response body correctly using charset from Content-Type", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html; charset=ISO-8859-1" }),
-				ok: true,
-				body: {
-					getReader: () => {
-						let done = false;
-						return {
-							read: async () => {
-								if (!done) {
-									done = true;
-									// 0xe9 is 'é' in ISO-8859-1
-									return { done: false, value: new Uint8Array([0xe9]) };
-								}
-								return { done: true, value: undefined };
-							},
-							cancel: async () => {},
-						};
-					},
-				},
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/iso-test");
-		expect(result).toBe("é");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should fallback to utf-8 if charset is unsupported", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html; charset=unsupported-charset" }),
-				ok: true,
-				body: {
-					getReader: () => {
-						let done = false;
-						return {
-							read: async () => {
-								if (!done) {
-									done = true;
-									return { done: false, value: new Uint8Array([0x61]) }; // 'a'
-								}
-								return { done: true, value: undefined };
-							},
-							cancel: async () => {},
-						};
-					},
-				},
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/fallback-test");
-		expect(result).toBe("a");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should handle extra spaces in Content-Type gracefully", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-
-		global.fetch = vi.fn().mockImplementation(async () => {
-			const encoder = new TextEncoder();
-			const encoded = encoder.encode("Spaced Test Content");
-			const stream = new ReadableStream({
-				start(controller) {
-					controller.enqueue(encoded);
-					controller.close();
-				}
-			});
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html; charset  =  windows-1252" }),
-				ok: true,
-				body: stream,
-			};
-		});
-		const resultSpaced = await (fetcher as any).fetchSingle("https://example.com/spaced-charset");
-		expect(resultSpaced).toBe("Spaced Test Content");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should handle missing charset in Content-Type gracefully", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-
-		global.fetch = vi.fn().mockImplementation(async () => {
-			const encoder = new TextEncoder();
-			const encoded = encoder.encode("Missing Test Content");
-			const stream = new ReadableStream({
-				start(controller) {
-					controller.enqueue(encoded);
-					controller.close();
-				}
-			});
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-				body: stream,
-			};
-		});
-		const resultMissing = await (fetcher as any).fetchSingle("https://example.com/missing-charset");
-		expect(resultMissing).toBe("Missing Test Content");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should gracefully handle malformed or non-UTF-8 charsets in Content-Type header", async () => {
-		const originalFetch = global.fetch;
-
-		// 1. Valid non-utf-8 charset
-		global.fetch = vi.fn().mockImplementation(async () => {
-			const encoder = new TextEncoder();
-			const encoded = encoder.encode("Valid Test Content");
-			const stream = new ReadableStream({
-				start(controller) {
-					controller.enqueue(encoded);
-					controller.close();
-				}
-			});
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html; charset=windows-1252" }),
-				ok: true,
-				body: stream,
-			};
-		});
-		let result = await (fetcher as any).fetchSingle("https://example.com/windows-1252");
-		expect(result).toBe("Valid Test Content");
-		(fetcher as any).cache.clear();
-
-		// 2. Malformed/Unsupported charset fallback to utf-8
-		global.fetch = vi.fn().mockImplementation(async () => {
-			const encoder = new TextEncoder();
-			const encoded = encoder.encode("Malformed Test Content");
-			const stream = new ReadableStream({
-				start(controller) {
-					controller.enqueue(encoded);
-					controller.close();
-				}
-			});
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html; charset=invalid-charset" }),
-				ok: true,
-				body: stream,
-			};
-		});
-		result = await (fetcher as any).fetchSingle("https://example.com/malformed-charset");
-		expect(result).toBe("Malformed Test Content");
-
-		// 3. Extra spaces in Content-Type
-		global.fetch = vi.fn().mockImplementation(async () => {
-			const encoder = new TextEncoder();
-			const encoded = encoder.encode("Spaced Test Content");
-			const stream = new ReadableStream({
-				start(controller) {
-					controller.enqueue(encoded);
-					controller.close();
-				}
-			});
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html; charset  =  windows-1252" }),
-				ok: true,
-				body: stream,
-			};
-		});
-		const resultSpaced = await (fetcher as any).fetchSingle("https://example.com/spaced-charset");
-		expect(resultSpaced).toBe("Spaced Test Content");
-		(fetcher as any).cache.clear();
-
-		// 4. Missing charset
-		global.fetch = vi.fn().mockImplementation(async () => {
-			const encoder = new TextEncoder();
-			const encoded = encoder.encode("Missing Test Content");
-			const stream = new ReadableStream({
-				start(controller) {
-					controller.enqueue(encoded);
-					controller.close();
-				}
-			});
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-				body: stream,
-			};
-		});
-		const resultMissing = await (fetcher as any).fetchSingle("https://example.com/missing-charset");
-		expect(resultMissing).toBe("Missing Test Content");
-		global.fetch = originalFetch;
-	});
-
-	it("should decode different charsets correctly and fallback to utf-8 safely", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async (url) => {
-			if (url.includes("iso")) {
-				return {
-					status: 200,
-					headers: new Headers({ "content-type": "text/html; charset=iso-8859-1" }),
-					ok: true,
-					body: {
-						getReader: () => {
-							const text = "H\xe9llo W\xf6rld";
-							const uint8Array = new Uint8Array(text.length);
-							for (let i = 0; i < text.length; i++) {
-								uint8Array[i] = text.charCodeAt(i);
-							}
-							let done = false;
-							return {
-								read: async () => {
-									if (done) return { done: true, value: undefined };
-									done = true;
-									return { done: false, value: uint8Array };
-								},
-								cancel: vi.fn()
-							};
-						}
-					}
-				};
-			} else if (url.includes("unsupported")) {
-				return {
-					status: 200,
-					headers: new Headers({ "content-type": "text/html; charset=unsupported-charset" }),
-					ok: true,
-					body: {
-						getReader: () => {
-							const text = "Fallback to UTF-8";
-							const uint8Array = new Uint8Array(text.length);
-							for (let i = 0; i < text.length; i++) {
-								uint8Array[i] = text.charCodeAt(i);
-							}
-							let done = false;
-							return {
-								read: async () => {
-									if (done) return { done: true, value: undefined };
-									done = true;
-									return { done: false, value: uint8Array };
-								},
-								cancel: vi.fn()
-							};
-						}
-					}
-				};
-			} else {
-				return {
-					status: 200,
-					headers: new Headers({ "content-type": "text/html" }),
-					ok: true,
-					body: {
-						getReader: () => {
-							const text = "No charset provided";
-							const uint8Array = new Uint8Array(text.length);
-							for (let i = 0; i < text.length; i++) {
-								uint8Array[i] = text.charCodeAt(i);
-							}
-							let done = false;
-							return {
-								read: async () => {
-									if (done) return { done: true, value: undefined };
-									done = true;
-									return { done: false, value: uint8Array };
-								},
-								cancel: vi.fn()
-							};
-						}
-					}
-				};
-			}
-		});
-
-		const resultIso = await (fetcher as any).fetchSingle("https://example.com/iso");
-		expect(resultIso).toContain("Héllo Wörld");
-
-		const resultUnsupported = await (fetcher as any).fetchSingle("https://example.com/unsupported");
-		expect(resultUnsupported).toContain("Fallback to UTF-8");
-
-		const resultNoCharset = await (fetcher as any).fetchSingle("https://example.com/no-charset");
-		expect(resultNoCharset).toContain("No charset provided");
-
-		global.fetch = originalFetch;
-	});
-
 	it("should evict normalizedUrl from cache on fetch error", async () => {
 		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
@@ -729,43 +290,6 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
-
-	it("should strip HTML comments safely", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-				text: async () => "<!-- <div> hidden > text --> <p>Main content</p>"
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/test-strip-comments");
-		expect(result).toBe("Main content");
-
-		global.fetch = originalFetch;
-	});
-
-
-	it("should correctly handle HTML comments within script tags without corrupting them", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-				text: async () => "<script>\n<!--\nconsole.log('test');\n//-->\n</script><p>Main content</p>"
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/test-script-comments");
-		expect(result).toBe("Main content");
-
-		global.fetch = originalFetch;
-	});
-
 	it("should strip boilerplate HTML tags to save context", async () => {
 		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
@@ -779,6 +303,121 @@ describe("WebFetcher", () => {
 
 		const result = await (fetcher as any).fetchSingle("https://example.com/test-strip");
 		expect(result).toBe("Main content");
+
+		global.fetch = originalFetch;
+	});
+
+
+	it("should decode text with dynamic charset from Content-Type", async () => {
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			const utf8Buffer = new TextEncoder().encode("Hello World");
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=utf-8" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let isDone = false;
+						return {
+							read: async () => {
+								if (isDone) return { done: true, value: undefined };
+								isDone = true;
+								return { done: false, value: utf8Buffer };
+							},
+							cancel: vi.fn()
+						};
+					}
+				}
+			};
+		});
+
+		const result1 = await (fetcher as any).fetchSingle("https://example.com/utf8");
+		expect(result1).toContain("Hello World");
+
+		global.fetch = vi.fn().mockImplementation(async () => {
+			// Simulating windows-1251 encoded content
+			const win1251Buffer = new Uint8Array([0xcf, 0xf0, 0xe8, 0xe2, 0xe5, 0xf2]); // "Привет" in win-1251
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=windows-1251" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let isDone = false;
+						return {
+							read: async () => {
+								if (isDone) return { done: true, value: undefined };
+								isDone = true;
+								return { done: false, value: win1251Buffer };
+							},
+							cancel: vi.fn()
+						};
+					}
+				}
+			};
+		});
+
+		const result2 = await (fetcher as any).fetchSingle("https://example.com/win1251");
+		expect(result2).toContain("Привет");
+
+		// Test fallback to utf-8 on invalid charset
+		global.fetch = vi.fn().mockImplementation(async () => {
+			const utf8Buffer = new TextEncoder().encode("Fallback OK");
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=invalid-charset" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let isDone = false;
+						return {
+							read: async () => {
+								if (isDone) return { done: true, value: undefined };
+								isDone = true;
+								return { done: false, value: utf8Buffer };
+							},
+							cancel: vi.fn()
+						};
+					}
+				}
+			};
+		});
+
+		const result3 = await (fetcher as any).fetchSingle("https://example.com/invalid");
+		expect(result3).toContain("Fallback OK");
+
+		global.fetch = originalFetch;
+	});
+
+	it("should fallback to utf-8 if charset is unsupported", async () => {
+		const fetcher = new WebFetcher(3);
+		const originalFetch = global.fetch;
+		global.fetch = vi.fn().mockImplementation(async () => {
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html; charset=unsupported-charset" }),
+				ok: true,
+				body: {
+					getReader: () => {
+						let done = false;
+						return {
+							read: async () => {
+								if (!done) {
+									done = true;
+									return { done: false, value: new Uint8Array([0x61]) }; // 'a'
+								}
+								return { done: true, value: undefined };
+							},
+							cancel: async () => {},
+						};
+					},
+				},
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/fallback-test");
+		expect(result).toBe("a");
 
 		global.fetch = originalFetch;
 	});

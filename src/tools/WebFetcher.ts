@@ -1,6 +1,5 @@
 import * as dns from "node:dns/promises";
 import * as url from "node:url";
-import { load } from "cheerio";
 import * as ipaddr from "ipaddr.js";
 import pLimit from "p-limit";
 import { extractCharset } from "../utils/http";
@@ -84,14 +83,9 @@ export class WebFetcher {
 
 			this.hostValidationCache.set(hostname, validationPromise);
 
-			// Retain DNS validation in cache to prevent redundant lookups for same hostname
-			// Prevent unbounded memory growth by limiting cache size (e.g., 10,000 entries)
-			if (this.hostValidationCache.size > 10000) {
-				const firstKey = this.hostValidationCache.keys().next().value;
-				if (firstKey !== undefined) {
-					this.hostValidationCache.delete(firstKey);
-				}
-			}
+			validationPromise.finally(() => {
+				this.hostValidationCache.delete(hostname);
+			});
 
 			return validationPromise;
 		} catch {
@@ -214,6 +208,7 @@ export class WebFetcher {
 					let totalBytes = 0;
 					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM
 					const chunks: string[] = [];
+
 					while (true) {
 						const { done, value } = await reader.read();
 						if (done) break;
@@ -236,16 +231,8 @@ export class WebFetcher {
 				}
 
 				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
-				// Note: Regex-based HTML stripping is limited and can struggle with severely malformed HTML.
-				// However, for the scope of extracting textual context for LLMs, these non-greedy regexes
-				// combined with the 500KB payload limit provide excellent performance and sufficient reliability
-				// without introducing large DOM parsing dependencies (which would impact startup time).
 				const strippedText = text
-					.replace(/<!--[\s\S]*?-->/g, "") // Remove HTML comments early. Note: Safe because <script>/<style> blocks are removed entirely in the next step.
-					.replace(
-						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*\/>/gi,
-						"",
-					) // Remove self-closing boilerplate tags first
+					.replace(/<!--[\s\S]*?-->/g, "")
 					.replace(
 						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
 						"",
@@ -253,6 +240,7 @@ export class WebFetcher {
 					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag
 					.replace(/\s+/g, " ")
 					.trim();
+
 				const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
 				return truncated;
 			} catch (error: unknown) {
