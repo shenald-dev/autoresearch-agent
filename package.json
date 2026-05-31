@@ -1,8 +1,7 @@
 {
   "name": "autoresearch-agent",
   "version": "1.0.30",
-  "description": "Enterprise-grade autonomous AI research framework.",
-  "main": "dist/index.js",
+  "description": "Enterprise-grade autonomous AI research framework.",  "main": "dist/index.js",
   "scripts": {
     "start": "tsx src/index.ts",
     "build": "tsc",
