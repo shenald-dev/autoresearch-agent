@@ -4,6 +4,21 @@ All notable changes to autoresearch-agent will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.0.28] - 2026-05-17
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update` (excluding `@clack/prompts` due to test failures).
+* **[Pruned]:** Removed dead script files resolve_changelog.js and resolve_warden.js.
+## [1.0.30] - 2026-05-25
+* **[Optimized]:** BOLT successfully optimized the HTML stripping logic by preemptively removing HTML comments to save context tokens.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+## [1.0.34] - 2026-05-30
+* **[Fixed]:** Verified stability and optimized dependency management.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via npm update.
+
+## [1.0.33] - 2026-05-29
+* **[Fixed]:** Fixed unhandled Promise rejection in `cliPromise` when awaiting `ResearchEngine.run` by resolving async test concurrency issues and correctly awaiting the CLI execution in tests.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 ## [1.0.32] - 2026-05-28
 * **[Dead Code]:** Removed unused dependency `console-table-printer`.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
@@ -13,6 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
 ## [1.0.30] - 2026-05-26
+* **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
+* **[Lifecycle]:** Assured codebase stability and aligned tests after BOLT's HTML comment stripping optimization. Verified no new regressions.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
+* **[Optimized]:** Preemptively stripped HTML comments in `WebFetcher` to conserve context tokens and prevent nested tag parsing anomalies.
 * **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
@@ -128,6 +148,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **[Fixed]:** Replaced `any` types with explicit `unknown` and `Record<string, unknown>` types for better type safety.
 * **[Fixed]:** Resolved Biome linter warnings by strictly organizing imports and using `node:` protocol for built-in modules.
 * **[Changed]:** Bumped minor/patch versions of dependencies (`npm update`).
+
+## [1.0.32] - 2026-05-26
+
+### Changed
+* **[Security/Perf]:** Enforced strict content-type allowlist in `WebFetcher` to reject large binary files early.
+* **[Documentation]:** Aligned documentation to reflect the recent optimizations to HTML comment stripping in `WebFetcher`, saving context tokens.
+* **[Maintenance]:** Applied safe minor/patch dependency bumps via `npm update`.
 
 ## [0.1.0] - YYYY-MM-DD
 

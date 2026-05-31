@@ -128,18 +128,20 @@ describe("WebFetcher", () => {
 
 		global.fetch = vi.fn().mockImplementation(async (url) => {
 			return {
-				status: 200,
-				headers: new Headers({ "content-type": "application/pdf" }),
 				ok: true,
+				status: 200,
+				headers: new Headers({
+					"content-type": "application/zip",
+				}),
 				body: { cancel: mockCancel },
 			};
 		});
 
 		const result = await (fetcher as any).fetchSingle(
-			"https://example.com/document.pdf",
+			"https://example.com/archive.zip",
 		);
 		expect(result).toContain(
-			"Error: Unsupported content type (application/pdf)",
+			"Error: Unsupported content type (application/zip)",
 		);
 		expect(mockCancel).toHaveBeenCalled();
 
@@ -370,7 +372,6 @@ describe("WebFetcher", () => {
 
 		const result = await (fetcher as any).fetchSingle("https://example.com/invalid-charset-test");
 		expect(result).toBe("Mock invalid charset content");
-
 		global.fetch = originalFetch;
 	});
 
