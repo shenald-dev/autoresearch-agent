@@ -1,9 +1,7 @@
-## 2026-03-31 — Caching Network API Calls
-
-Learning:
-When caching network-heavy API calls like `GoogleSearcher.search()`, caching the `Promise` immediately rather than awaiting the result effectively implements Promise Coalescing, preventing cache stampedes from concurrent identical requests.
+ed text. Semantic structural tags like `<header>` and `<aside>` should be preserved as they frequently contain essential content.
 
 Action:
+Expanded the HTML stripping regex in `WebFetcher` to safely remove complete and unclosed boilerplate tags without touching semantic tags to save LLM context window tokens and improve API efficiency.
 Ensure rejected promises are caught and removed from the cache using `.catch()` or `try-catch` blocks within the async closure to prevent transient errors from being permanently cached. Do not commit temporary script files like `patch.js`.
 
 ## 2026-04-01 — Streaming External Payloads to Prevent OOM

@@ -83,6 +83,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **[Pruned]:** Removed unused `HttpError` export from `GoogleSearcher`.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
+## [1.0.28] - 2026-05-12
+* **[Pruned]:** Checked for dead code using `knip`. Pruned `resolve_changelog.js` and `resolve_warden.js` which are unused files, but preserved `bin/cli.js` as it is an essential entry point despite `knip` flagging it.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 ## [1.0.28] - 2026-05-13
 * **[Optimized]:** Expanded HTML stripping regex in WebFetcher to remove boilerplate tags (e.g., `<nav>`, `<footer>`) and conserve LLM context tokens while preserving semantic tags.
 * **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
