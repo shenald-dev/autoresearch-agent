@@ -527,6 +527,14 @@ Checked for dead code using `knip` and `ts-prune`. Verified that `bin/cli.js` is
 
 **Alignment / Deferred:**
 Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.25 to deploy these updates.
+## 2026-05-17 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized the system by reusing the ConfigManager instance across services to optimize file reads. Removed dead files resolve_changelog.js and resolve_warden.js flagged by knip.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran npm update to bump patch/minor dependencies safely. Note: @clack/prompts was explicitly excluded and pinned due to test failures. All tests passing. Tagging release v1.0.28 to deploy these updates.
+
 ## 2026-05-11 — Assessment & Lifecycle
 
 **Observation / Pruned:**
