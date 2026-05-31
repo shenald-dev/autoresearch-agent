@@ -210,8 +210,8 @@ export class WebFetcher {
 					} catch {
 						decoder = new TextDecoder("utf-8");
 					}
-					let totalBytes = 0;					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM
-					const chunks: string[] = [];
+					let totalBytes = 0;
+					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM					const chunks: string[] = [];
 
 					while (true) {
 						const { done, value } = await reader.read();
@@ -238,8 +238,8 @@ export class WebFetcher {
 				// Note: HTML comments are preemptively stripped here to save context tokens and prevent parsing anomalies.
 				const strippedText = text
 					.replace(/<!--[\s\S]*?-->/g, "")
-					.replace(						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
-						"",
+					.replace(
+						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,						"",
 					) // Remove complete and unclosed boilerplate blocks
 					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag
 					.replace(/\s+/g, " ")

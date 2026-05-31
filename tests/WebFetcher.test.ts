@@ -514,10 +514,7 @@ describe("WebFetcher", () => {
 	});
 
 
-
-	it("should decode response body correctly using charset from Content-Type", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
+	it("should decode response body correctly using charset from Content-Type", async () => {		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
 			return {
 				status: 200,
@@ -548,35 +545,55 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
-	it("should fallback to utf-8 if charset is unsupported", async () => {
-		const fetcher = new WebFetcher(3);
+	it("should fallback to utf-8 if Content-Type charset is invalid", async () => {
 		const originalFetch = global.fetch;
+
 		global.fetch = vi.fn().mockImplementation(async () => {
+			const stream = new ReadableStream({
+				start(controller) {
+					controller.enqueue(new TextEncoder().encode("Hello"));
+					controller.close();
+				}
+			});
+
 			return {
 				status: 200,
-				headers: new Headers({ "content-type": "text/html; charset=unsupported-charset" }),
+				headers: new Headers({ "content-type": "text/html; charset=invalid-charset-123" }),
 				ok: true,
-				body: {
-					getReader: () => {
-						let done = false;
-						return {
-							read: async () => {
-								if (!done) {
-									done = true;
-									return { done: false, value: new Uint8Array([0x61]) }; // 'a'
-								}
-								return { done: true, value: undefined };
-							},
-							cancel: async () => {},
-						};
-					},
-				},
+				body: stream,
 			};
 		});
 
-		const result = await (fetcher as any).fetchSingle("https://example.com/fallback-test");
-		expect(result).toBe("a");
+		const result = await (fetcher as any).fetchSingle("https://example.com/invalid-charset-test");
+		expect(result).toBe("Hello");
 
+		global.fetch = originalFetch;
+	});
+
+	it("should fallback to utf-8 if Content-Type charset is missing", async () => {
+		const originalFetch = global.fetch;
+
+		global.fetch = vi.fn().mockImplementation(async () => {
+			const stream = new ReadableStream({
+				start(controller) {
+					controller.enqueue(new TextEncoder().encode("Hello"));
+					controller.close();
+				}
+			});
+
+			return {
+				status: 200,
+				headers: new Headers({ "content-type": "text/html" }),
+				ok: true,
+				body: stream,
+			};
+		});
+
+		const result = await (fetcher as any).fetchSingle("https://example.com/missing-charset-test");
+		expect(result).toBe("Hello");
+
+		global.fetch = originalFetch;
+	});
 		global.fetch = originalFetch;
 	});
 
@@ -594,8 +611,3 @@ describe("WebFetcher", () => {
 
 		const result = await (fetcher as any).fetchSingle("https://example.com/test-comment-strip");
 		expect(result).toBe("Before After");
-		global.fetch = originalFetch;
-	});
-});
-=======
->>>>>>> origin/master
