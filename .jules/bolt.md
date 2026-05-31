@@ -138,10 +138,3 @@ When testing a Node CLI entry point that uses `commander` with async actions, ca
 
 Action:
 Export the result of `program.parseAsync()` from the entry point and `await` it explicitly in the test to ensure all async actions complete before making assertions.
-## 2026-06-03 — Self-Closing HTML Tags Truncation
-
-Learning:
-When stripping boilerplate HTML tags using a regex designed to remove complete and unclosed blocks (e.g., `/<tag\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi`), encountering a self-closing tag (like `<script src="..." />`) causes the regex to incorrectly consume and discard the entire remainder of the document because it never finds the closing tag.
-
-Action:
-Preemptively strip self-closing boilerplate tags using a targeted regex (e.g., `/<tag\b[^>]*\/>/gi`) before applying the full boilerplate regex to prevent massive data loss during extraction.
