@@ -78,29 +78,11 @@ Return ONLY the markdown document.
 			return `No results found for "${topic}". The API key may be missing or the query was too niche.`;
 		}
 
-		// Preemptively deduplicate search results by normalized URL
-		// This saves concurrency slots and prevents redundant processing
-		const seenLinks = new Set<string>();
-		const uniqueSearchResults = searchResults.filter((r) => {
-			let normalized = r.link;
-			try {
-				const parsed = new URL(r.link);
-				parsed.hash = "";
-				normalized = parsed.toString();
-			} catch {}
-
-			if (seenLinks.has(normalized)) {
-				return false;
-			}
-			seenLinks.add(normalized);
-			return true;
-		});
-
 		// Phase 2: Fetch and Extract
 		updateStatus(
-			`📄 Discovered ${uniqueSearchResults.length} sources. Fetching content concurrently...`,
+			`📄 Discovered ${searchResults.length} sources. Fetching content concurrently...`,
 		);
-		const urls = uniqueSearchResults.map((r) => r.link);
+		const urls = searchResults.map((r) => r.link);
 		const fetchResults = await this.fetcher.fetchBatch(urls);
 
 		// Phase 3: Synthesize
