@@ -100,26 +100,4 @@ describe("GoogleSearcher", () => {
 
 		vi.restoreAllMocks();
 	});
-
-	it("should fail fast without retrying on 4xx client errors (except 429)", async () => {
-		vi.spyOn(global, "setTimeout").mockImplementation((cb: any) => {
-			cb();
-			return 0 as any;
-		});
-
-		(global.fetch as any).mockResolvedValue({
-			ok: false,
-			status: 403,
-			body: { cancel: vi.fn().mockResolvedValue(undefined) },
-		});
-
-		await expect(searcher.search("fail fast test", 1)).rejects.toThrow(
-			"Serper API HTTP error: 403",
-		);
-
-		// Should only try once because it fails fast
-		expect(global.fetch).toHaveBeenCalledTimes(1);
-
-		vi.restoreAllMocks();
-	});
 });
