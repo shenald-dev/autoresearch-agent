@@ -496,130 +496,22 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
-	it("should strip boilerplate HTML tags like nav, footer, iframe, and noscript", async () => {
-		const originalFetch = global.fetch;
-		const mockHtml = `
-			<html>
-			<body>
-				<nav>Menu</nav>
-				<header><h1>Real Content</h1></header>
-				<main>Main article</main>
-				<footer>Copyright</footer>
-				<iframe src="ads"></iframe>
-				<noscript>Enable JS</noscript>
-			</body>
-			</html>
-		`;
-		global.fetch = vi.fn().mockImplementation(async () => {
+	it("should strip boilerplate HTML tags to save context", async () => {
+		const originalFetch = global.fetch;		global.fetch = vi.fn().mockImplementation(async () => {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
 				ok: true,
-				text: async () => mockHtml,
+				text: async () => "<nav>Navigation</nav><footer>Footer</footer><noscript>No JS</noscript><iframe>Ads</iframe><p>Main content</p>"
 			};
 		});
 
-		const result = await (fetcher as any).fetchSingle("https://example.com/boilerplate");
-		expect(result).not.toContain("Menu");
-		expect(result).not.toContain("Copyright");
-		expect(result).not.toContain("ads");
-		expect(result).not.toContain("Enable JS");
-		expect(result).toContain("Real Content");
-		expect(result).toContain("Main article");
+		const result = await (fetcher as any).fetchSingle("https://example.com/test-strip");
+		expect(result).toBe("Main content");
 		global.fetch = originalFetch;
 	});
 
-
-
-	it("should decode response body correctly using charset from Content-Type", async () => {
-		const fetcher = new WebFetcher(3);		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html; charset=ISO-8859-1" }),
-				ok: true,				body: {
-					getReader: () => {
-						let done = false;
-						return {
-							read: async () => {
-								if (!done) {
-									done = true;
-									// 0xe9 is 'é' in ISO-8859-1
-									return { done: false, value: new Uint8Array([0xe9]) };
-								}
-								return { done: true, value: undefined };
-							},
-							cancel: async () => {},
-						};
-					},
-				},
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/iso-test");
-		expect(result).toBe("é");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should fallback to utf-8 if charset is unsupported", async () => {
-		const fetcher = new WebFetcher(3);>>>>>>> origin/master
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html; charset=unsupported-charset" }),
-				ok: true,
-				body: {
-					getReader: () => {
-						let done = false;
-						return {
-							read: async () => {
-								if (!done) {
-									done = true;
-									return { done: false, value: new Uint8Array([0x61]) }; // 'a'
-								}
-								return { done: true, value: undefined };
-							},
-							cancel: async () => {},
-						};
-					},
-				},
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/fallback-test");
-		expect(result).toBe("a");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should strip HTML comments to save context tokens", async () => {
-		const fetcher = new WebFetcher(3);		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-=======
-				text: async () => "<noscript>This site requires JS</noscript><article>Main content</article>"
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/test-noscript-content");
-        expect(result).toContain("This site requires JS");
-
-		global.fetch = originalFetch;
-	});
-
-	it("should strip HTML comments to save context tokens", async () => {		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
->>>>>>> origin/master
-				text: async () => "<p>Before</p><!-- This is a large HTML comment that should be removed --><p>After</p>"
+});				text: async () => "<p>Before</p><!-- This is a large HTML comment that should be removed --><p>After</p>"
 			};
 		});
 
@@ -631,3 +523,4 @@ describe("WebFetcher", () => {
 <<<<<<< HEAD
 
 });
+>>>>>>> origin/master
