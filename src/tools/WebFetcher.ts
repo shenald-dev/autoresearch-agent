@@ -1,5 +1,6 @@
 import * as dns from "node:dns/promises";
 import * as url from "node:url";
+import { load } from "cheerio";
 import * as ipaddr from "ipaddr.js";
 import pLimit from "p-limit";
 import { extractCharset } from "../utils/http";
@@ -209,9 +210,10 @@ export class WebFetcher {
 						decoder = new TextDecoder(extractCharset(contentType));
 					} catch {
 						decoder = new TextDecoder("utf-8");
-					}					let totalBytes = 0;
-					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM					const chunks: string[] = [];
-
+					}
+					let totalBytes = 0;
+					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM
+					const chunks: string[] = [];
 					while (true) {
 						const { done, value } = await reader.read();
 						if (done) break;
@@ -233,16 +235,13 @@ export class WebFetcher {
 					text = await response.text();
 				}
 
-				// Basic HTML to Text stripping (a real app would use cheerio or html-to-text)
-				// Note: HTML comments are preemptively stripped here to save context tokens and prevent parsing anomalies.
-				const strippedText = text
-					.replace(
-						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
-						"",
-					) // Remove complete and unclosed boilerplate blocks
-					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag
-					.replace(/\s+/g, " ")					.trim();
-
+				// Robust HTML to Text stripping using Cheerio
+				// First safely strip comments to ensure proper spacing if elements were only separated by comments
+				const htmlWithoutComments = text.replace(/<!--[\s\S]*?-->/g, " ");
+				const $ = load(htmlWithoutComments);
+				$("script, style, svg, nav, footer, iframe, noscript").remove();
+				// Use .text() but add spaces between block elements to avoid concatenating text from different tags
+				const strippedText = $("body").text().replace(/\s+/g, " ").trim();
 				const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
 				return truncated;
 			} catch (error: unknown) {
