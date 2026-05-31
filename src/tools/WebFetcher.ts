@@ -208,8 +208,8 @@ export class WebFetcher {
 					try {
 						decoder = new TextDecoder(extractCharset(contentType));
 					} catch {
-						decoder = new TextDecoder("utf-8");					}
-					let totalBytes = 0;
+						decoder = new TextDecoder("utf-8");
+					}					let totalBytes = 0;
 					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM					const chunks: string[] = [];
 
 					while (true) {
@@ -238,10 +238,11 @@ export class WebFetcher {
 				const strippedText = text
 					.replace(/<!--[\s\S]*?-->/g, "")
 					.replace(
-						/<(script|style|svg|nav|footer|iframe)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
+						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
 						"",
-					) // Remove complete and unclosed boilerplate/non-content blocks					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag
-					.replace(/\s+/g, " ")
+					) // Remove complete and unclosed script/style/svg/boilerplate blocks
+
+					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag					.replace(/\s+/g, " ")
 					.trim();
 
 				const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
