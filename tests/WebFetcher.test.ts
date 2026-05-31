@@ -391,25 +391,6 @@ describe("WebFetcher", () => {
 
 		global.fetch = originalFetch;
 	});
-<<<<<<< HEAD
 =======
-
-	it("should correctly handle self-closing boilerplate tags without truncating the document", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-				text: async () => "<script src=\"foo.js\" /><h1>My Title</h1><p>Important content</p>"
-			};
-		});
-
-		const result = await fetcher.fetchSingle("https://example.com/test-self-closing");
-		expect(result).toBe("My Title Important content");
-
-		global.fetch = originalFetch;
-	});
->>>>>>> origin/master
+<<<<<<< HEAD>>>>>>> origin/master
 });
