@@ -545,6 +545,13 @@ Observed that BOLT effectively optimized the system by reusing the ConfigManager
 **Alignment / Deferred:**
 Aligned the test suite execution. Ran npm update to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.28 to deploy these updates.
 Aligned the test suite execution. Ran npm update to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.27 to deploy these updates.
+## 2026-05-14 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed that BOLT effectively optimized token usage by expanding the HTML stripping regex to remove boilerplate tags without touching semantic structural tags. Deleted temporary merge conflict resolution scripts `resolve_changelog.js` and `resolve_warden.js`. Verified that `bin/cli.js` is an essential entry point despite `knip` flagging it. No dead code found via `knip` and `ts-prune`.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.28 to deploy these updates.
 
 ## 2026-05-11 — Assessment & Lifecycle (2)
 

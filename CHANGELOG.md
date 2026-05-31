@@ -76,6 +76,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **[Pruned]:** Removed unused `HttpError` export from `GoogleSearcher`.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
+## [1.0.28] - 2026-05-14
+* **[Optimized]:** Expanded HTML stripping regex in WebFetcher to remove boilerplate tags without touching semantic structural tags.
+* **[Pruned]:** Removed temporary merge conflict resolution scripts resolve_changelog.js and resolve_warden.js.
+* **[QA]:** Added nested boilerplate tests to WebFetcher to ensure semantic content preservation.
+* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
+
 ## [1.0.28] - 2026-05-11
 * **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
 
