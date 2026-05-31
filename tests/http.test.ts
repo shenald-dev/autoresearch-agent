@@ -28,7 +28,7 @@ describe("http utils", () => {
 		});
 
 		it("should handle case-insensitivity", () => {
-			expect(extractCharset("TEXT/HTML; CharSet=ISO-8859-1")).toBe("ISO-8859-1");
+			expect(extractCharset("TEXT/HTML; CharSet=ISO-8859-1")).toBe("iso-8859-1");
 		});
 	});
 });

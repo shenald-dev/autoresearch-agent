@@ -64,7 +64,7 @@ describe("CLI WebFetcher index", () => {
 			"-d",
 			"1",
 		];
-const { cliPromise } = await import("../src/index.ts");
+		const { cliPromise } = await import("../src/index.ts");
 		await cliPromise;
 
 		expect(messageMock).toHaveBeenCalledWith("Test progress message");
