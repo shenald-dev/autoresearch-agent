@@ -206,10 +206,16 @@ export class WebFetcher {
 					reader = response.body.getReader();
 					let decoder: TextDecoder;
 					try {
-						decoder = new TextDecoder(extractCharset(contentType));
-					} catch {
-						decoder = new TextDecoder("utf-8");
-					}
+						const match = contentType.match(
+							/charset\s*=\s*['"]?([\w-]+)['"]?/i,
+						);
+						decoder = new TextDecoder(match ? match[1] : "utf-8");
+					} catch (e) {
+						if (e instanceof RangeError || e instanceof TypeError) {
+							decoder = new TextDecoder("utf-8");
+						} else {
+							throw e;
+						}					}
 					let totalBytes = 0;
 					const MAX_BYTES = 500_000; // Limit payload size to avoid OOM
 					const chunks: string[] = [];
@@ -239,9 +245,7 @@ export class WebFetcher {
 				// Note: HTML comments are preemptively stripped here to save context tokens and prevent parsing anomalies.
 				const strippedText = text
 					.replace(/<!--[\s\S]*?-->/g, "")
-=======
-<<<<<<< HEAD>>>>>>> origin/master
-					.replace(
+=======					.replace(
 						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
 						"",
 					) // Remove complete and unclosed boilerplate blocks
