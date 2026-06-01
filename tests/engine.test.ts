@@ -14,12 +14,12 @@ vi.mock("../src/tools/WebFetcher", () => ({
 }));
 vi.mock("../src/utils/config", () => ({
 	ConfigManager: class {
-		get = vi.fn().mockResolvedValue("mock-key"),
+		get = vi.fn().mockResolvedValue("mock-key");
 	},
 }));
 vi.mock("@langchain/openai", () => ({
 	ChatOpenAI: class {
-		invoke = vi.fn(),
+		invoke = vi.fn();
 	},
 }));
 

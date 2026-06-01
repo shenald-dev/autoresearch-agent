@@ -215,3 +215,11 @@ The `cheerio` and `console-table-printer` dependencies were imported/installed b
 
 Action:
 Removed unused dependencies via `npm uninstall` and cleaned up dead code imports to keep the project lean and maintainable.
+
+## 2024-05-18 — DNS Rebinding Vulnerability in SSRF Validation
+
+Learning:
+When implementing SSRF validation via DNS lookups, persistently caching the validation result across sequential requests introduces a DNS Rebinding vulnerability. An attacker can serve a safe IP on the first lookup (which gets cached as safe) and then change the DNS record to point to an internal IP (like 127.0.0.1) for subsequent fetches, bypassing the SSRF protection entirely.
+
+Action:
+Only cache the DNS validation promise for in-flight concurrent requests (request coalescing) and clear it immediately upon resolution. This prevents redundant lookups during a single batch fetch without persistently caching a potentially stale and dangerous DNS resolution.
