@@ -1,14 +1,26 @@
-# ✨ AutoResearch Agent
+<div align="center">
+  <img src="assets/logo.png" alt="AutoResearch Agent Logo" width="250" />
 
-> An enterprise-grade, modular AI research agent built for high-performance content generation.
+  <h1>✨ AutoResearch Agent</h1>
+  <p><b>Modular AI Research Agent</b></p>
+  <i>An enterprise-grade, modular AI research agent built for high-performance content generation.</i>
+  
+  <br/>
+</div>
 
-## Features
+---
+
+## 🚀 Features
+
 - **🧠 Modular Architecture**: Drop-in memory, tools, and output formatters.
 - **⚡ Type-Safe**: Built entirely in TypeScript with strict schema validation (`zod`).
 - **🔗 LangChain Core**: Powered by robust LCEL pipelines.
 - **🌊 Zero Bloat**: Lightning-fast dev loop via `tsx` and `Biome`.
 
-## Architecture Diagram
+---
+
+## 🗺️ Architecture Diagram
+
 ```mermaid
 graph TD
     A[CLI Input] --> B[Core Engine]
@@ -20,10 +32,14 @@ graph TD
     G --> H[Final Report]
 ```
 
-## Quick Start
+---
+
+## ⚡ Quick Start
+
 ```bash
 npm install
 npm run dev -- --topic "The Future of AI Agents"
 ```
 
-*Built by a Vibe Coder. Focused on Flow.*
+---
+> *Built by a Vibe Coder. Focused on Flow.*
