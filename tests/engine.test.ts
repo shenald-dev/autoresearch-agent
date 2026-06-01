@@ -14,12 +14,12 @@ vi.mock("../src/tools/WebFetcher", () => ({
 }));
 vi.mock("../src/utils/config", () => ({
 	ConfigManager: class {
-		get = vi.fn().mockResolvedValue("mock-key");
+		get = vi.fn().mockResolvedValue("mock-key"),
 	},
 }));
 vi.mock("@langchain/openai", () => ({
 	ChatOpenAI: class {
-		invoke = vi.fn();
+		invoke = vi.fn(),
 	},
 }));
 
@@ -178,6 +178,32 @@ describe("ResearchEngine", () => {
 			"http://first.com",
 			"http://second.com",
 			"http://third.com"
+		]);
+	});
+
+	it("should preemptively deduplicate search URLs before fetching", async () => {
+		engine.searcher.search.mockResolvedValueOnce([
+			{ link: "http://test.com/page#section1" },
+			{ link: "http://test.com/page#section2" },
+			{ link: "http://test.com/other" }
+		]);
+
+		const fetchResults = new Map();
+		fetchResults.set("http://test.com/page", "Content 1");
+		fetchResults.set("http://test.com/other", "Content 2");
+		engine.fetcher.fetchBatch.mockResolvedValueOnce(fetchResults);
+
+		engine.prompt.pipe = vi.fn().mockReturnValue({
+			invoke: vi.fn().mockImplementation(async (args: any) => {
+				return { content: args.context };
+			}),
+		});
+
+		await engine.run("test topic");
+
+		expect(engine.fetcher.fetchBatch).toHaveBeenCalledWith([
+			"http://test.com/page#section1",
+			"http://test.com/other"
 		]);
 	});
 });

@@ -9,5 +9,5 @@ export function extractCharset(contentType: string): string {
 	if (!contentType) return "utf-8";
 
 	const charsetMatch = contentType.match(/charset\s*=\s*['"]?([\w-]+)['"]?/i);
-	return charsetMatch ? charsetMatch[1] : "utf-8";
+	return charsetMatch ? charsetMatch[1].trim().toLowerCase() : "utf-8";
 }

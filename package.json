@@ -1,6 +1,6 @@
 {
   "name": "autoresearch-agent",
-  "version": "1.0.27",
+  "version": "1.0.35",
   "description": "Enterprise-grade autonomous AI research framework.",
   "main": "dist/index.js",
   "scripts": {
@@ -20,7 +20,7 @@
   "author": "shenald.dev",
   "license": "MIT",
   "dependencies": {
-    "@clack/prompts": "^1.2.0",
+    "@clack/prompts": "1.2.0",
     "@langchain/core": "^0.3.80",
     "@langchain/openai": "^0.3.17",
     "commander": "^12.1.0",
