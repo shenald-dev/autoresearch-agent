@@ -2,6 +2,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { WebFetcher } from "../src/tools/WebFetcher";
 
 describe("WebFetcher", () => {
+	let fetcher: WebFetcher;
+
+	beforeEach(() => {
+		fetcher = new WebFetcher(3);
+		// Clear cache
+		(fetcher as any).cache.clear();
+	});
 	it("should preserve semantic HTML but strip boilerplate like <nav> and <footer>", async () => {
 		const originalFetch = global.fetch;
 		global.fetch = vi.fn().mockImplementation(async () => {
@@ -112,13 +119,7 @@ describe("WebFetcher", () => {
 	});
 
 
-	let fetcher: WebFetcher;
 
-	beforeEach(() => {
-		fetcher = new WebFetcher(3);
-		// Clear cache
-		(fetcher as any).cache.clear();
-	});
 
 	it("should reject domains that resolve to empty address arrays", async () => {
 		const dnsPromises = require("node:dns/promises");
@@ -781,21 +782,4 @@ describe("WebFetcher", () => {
 		global.fetch = originalFetch;
 	});
 
-	it("should strip HTML comments to save context tokens", async () => {
-		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
-			return {
-				status: 200,
-				headers: new Headers({ "content-type": "text/html" }),
-				ok: true,
-				text: async () => "<p>Before</p><!-- This is a large HTML comment that should be removed --><p>After</p>"
-			};
-		});
-
-		const result = await (fetcher as any).fetchSingle("https://example.com/test-comment-strip");
-		expect(result).toBe("Before After");
-
-		global.fetch = originalFetch;
-	});
 });

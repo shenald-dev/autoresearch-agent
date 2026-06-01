@@ -240,13 +240,9 @@ export class WebFetcher {
 				// combined with the 500KB payload limit provide excellent performance and sufficient reliability
 				// without introducing large DOM parsing dependencies (which would impact startup time).
 				const strippedText = text
-					.replace(/<!--[\s\S]*?-->/g, "") // Remove HTML comments early. Note: Safe because <script>/<style> blocks are removed entirely in the next step.
+					.replace(/<!--[\s\S]*?-->/g, "")
 					.replace(
-						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*\/>/gi,
-						"", // Remove self-closing boilerplate tags first
-					)
-					.replace(
-						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*>[\s\S]*?(?:<\/\1>|$)/gi,
+						/<(script|style|svg|nav|footer|iframe|noscript)\b[^>]*?(?:>[\s\S]*?<\/\1>|\/>|$)/gi,
 						"", // Remove complete and unclosed boilerplate blocks
 					)
 					.replace(/<[^>]+>|<[^>]*$/g, " ") // Remove complete HTML tags and any trailing partial HTML tag

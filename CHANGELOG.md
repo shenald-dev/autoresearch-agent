@@ -3,35 +3,35 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
 @@ -1,120 +1,451 @@
 -﻿# Changelog
 +We are given a merge conflict in CHANGELOG.md. We have three versions: base (master), head (PR branch), and the common ancestor.
- 
+
 -All notable changes to autoresearch-agent will be documented in this file.
 +The goal is to produce a resolved file that includes all meaningful changes from both branches, without conflict markers.
- 
+
 -The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 -and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 -## [1.0.27] - 2026-05-11
 -* **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
 -* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 +From the context:
- 
+
 -## [1.0.25] - 2026-05-04
 -* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 +- The base branch (master) has changes from lines 7-138 (126 lines changed) and includes version bumps up to 1.0.31.
 +- The head branch (PR branch) has changes from lines 7-129 (98 lines changed) and includes version bumps up to 1.0.29.
- 
+
 -## [1.0.24] - 2026-05-03
 -* **[Optimization]:** Added unit tests for empty context chunk skipping in ResearchEngine.
 -* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 +The git diff provided (Head changes vs base) shows that the head branch has added two new version sections at the top: [1.0.29] and [1.0.28], and then the base branch has [1.0.30] and [1.0.31] (among others) that are not in the head.
- 
+
 -## [1.0.23] - 2026-05-02
 -* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 +However, note that the base branch already has [1.0.30] and [1.0.31] (and more) while the head branch has [1.0.29] and [1.0.28] and then the rest.
- 
+
 +But wait: the base branch (master) has:
 +  ## [1.0.31] - 2026-05-27
 +  ... (then 1.0.30, 1.0.29, ...)
- 
+
 -## [1.0.22] - 2026-05-02
 -* **[Optimization]:** Im
 ﻿# Changelog
@@ -43,110 +43,6 @@ We are given a merge conflict in CHANGELOG.md between base (master) and head (fi
  However, note that the base branch has a version 1.0.31 (which is newer than the head's 1.0.30) and the head branch has versions 1.0.29 and 1.0.28 that are not in the base.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-## [1.0.27] - 2026-05-06
-* **[Optimized]:** Reused `ConfigManager` instance across CLI and core services to optimize file reads.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.35] - 2026-05-31
-
-* **[Dead Code]:** Removed unused `console-table-printer` dependency and removed orphaned helper scripts.
-* **[Dependencies]:** Safely bumped minor and patch dependencies.
-
-## [1.0.33] - 2026-05-29
-* **[Fixed]:** Fixed unhandled Promise rejection in `cliPromise` when awaiting `ResearchEngine.run` by resolving async test concurrency issues and correctly awaiting the CLI execution in tests.
-## [1.0.39] - 2026-05-28
-* **[Fixed]:** Successfully resolved cascading merge conflicts with the `master` branch, protecting the strict `Content-Type` allowlist, the preemptive HTML comment stripping, and all previously consolidated optimizations for HTTP fetching and charset decoding.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.32] - 2026-05-28
-* **[Dead Code]:** Removed unused dependency `console-table-printer`.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.31] - 2026-05-27
-* **[Security]:** Enforced strict Content-Type allowlist in WebFetcher to prevent downloading arbitrary large binaries.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.30] - 2026-05-26
-* **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-
-## [1.0.29] - 2026-05-20
-* **[Performance]:** Expanded HTML stripping regex in WebFetcher to include boilerplate elements like `<nav>`, `<footer>`, `<iframe>`, and `<noscript>` tags, conserving LLM context tokens and reducing parsing payload size without breaking self-closing or nested variants.
-* **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
-* **[Optimized]:** Replaced inline charset parsing in WebFetcher with the shared `extractCharset` utility to eliminate duplicate computation.
-* **[Pruned]:** Removed unused `HttpError` export from `GoogleSearcher`.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-* **Lifecycle:** Verified BOLT optimizations (HTML stripping context deduction, fetch concurrency). Pruned dead resolve script files and applied safe dependency minor/patch updates. Prepared v1.0.28 release.
-* **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
-## [1.0.28] - 2026-05-11
-* **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
-
-## [1.0.27] - 2026-05-11
-* **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-
-## [1.0.25] - 2026-05-04
-## [1.0.28] - 2026-05-17
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update` (excluding `@clack/prompts` due to test failures).
-* **[Pruned]:** Removed dead script files resolve_changelog.js and resolve_warden.js.
-## [1.0.30] - 2026-05-25
-* **[Optimized]:** BOLT successfully optimized the HTML stripping logic by preemptively removing HTML comments to save context tokens.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.34] - 2026-05-30
-* **[Fixed]:** Verified stability and optimized dependency management.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via npm update.
-
-## [1.0.33] - 2026-05-29
-* **[Fixed]:** Fixed unhandled Promise rejection in `cliPromise` when awaiting `ResearchEngine.run` by resolving async test concurrency issues and correctly awaiting the CLI execution in tests.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.32] - 2026-05-28
-* **[Dead Code]:** Removed unused dependency `console-table-printer`.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.31] - 2026-05-27
-* **[Security]:** Enforced strict Content-Type allowlist in WebFetcher to prevent downloading arbitrary large binaries.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.30] - 2026-05-26
-* **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-* **[Lifecycle]:** Assured codebase stability and aligned tests after BOLT's HTML comment stripping optimization. Verified no new regressions.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-* **[Optimized]:** Preemptively stripped HTML comments in `WebFetcher` to conserve context tokens and prevent nested tag parsing anomalies.
-* **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-
-## [1.0.29] - 2026-05-20
-* **[Optimized]:** Replaced inline charset parsing in WebFetcher with the shared `extractCharset` utility to eliminate duplicate computation.
-* **[Pruned]:** Removed unused `HttpError` export from `GoogleSearcher`.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.28] - 2026-05-12
-* **[Pruned]:** Checked for dead code using `knip`. Pruned `resolve_changelog.js` and `resolve_warden.js` which are unused files, but preserved `bin/cli.js` as it is an essential entry point despite `knip` flagging it.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.28] - 2026-05-13
-* **[Optimized]:** Expanded HTML stripping regex in WebFetcher to remove boilerplate tags (e.g., `<nav>`, `<footer>`) and conserve LLM context tokens while preserving semantic tags.
-* **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.28] - 2026-05-14
-* **[Optimized]:** Expanded HTML stripping regex in WebFetcher to remove boilerplate tags without touching semantic structural tags.
-* **[Pruned]:** Removed temporary merge conflict resolution scripts resolve_changelog.js and resolve_warden.js.
-* **[QA]:** Added nested boilerplate tests to WebFetcher to ensure semantic content preservation.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-## [1.0.28] - 2026-05-11
-* **[Pruned]:** Removed unused temporary scripts `resolve_changelog.js` and `resolve_warden.js`.
-
 ## [1.0.27] - 2026-05-11
 * **[Optimized]:** Reused the ConfigManager instance across services to optimize file reads.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
