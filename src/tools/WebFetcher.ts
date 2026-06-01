@@ -1,6 +1,5 @@
 import * as dns from "node:dns/promises";
 import * as url from "node:url";
-import { load } from "cheerio";
 import * as ipaddr from "ipaddr.js";
 import pLimit from "p-limit";
 import { extractCharset } from "../utils/http";
