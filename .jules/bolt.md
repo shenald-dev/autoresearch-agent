@@ -208,3 +208,10 @@ When stripping boilerplate HTML tags using a regex designed to remove complete a
 
 Action:
 Preemptively strip self-closing boilerplate tags using a targeted regex (e.g., `/<tag\b[^>]*\/>/gi`) before applying the full boilerplate regex to prevent massive data loss during extraction.
+## 2024-05-31 — Remove Unused Dependencies
+
+Learning:
+The `cheerio` and `console-table-printer` dependencies were imported/installed but not actively utilized in the codebase. Removing them reduces the package footprint, decreases bundle size, and lowers attack surface area.
+
+Action:
+Removed unused dependencies via `npm uninstall` and cleaned up dead code imports to keep the project lean and maintainable.
