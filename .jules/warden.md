@@ -1,3 +1,11 @@
+## 2026-05-31 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed unused `console-table-printer` dependency and orphaned scripts (`fix_json.js`, `fix_package.js`, `fix_package_json.js`, `resolve_warden.js`). Removed them to fight codebase entropy.
+
+**Alignment / Deferred:**
+Aligned the test suite execution. Ran `npm update` to bump patch/minor dependencies safely. All tests passing. Tagging release v1.0.35 to deploy these updates.
+
 
 ## 2026-05-12 — Assessment & Lifecycle
 
