@@ -83,14 +83,14 @@ export class WebFetcher {
 
 			this.hostValidationCache.set(hostname, validationPromise);
 
-			// Retain DNS validation in cache to prevent redundant lookups for same hostname
-			// Prevent unbounded memory growth by limiting cache size (e.g., 10,000 entries)
-			if (this.hostValidationCache.size > 10000) {
-				const firstKey = this.hostValidationCache.keys().next().value;
-				if (firstKey !== undefined) {
-					this.hostValidationCache.delete(firstKey);
-				}
-			}
+			// Prevent DNS rebinding by only caching in-flight requests (request coalescing)
+			validationPromise
+				.finally(() => {
+					if (this.hostValidationCache.get(hostname) === validationPromise) {
+						this.hostValidationCache.delete(hostname);
+					}
+				})
+				.catch(() => {});
 
 			return validationPromise;
 		} catch {
