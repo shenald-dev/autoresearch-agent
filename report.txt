@@ -1,0 +1,5 @@
+QA Status: [Verified | Amended | Reverted]
+Entropy Pruned: -0 lines of dead code removed
+Dependencies Bumped: (List of notable minor/patch updates)
+Docs Updated: CHANGELOG.md, .jules/warden.md
+Release: v1.0.38 cut, tagged, and ready
