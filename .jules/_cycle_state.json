@@ -1,0 +1,16 @@
+{
+  "sentinel": {
+    "ci_status": "fixed",
+    "ci_fixed": 2,
+    "ci_issues_created": 0,
+    "prs_merged": 0,
+    "prs_conflicts_resolved": 0,
+    "prs_pinged": 0,
+    "issues_triaged": 0,
+    "issues_closed": 0,
+    "vulnerabilities_critical": 0,
+    "vulnerabilities_high": 0,
+    "branches_deleted": 0,
+    "blockers": []
+  }
+}
