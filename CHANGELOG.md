@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.0.39] - 2026-06-07
+
+- ef934fd chore(sentinel): update monitoring log
+- 3fb73af Merge pull request #168 from shenald-dev/jules-5177095139123476073-57fd5496
+- c0fb96f I have finished the task and the final result is ready for you.
+- 8dea139 Merge pull request #167 from shenald-dev/jules-13710994976568883044-42195d1a
+- ffebd18 I have completed the task and the final results are ready.
+- efa2362 Overhaul README with enterprise documentation
+- bb8d1a9 Update README with awesome new logo and formatting
+- 634e213 Merge pull request #112 from shenald-dev/deduplicate-urls-safely-5822219880025886722
+- 7841453 Fix merge conflicts
+- 0fcdc32 Merge pull request #165 from shenald-dev/jules-6948775061259296281-3dac5994
+
+
 All notable changes to autoresearch-agent will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
