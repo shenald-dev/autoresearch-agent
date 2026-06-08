@@ -1,5 +1,8 @@
 # CHANGELOG.md
 
+## [1.0.41] - 2026-06-08
+* **[Chore]:** Routine maintenance and structural verification.
+
 ## [1.0.40] - 2026-06-08
 
 - e51970e chore(sentinel): update monitoring log
@@ -53,9 +56,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **[Security]:** Enforced strict Content-Type allowlist in WebFetcher to prevent downloading arbitrary large binaries.
 * **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
 
-## [1.0.30] - 2026-05-26
-* **[Optimized]:** Added preemptive stripping of HTML comments in `WebFetcher` to save context tokens.
-* **[Dependencies]:** Safely bumped minor/patch versions of dependencies via `npm update`.
-
-
-## [1.0.29] - 2026-05-20
+## [1.0.30] - 2026-0
