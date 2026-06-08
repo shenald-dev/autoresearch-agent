@@ -16,18 +16,16 @@
   "warden": {
     "qa_status": "amended",
     "dead_code_removed_lines": 0,
-    "dependencies_bumped": [
-      "all-dependencies: current -> latest-compatible (ROLLED BACK)"
-    ],
+    "dependencies_bumped": [],
     "security_critical": 0,
     "security_high": 0,
     "security_medium": 0,
     "security_low": 0,
     "docs_updated": [
-      "CHANGELOG.md (generation failed)",
-      ".jules/warden.md"
+      "README.md (generation failed)",
+      "CHANGELOG.md"
     ],
-    "release_version": "1.0.39",
+    "release_version": "1.0.40",
     "blockers": []
   }
 }
