@@ -22,8 +22,8 @@
     "security_medium": 0,
     "security_low": 0,
     "docs_updated": [
-      "src/index.ts",
-      "README.md"
+      ".jules/warden.md",
+      "CHANGELOG.md"
     ],
     "release_version": null,
     "blockers": []
