@@ -1,5 +1,6 @@
+# README.md
 <div align="center">
-  <img src="assets/logo.png" alt="AutoResearch Agent Logo" width="250" />
+  <img src="assets/enterprise-logo.png" alt="AutoResearch Agent Logo" width="250" />
 
   <h1>✨ AutoResearch Agent</h1>
   <p><b>Modular AI Research Agent</b></p>
@@ -46,26 +47,6 @@ Say goodbye to having 50 browser tabs open. Let the agent do the heavy lifting w
 ## 🗺️ System Architecture
 
 The agent follows an iterative "Plan-and-Solve" pattern, dynamically deciding which tools to call based on the complexity of the research topic.
-
-```mermaid
-graph TD
-    A[CLI Input Topic] --> B[Agent Core Engine]
-    B --> C(Researcher Agent)
-    
-    subgraph Tooling Layer
-        D{LangChain Tools}
-        D -->|Query Formulation| E[Web Search API]
-        D -->|Data Extraction| F[Web Scraper/Crawler]
-        D -->|Memory| M[(Vector Memory Store)]
-    end
-    
-    C <--> D
-    C --> G(Draft Generator Node)
-    G --> H(Critique & Refine Node)
-    H -->|Needs more info| C
-    H -->|Approved| I[Final Markdown Report]
-```
-
 ---
 
 ## ⚡ Quick Start Guide
@@ -75,50 +56,47 @@ Ensure you have Node.js 18+ and an API key for your preferred LLM (e.g., OpenAI,
 
 ### 2. Installation
 Clone the repository and install the lightning-fast dependencies:
-```bash
-git clone https://github.com/shenald-dev/autoresearch-agent.git
-cd autoresearch-agent
-npm install
-```
+### 3. Environment Configuration
+Copy the example environment file and add your API keys:
+Edit the `.env` file to include your LLM provider keys (e.g., `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`) and any search API keys required for web browsing.
 
-### 3. Configuration
-Copy the sample environment file and add your API keys:
-```bash
-cp .env.example .env
-```
-Ensure you provide a valid `OPENAI_API_KEY` (or OpenRouter/Anthropic key) and a `TAVILY_API_KEY` (or equivalent) for web search.
-
+### 4. Run the Agent
+Start researching with a single command:
 ---
 
 ## 💻 Comprehensive Usage
 
-Run the agent dynamically using `tsx`:
-```bash
-npm run dev -- --topic "The Future of Autonomous AI Agents in 2026"
-```
+The AutoResearch Agent provides several CLI options to fine-tune your research workflow:
 
-### Advanced Flags
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--model` | Specify the LLM model to use (e.g., `gpt-4o`, `claude-3-5-sonnet`) | `gpt-4o` |
+| `--max-iterations` | Set the maximum number of research loops | `5` |
+| `--output` | Define the output directory for the generated reports | `./reports` |
+| `--verbose` | Enable detailed logging for debugging the agent's reasoning | `false` |
 
-- `--depth`: Control how deep the agent goes. `shallow` (default), `deep`, or `exhaustive`.
-- `--output`: Specify a custom output directory (e.g., `./reports`).
-- `--format`: Request specific formats like `markdown`, `json`, or `csv`.
+### Example Commands
 
-**Example:**
-```bash
-npm run dev -- --topic "Quantum Computing Breakthroughs" --depth deep --output ./my-research
-```
-
-The agent will stream its thought process to the console, and upon completion, a highly detailed report will be saved to your output directory!
-
+**Basic Research:**
+**Advanced Configuration:**
 ---
 
 ## 🤝 Contributing
 
-We welcome all Vibe Coders to enhance the agent!
+We welcome contributions to the AutoResearch Agent! Please follow these steps to contribute:
 
-- 🐛 **Found a bug?** Open an issue to let us know.
-- ✨ **New Tools?** If you have a great idea for a new LangChain tool, submit a PR!
-- 🎨 **Documentation tweaks?** Always welcome!
+1. **Fork** the repository.
+2. Create a new feature branch (`git checkout -b feature/amazing-feature`).
+3. Ensure your code passes linting and formatting checks using `Biome` (`npm run lint`).
+4. Commit your changes (`git commit -m 'Add some amazing feature'`).
+5. Push to the branch (`git push origin feature/amazing-feature`).
+6. Open a **Pull Request**.
+
+Please ensure all new features are accompanied by appropriate tests and documentation updates.
 
 ---
-> *Built by a Vibe Coder. Focused on Flow.*
+
+<div align="center">
+  <p>Built with ❤️ by the Enterprise AI Team</p>
+  <p><a href="#-autoresearch-agent">Back to top</a></p>
+</div>
