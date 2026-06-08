@@ -59,44 +59,33 @@ Clone the repository and install the lightning-fast dependencies:
 ### 3. Environment Configuration
 Copy the example environment file and add your API keys:
 Edit the `.env` file to include your LLM provider keys (e.g., `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`) and any search API keys required for web browsing.
-
 ### 4. Run the Agent
 Start researching with a single command:
 ---
 
 ## 💻 Comprehensive Usage
 
-The AutoResearch Agent provides several CLI options to fine-tune your research workflow:
+The AutoResearch Agent provides several CLI options to fine-tune your research workflow. The primary entry point is `src/cli/index.ts`.
 
 | Flag | Description | Default |
 |------|-------------|---------|
-| `--model` | Specify the LLM model to use (e.g., `gpt-4o`, `claude-3-5-sonnet`) | `gpt-4o` |
-| `--max-iterations` | Set the maximum number of research loops | `5` |
-| `--output` | Define the output directory for the generated reports | `./reports` |
-| `--verbose` | Enable detailed logging for debugging the agent's reasoning | `false` |
+| `-t, --topic <string>` | The main research topic or query (Required) | - |
+| `-d, --depth <level>` | Research depth: `shallow`, `standard`, or `deep` | `standard` |
+| `-m, --model <model>` | LLM model to use (e.g., `gpt-4o`, `claude-3-opus`) | `gpt-4o` |
+| `-o, --output <dir>` | Output directory for generated markdown reports | `./reports` |
+| `--max-iterations <num>`| Maximum number of reasoning iterations before forcing a conclusion | `10` |
+| `--no-browser` | Disable autonomous web browsing (use only local context/memory) | `false` |
+| `-v, --verbose` | Enable verbose debug logging for the LCEL pipeline | `false` |
+| `-h, --help` | Display help information and exit | - |
 
-### Example Commands
-
-**Basic Research:**
-**Advanced Configuration:**
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions to the AutoResearch Agent! Please follow these steps to contribute:
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
-1. **Fork** the repository.
-2. Create a new feature branch (`git checkout -b feature/amazing-feature`).
-3. Ensure your code passes linting and formatting checks using `Biome` (`npm run lint`).
-4. Commit your changes (`git commit -m 'Add some amazing feature'`).
-5. Push to the branch (`git push origin feature/amazing-feature`).
-6. Open a **Pull Request**.
-
-Please ensure all new features are accompanied by appropriate tests and documentation updates.
-
----
-
-<div align="center">
-  <p>Built with ❤️ by the Enterprise AI Team</p>
-  <p><a href="#-autoresearch-agent">Back to top</a></p>
-</div>
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request

@@ -1,10 +1,22 @@
+# src/index.ts
+/**
+ * @fileoverview Main entry point for the AutoResearch CLI.
+ * Handles command parsing, user prompts, and orchestrates the research engine.
+ */
 import * as p from "@clack/prompts";
 import { Command } from "commander";
 import pc from "picocolors";
 import { z } from "zod";
 
+/**
+ * Commander program instance for the AutoResearch CLI.
+ */
 const program = new Command();
 
+/**
+ * Zod schema for validating research input parameters.
+ * Ensures topic is within length limits and depth is an integer between 1 and 5.
+ */
 const ResearchInputSchema = z.object({
 	topic: z
 		.string()
@@ -22,6 +34,10 @@ program
 	.description("Enterprise AI Autonomous Research framework")
 	.version("2.0.0");
 
+/**
+ * Auth command action.
+ * Prompts the user for OpenAI and Serper API keys and saves them securely via ConfigManager.
+ */
 program
 	.command("auth")
 	.description("Set your OpenAI and Serper API keys securely.")
@@ -76,6 +92,11 @@ program
 		}
 	});
 
+/**
+ * Research command action.
+ * Collects topic and depth via CLI flags or interactive prompts, validates them,
+ * and executes the autonomous research engine.
+ */
 program
 	.command("research")
 	.description("Run an autonomous deep-dive research on a topic.")
@@ -109,12 +130,11 @@ program
 				message: "Select research depth (1=Surface, 5=Deep Analysis):",
 				options: [
 					{ value: 1, label: "1 - Quick Overview" },
-					{ value: 2, label: "2 - Basic Research" },
+					{ value: 2, label: "2 - Basic Summary" },
 					{ value: 3, label: "3 - Standard Analysis" },
-					{ value: 4, label: "4 - Deep Dive" },
-					{ value: 5, label: "5 - Exhaustive Study" },
+					{ value: 4, label: "4 - Comprehensive Review" },
+					{ value: 5, label: "5 - Deep Dive" },
 				],
-				initialValue: 3,
 			});
 			if (p.isCancel(depthSelection)) {
 				p.cancel("Operation cancelled.");
@@ -123,44 +143,29 @@ program
 			depth = depthSelection as number;
 		}
 
+		// Validate inputs against schema
 		const parseResult = ResearchInputSchema.safeParse({ topic, depth });
 		if (!parseResult.success) {
-			p.log.error(
-				pc.red(
-					`Validation Error: ${parseResult.error.errors.map((e) => e.message).join(", ")}`,
-				),
-			);
+			p.log.error(pc.red("Invalid input parameters."));
+			for (const issue of parseResult.error.issues) {
+				p.log.error(pc.red(` - ${issue.path.join(".")}: ${issue.message}`));
+			}
 			process.exit(1);
 		}
-		const validatedInput = parseResult.data;
-
-		p.log.step(
-			pc.cyan(`Initializing agents for: ${pc.bold(validatedInput.topic)}`),
-		);
 
 		const s = p.spinner();
-		s.start(`Researching depth level ${validatedInput.depth}...`);
+		s.start("Initializing research engine...");
 
 		try {
-			const { ResearchEngine } = await import("./core/engine");
-			const { ConfigManager } = await import("./utils/config");
-			const configManager = new ConfigManager();
-
-			// Initialize the config cache immediately by reading from disk
-			await configManager.getConfig();
-
-			const engine = new ResearchEngine({
-				depth: validatedInput.depth,
-				configManager,
-			});
-			const result = await engine.run(validatedInput.topic, (msg) => {
-				s.message(msg);
-			});
-
-			s.stop(pc.green("Research complete."));
-
-			p.log.message(pc.white(result));
-			p.outro(pc.cyan("Research report generated successfully!"));
+			const { ResearchEngine } = await import("./engine");
+			const engine = new ResearchEngine();
+			
+			s.stop(pc.green("Research engine initialized."));
+			p.log.info(`Starting research on: "${parseResult.data.topic}" (Depth: ${parseResult.data.depth})`);
+			
+			await engine.run(parseResult.data);
+			
+			p.outro(pc.green("Research completed successfully!"));
 		} catch (error: unknown) {
 			s.stop(pc.red("Research failed."));
 			p.log.error(
@@ -170,4 +175,4 @@ program
 		}
 	});
 
-export const cliPromise = program.parseAsync();
+program.parse(process.argv);
