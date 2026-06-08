@@ -23,6 +23,18 @@
       "classification": "unknown_code_failure",
       "workflow": "CI",
       "timestamp": "2026-06-08T00:51:10.955255+00:00"
+    },
+    {
+      "run_id": 23022581000,
+      "classification": "lint_failure",
+      "workflow": "CI",
+      "timestamp": "2026-06-08T04:29:00.506354+00:00"
+    },
+    {
+      "run_id": 22739727103,
+      "classification": "unknown_code_failure",
+      "workflow": "CI",
+      "timestamp": "2026-06-08T04:29:01.516800+00:00"
     }
   ],
   "flaky_workflows": {}
