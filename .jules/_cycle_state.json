@@ -1,7 +1,7 @@
 {
   "sentinel": {
-    "ci_status": "fixed",
-    "ci_fixed": 2,
+    "ci_status": "passing",
+    "ci_fixed": 0,
     "ci_issues_created": 0,
     "prs_merged": 0,
     "prs_conflicts_resolved": 0,
