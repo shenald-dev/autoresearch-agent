@@ -6,10 +6,11 @@
     "prs_merged": 0,
     "prs_conflicts_resolved": 0,
     "prs_pinged": 0,
-    "issues_triaged": 0,
+    "issues_labeled": 0,
+    "issues_responded": 0,
     "issues_closed": 0,
-    "vulnerabilities_critical": 0,
-    "vulnerabilities_high": 0,
+    "security_critical": 0,
+    "security_high": 0,
     "branches_deleted": 0,
     "blockers": []
   },
@@ -21,7 +22,9 @@
     "security_high": 0,
     "security_medium": 0,
     "security_low": 0,
-    "docs_updated": [],
+    "docs_updated": [
+      ".jules/warden.md"
+    ],
     "release_version": null,
     "blockers": []
   }
