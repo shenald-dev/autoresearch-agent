@@ -76,3 +76,14 @@ Docs Updated: none
 Release: none
 
 AI Summary: AI analysis failed, running basic checks only
+
+## 2026-10-24 — WARDEN Run
+
+QA Status: verified
+Dead Code Removed: 0 lines
+Dependencies Bumped: 0
+Security: Critical=0, High=0
+Docs Updated: .jules/warden.md
+Release: none
+
+AI Summary: Verified that tests pass after rebasing against master, where the signature of engine.run in src/index.ts was fixed to use the progress callback and cliPromise was properly exported. All 52 tests are passing.
