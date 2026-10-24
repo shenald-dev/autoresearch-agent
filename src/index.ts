@@ -1,4 +1,4 @@
-# src/index.ts
+// src/index.ts
 /**
  * @fileoverview Main entry point for the AutoResearch CLI.
  * Handles command parsing, user prompts, and orchestrates the research engine.
@@ -157,14 +157,23 @@ program
 		s.start("Initializing research engine...");
 
 		try {
-			const { ResearchEngine } = await import("./engine");
-			const engine = new ResearchEngine();
-			
+			const { ResearchEngine } = await import("./core/engine");
+			const engine = new ResearchEngine({ depth: parseResult.data.depth });
+
 			s.stop(pc.green("Research engine initialized."));
-			p.log.info(`Starting research on: "${parseResult.data.topic}" (Depth: ${parseResult.data.depth})`);
-			
-			await engine.run(parseResult.data);
-			
+			p.log.step(
+				pc.cyan(
+					`Starting research on: "${pc.bold(parseResult.data.topic)}" (Depth: ${parseResult.data.depth})`,
+				),
+			);
+
+			s.start("Conducting research...");
+			const report = await engine.run(parseResult.data.topic, (status) => {
+				s.message(status);
+			});
+			s.stop(pc.green("Research completed."));
+			console.log(`\n${report}\n`);
+
 			p.outro(pc.green("Research completed successfully!"));
 		} catch (error: unknown) {
 			s.stop(pc.red("Research failed."));
@@ -175,4 +184,4 @@ program
 		}
 	});
 
-program.parse(process.argv);
+export const cliPromise = program.parseAsync();
