@@ -99,7 +99,10 @@ export class GoogleSearcher {
 					});
 
 					if (!response.ok) {
-						await response.body?.cancel().catch(() => {});
+						try {
+							await response.body?.cancel();
+						} catch (err) {}
+
 						throw new HttpError(
 							`Serper API HTTP error: ${response.status}`,
 							response.status,
