@@ -223,3 +223,11 @@ When implementing SSRF validation via DNS lookups, persistently caching the vali
 
 Action:
 Only cache the DNS validation promise for in-flight concurrent requests (request coalescing) and clear it immediately upon resolution. This prevents redundant lookups during a single batch fetch without persistently caching a potentially stale and dangerous DNS resolution.
+
+## 2026-11-23 — ReadableStream Synchronous Cancellation Error
+
+**Learning:**
+When cancelling a native fetch Response stream in Node.js, calling \`response.body.cancel()\` or \`reader.cancel()\` can throw a synchronous \`TypeError\` (e.g. if the stream is locked). Because this throw is synchronous, appending \`.catch(() => {})\` to the promise does not catch it, causing an unhandled exception that bypasses standard error handling and can crash the application.
+
+**Action:**
+To prevent unhandled exceptions during stream cancellation, always wrap \`response.body?.cancel()\` and \`reader.cancel()\` inside a standard \`try...catch\` block instead of using promise-based \`.catch()\`.
