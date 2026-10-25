@@ -1,4 +1,10 @@
 # .jules/warden.md
+
+## 2026-10-25 — Lifecycle & Assurance Ledger
+- **QA & Veto Actions:** Ran tests, build, and lint checks. No regressions found. Fixed `package.json` missing `bin` field to prevent `knip` from flagging `bin/cli.js` as dead code.
+- **Entropy Pruned:** 0 lines deleted. Retained `bin/cli.js` as an essential entry point.
+- **Deferred / Blocked:** Safely bumped minor and patch dependencies via `npm update`. No breaking dependencies found.
+
 ## 2026-06-08 — Assessment & Lifecycle
 
 **Observation / Pruned:**
