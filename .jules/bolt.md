@@ -231,3 +231,10 @@ When cancelling a native fetch Response stream in Node.js, calling \`response.bo
 
 **Action:**
 To prevent unhandled exceptions during stream cancellation, always wrap \`response.body?.cancel()\` and \`reader.cancel()\` inside a standard \`try...catch\` block instead of using promise-based \`.catch()\`.
+## 2026-10-26 — Vulnerability Resolution with Breaking Upgrades
+
+**Learning:**
+When updating packages to resolve security vulnerabilities (like those from `npm audit`), strictly following negative constraints against major updates can conflict with the availability of security patches for the older major version. In our case, `uuid`, `zod`, and `langsmith` vulnerabilities could only be fully resolved without conflicts by updating their dependents as well, which involved accepting the major version updates to `@langchain/core` (to `1.3.0`) and `@langchain/openai` (to `1.7.0`), along with `openai` (to `7.43.0`).
+
+**Action:**
+To fix `npm audit` vulnerabilities that involve complex peer dependency chains and missing older patches, allow controlled major version upgrades of the affected dependencies if, and only if, the full test suite and linter pass seamlessly.
