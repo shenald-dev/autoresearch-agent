@@ -51,8 +51,15 @@ export class GoogleSearcher {
 				}
 
 				if (attempt === maxRetries) {
+					console.error(
+						`[GoogleSearcher] Max retries exceeded. Error: ${error instanceof Error ? error.message : String(error)}`,
+					);
 					throw error;
 				}
+
+				console.warn(
+					`[GoogleSearcher] Attempt ${attempt} failed. Retrying in ${2 ** (attempt - 1)}s... Error: ${error instanceof Error ? error.message : String(error)}`,
+				);
 
 				// Exponential backoff: 1s, 2s, 4s
 				const delayMs = 2 ** (attempt - 1) * 1000;
@@ -104,7 +111,7 @@ export class GoogleSearcher {
 						} catch (err) {}
 
 						throw new HttpError(
-							`Serper API HTTP error: ${response.status}`,
+							`Serper API HTTP error: ${response.status} - ${response.statusText}`,
 							response.status,
 						);
 					}
@@ -122,6 +129,9 @@ export class GoogleSearcher {
 					}));
 				});
 			} catch (error) {
+				console.error(
+					`[GoogleSearcher] Search failed for query "${query}": ${error instanceof Error ? error.message : String(error)}`,
+				);
 				this.cache.delete(cacheKey);
 				throw error;
 			}
