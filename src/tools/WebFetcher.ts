@@ -180,6 +180,10 @@ export class WebFetcher {
 				}
 
 				if (!response || !response.ok) {
+					const statusText = response?.statusText || "unknown error";
+					console.error(
+						`[WebFetcher] HTTP Error ${response?.status || "unknown"} - ${statusText} while fetching ${targetUrl}`,
+					);
 					try {
 						await response?.body?.cancel();
 					} catch (err) {
@@ -267,6 +271,9 @@ export class WebFetcher {
 				const truncated = strippedText.slice(0, 8000); // Prevent context window explosion
 				return truncated;
 			} catch (error: unknown) {
+				console.error(
+					`[WebFetcher] Fetch failed for ${targetUrl}: ${error instanceof Error ? error.message : String(error)}`,
+				);
 				if (reader) {
 					try {
 						await reader.cancel();
