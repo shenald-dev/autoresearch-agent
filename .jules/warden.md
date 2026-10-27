@@ -1,5 +1,13 @@
 # .jules/warden.md
 
+## 2026-10-27 — Assessment & Lifecycle
+
+**Observation / Pruned:**
+Observed unused `langsmith`, `openai`, and `uuid` dependencies in `package.json` according to `knip`. Removed them completely to fight codebase entropy.
+
+**Alignment / Deferred:**
+Aligned the test suite execution and linter. No regressions found.
+
 ## 2026-10-25 — Lifecycle & Assurance Ledger
 - **QA & Veto Actions:** Ran tests, build, and lint checks. No regressions found. Fixed `package.json` missing `bin` field to prevent `knip` from flagging `bin/cli.js` as dead code.
 - **Entropy Pruned:** 0 lines deleted. Retained `bin/cli.js` as an essential entry point.

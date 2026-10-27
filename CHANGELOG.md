@@ -1,6 +1,7 @@
 # CHANGELOG.md
 
 ## [Unreleased]
+* **[Pruned]:** Removed unused dependencies (`langsmith`, `openai`, `uuid`) to fight codebase entropy.
 * **[Chore]:** Routine WARDEN maintenance and structural verification. Fixed missing `bin` field in `package.json` to properly map `bin/cli.js`. Bumped patch/minor dependencies.
 
 ## [1.0.41] - 2026-06-08
