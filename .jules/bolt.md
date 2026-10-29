@@ -238,3 +238,11 @@ When updating packages to resolve security vulnerabilities (like those from `npm
 
 **Action:**
 To fix `npm audit` vulnerabilities that involve complex peer dependency chains and missing older patches, allow controlled major version upgrades of the affected dependencies if, and only if, the full test suite and linter pass seamlessly.
+
+## 2026-11-23 — Undici Dispatcher Dependency Injection for Test Mocks
+
+**Learning:**
+When using `undici.Agent` to create custom dispatchers for `undici.fetch` (e.g. to solve DNS Rebinding by pinning IP addresses), dynamically overriding `undici.fetch` using global `vi.mock("undici")` breaks tests because ES Module namespaces are strictly read-only and `undici` does not exist as a separate module instance that can be easily mutated if it's imported correctly.
+
+**Action:**
+To safely inject custom `undici.Agent` dispatchers and properly mock `undici.fetch` across environments, provide an optional `dispatcher` configuration to the object using `undici` (e.g. via dependency injection in `WebFetcher` constructor). Additionally, when mocking `undici` with Vitest, explicitly use `vi.mock("undici", () => ({ ... }))` at the top of the file before imports, and then use `vi.mocked(undici.fetch).mockImplementation(...)` instead of reassigning the property.

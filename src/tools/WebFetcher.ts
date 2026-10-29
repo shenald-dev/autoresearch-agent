@@ -2,17 +2,20 @@ import * as dns from "node:dns/promises";
 import * as url from "node:url";
 import * as ipaddr from "ipaddr.js";
 import pLimit from "p-limit";
+import { Agent, fetch as undiciFetch } from "undici";
 import { extractCharset } from "../utils/http";
 
 export class WebFetcher {
 	private cache: Map<string, Promise<string>>;
-	private hostValidationCache: Map<string, Promise<boolean>>;
+	private hostValidationCache: Map<string, Promise<string | null>>;
 	private maxConcurrency: number;
+	private dispatcher?: Agent;
 
-	constructor(maxConcurrency = 3) {
+	constructor(maxConcurrency = 3, dispatcher?: Agent) {
 		this.cache = new Map();
 		this.hostValidationCache = new Map();
 		this.maxConcurrency = maxConcurrency;
+		this.dispatcher = dispatcher;
 	}
 
 	/**
@@ -20,13 +23,13 @@ export class WebFetcher {
 	 * Only allows http and https protocols.
 	 * Performs DNS resolution to prevent DNS rebinding and loopback variants.
 	 */
-	private async isValidUrl(targetUrl: string): Promise<boolean> {
+	private async isValidUrl(targetUrl: string): Promise<string | null> {
 		try {
 			const parsed = new url.URL(targetUrl);
 
 			// Rejects file://, ftp://, gopher://, etc.
 			if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-				return false;
+				return null;
 			}
 
 			let hostname = parsed.hostname;
@@ -37,7 +40,7 @@ export class WebFetcher {
 			}
 
 			if (this.hostValidationCache.has(hostname)) {
-				return this.hostValidationCache.get(hostname) as Promise<boolean>;
+				return this.hostValidationCache.get(hostname) as Promise<string | null>;
 			}
 
 			const validationPromise = (async () => {
@@ -47,11 +50,11 @@ export class WebFetcher {
 					addresses = await dns.lookup(hostname, { all: true });
 				} catch {
 					// If DNS lookup fails (e.g., domain doesn't exist), we can't fetch it anyway
-					return false;
+					return null;
 				}
 
 				if (!addresses || addresses.length === 0) {
-					return false;
+					return null;
 				}
 
 				for (const { address } of addresses) {
@@ -69,16 +72,16 @@ export class WebFetcher {
 
 						// Strict whitelist: Only allow regular public unicast addresses.
 						// This implicitly rejects private, loopback, multicast, broadcast, and metadata ranges.
-						if (range !== "unicast") {
-							return false;
+						if (range === "unicast") {
+							return address;
 						}
 					} catch {
 						// Invalid IP format
-						return false;
+						return null;
 					}
 				}
 
-				return true;
+				return null;
 			})();
 
 			this.hostValidationCache.set(hostname, validationPromise);
@@ -94,7 +97,7 @@ export class WebFetcher {
 
 			return validationPromise;
 		} catch {
-			return false;
+			return null;
 		}
 	}
 
@@ -115,7 +118,10 @@ export class WebFetcher {
 		}
 
 		const fetchPromise = (async () => {
-			if (!(await this.isValidUrl(normalizedUrl))) {
+			let currentUrl = targetUrl;
+			let safeIp = await this.isValidUrl(normalizedUrl);
+
+			if (!safeIp) {
 				this.cache.delete(normalizedUrl);
 
 				return `Error: Invalid or insecure URL provided (${targetUrl})`;
@@ -123,18 +129,36 @@ export class WebFetcher {
 
 			let response: Response | null = null;
 			let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+			const createdDispatchers: Agent[] = [];
 			try {
-				let currentUrl = targetUrl;
 				let redirects = 0;
 				const MAX_REDIRECTS = 5;
 				const abortSignal = AbortSignal.timeout(15000);
 
 				while (redirects <= MAX_REDIRECTS) {
-					response = await fetch(currentUrl, {
+					const family = safeIp.includes(":") ? 6 : 4;
+					// Use the injected dispatcher or construct one that binds the hostname to safeIp
+					// We only close the dispatcher if we constructed it ourselves
+					const dispatcher =
+						this.dispatcher ||
+						new Agent({
+							connect: {
+								lookup: (hostname, options, callback) => {
+									callback(null, [{ address: safeIp as string, family }]);
+								},
+							},
+						});
+
+					if (!this.dispatcher) {
+						createdDispatchers.push(dispatcher);
+					}
+
+					response = (await undiciFetch(currentUrl, {
 						headers: { "User-Agent": "AutoResearchAgent/2.0" },
 						signal: abortSignal,
+						dispatcher,
 						redirect: "manual",
-					});
+					})) as unknown as Response;
 
 					// Handle redirects manually to prevent SSRF via 301/302 location headers
 					if (
@@ -157,7 +181,8 @@ export class WebFetcher {
 						const location = response.headers.get("location") as string;
 						const nextUrl = new url.URL(location, currentUrl).toString();
 
-						if (!(await this.isValidUrl(nextUrl))) {
+						safeIp = await this.isValidUrl(nextUrl);
+						if (!safeIp) {
 							try {
 								await response.body?.cancel();
 							} catch (err) {
@@ -290,6 +315,12 @@ export class WebFetcher {
 				this.cache.delete(normalizedUrl);
 
 				return `Error: Failed to fetch ${targetUrl} - ${error instanceof Error ? error.message : String(error)}`;
+			} finally {
+				for (const d of createdDispatchers) {
+					try {
+						await d.close();
+					} catch (err) {}
+				}
 			}
 		})();
 

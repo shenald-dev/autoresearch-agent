@@ -1,10 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import * as undici from "undici";
+
+vi.mock("undici", () => {
+	return {
+		Agent: class {},
+		fetch: vi.fn(),
+	};
+});
+
 import { WebFetcher } from "../src/tools/WebFetcher";
 
 describe("WebFetcher", () => {
 	it("should preserve semantic HTML but strip boilerplate like <nav> and <footer>", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
+
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
@@ -34,12 +43,12 @@ describe("WebFetcher", () => {
 		expect(result).not.toContain("ads");
 		expect(result).not.toContain("No JS");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should properly strip nested boilerplate tags", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
+
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
@@ -71,12 +80,12 @@ describe("WebFetcher", () => {
 		expect(result).not.toContain("Some text");
 		expect(result).not.toContain("inner");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should handle edge cases with self-closing boilerplate tags and tags with unusual attributes", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
+
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
@@ -108,7 +117,7 @@ describe("WebFetcher", () => {
 		expect(result).not.toContain("No JS");
 		expect(result).not.toContain("tracker");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 
@@ -179,9 +188,9 @@ describe("WebFetcher", () => {
 	});
 
 	it("should reject redirects to SSRF URLs", async () => {
-		// Mock global fetch to return a 302 redirect to an internal IP
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async (url, options) => {
+		// Mock undici.fetch to return a 302 redirect to an internal IP
+
+		vi.mocked(undici.fetch).mockImplementation(async (url, options) => {
 			if (url === "https://example.com/redirect-to-internal") {
 				return {
 					status: 302,
@@ -204,13 +213,13 @@ describe("WebFetcher", () => {
 		);
 		expect(result).toContain("Error: Redirected to invalid or insecure URL");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should correctly handle and strip malformed nested boilerplate tags", async () => {
-		const originalFetch = global.fetch;
 
-		global.fetch = vi.fn().mockImplementation(async () => {
+
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
@@ -237,14 +246,14 @@ describe("WebFetcher", () => {
 		expect(result).not.toContain("Malformed");
 		expect(result).not.toContain("Malformed <iframe> Content");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should cancel unconsumed response bodies during redirect loops to prevent socket leaks", async () => {
-		const originalFetch = global.fetch;
+
 		const mockCancel = vi.fn().mockResolvedValue(undefined);
 
-		global.fetch = vi.fn().mockImplementation(async (url) => {
+		vi.mocked(undici.fetch).mockImplementation(async (url) => {
 			// Force an invalid redirect loop to trigger the body.cancel() behavior
 			return {
 				status: 302,
@@ -262,14 +271,14 @@ describe("WebFetcher", () => {
 		expect(result).toContain("Error: Redirected to invalid or insecure URL");
 		expect(mockCancel).toHaveBeenCalled();
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should reject non-text content types", async () => {
-		const originalFetch = global.fetch;
+
 		const mockCancel = vi.fn().mockResolvedValue(undefined);
 
-		global.fetch = vi.fn().mockImplementation(async (url) => {
+		vi.mocked(undici.fetch).mockImplementation(async (url) => {
 			return {
 				ok: true,
 				status: 200,
@@ -288,14 +297,14 @@ describe("WebFetcher", () => {
 		);
 		expect(mockCancel).toHaveBeenCalled();
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should allow valid public HTTP/HTTPS URLs including tricky ones", async () => {
 		const isValid = await (fetcher as any).isValidUrl(
 			"https://en.wikipedia.org/wiki/AI",
 		);
-		expect(isValid).toBe(true);
+		expect(typeof isValid).toBe("string");
 
 		// To test real DNS we need a domain that actually resolves to a public IP.
 		// 10.example.com may not resolve, so we'll mock dns.lookup or pick known public domains.
@@ -303,12 +312,12 @@ describe("WebFetcher", () => {
 		const isValidTen = await (fetcher as any).isValidUrl(
 			"http://example.com/foo",
 		);
-		expect(isValidTen).toBe(true);
+		expect(typeof isValidTen).toBe("string");
 
 		const isValidInternalLooking = await (fetcher as any).isValidUrl(
 			"https://example.org",
 		);
-		expect(isValidInternalLooking).toBe(true);
+		expect(typeof isValidInternalLooking).toBe("string");
 	});
 
 	it("should cache results to avoid redundant fetching", async () => {
@@ -326,7 +335,7 @@ describe("WebFetcher", () => {
 	});
 
 	it("should deduplicate batch fetches with different hash fragments", async () => {
-		const originalFetch = global.fetch;
+
 		const fetchMock = vi.fn().mockImplementation(async () => {
 			return {
 				status: 200,
@@ -335,10 +344,10 @@ describe("WebFetcher", () => {
 				text: async () => "Mocked content",
 			};
 		});
-		global.fetch = fetchMock;
+		vi.mocked(undici.fetch).mockImplementation(fetchMock);
 
 		// Since dns.lookup cannot be easily redefined, we can just spy on fetchSingle instead,
-		// but since it's private we can just use the global fetch mock.
+		// but since it's private we can just use the undici.fetch mock.
 		// Real dns.lookup for example.com works and returns a public IP, so it passes SSRF checks.
 
 		const urls = [
@@ -360,13 +369,13 @@ describe("WebFetcher", () => {
 		);
 		expect(results.get("https://example.com/docs")).toBe("Mocked content");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should decode response body correctly using charset from Content-Type", async () => {
 		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
+
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html; charset=ISO-8859-1" }),
@@ -393,13 +402,13 @@ describe("WebFetcher", () => {
 		const result = await (fetcher as any).fetchSingle("https://example.com/iso-test");
 		expect(result).toBe("é");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should fallback to utf-8 if charset is unsupported", async () => {
 		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
+
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html; charset=unsupported-charset" }),
@@ -425,14 +434,14 @@ describe("WebFetcher", () => {
 		const result = await (fetcher as any).fetchSingle("https://example.com/fallback-test");
 		expect(result).toBe("a");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should handle extra spaces in Content-Type gracefully", async () => {
 		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
 
-		global.fetch = vi.fn().mockImplementation(async () => {
+
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			const encoder = new TextEncoder();
 			const encoded = encoder.encode("Spaced Test Content");
 			const stream = new ReadableStream({
@@ -451,14 +460,14 @@ describe("WebFetcher", () => {
 		const resultSpaced = await (fetcher as any).fetchSingle("https://example.com/spaced-charset");
 		expect(resultSpaced).toBe("Spaced Test Content");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should handle missing charset in Content-Type gracefully", async () => {
 		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
 
-		global.fetch = vi.fn().mockImplementation(async () => {
+
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			const encoder = new TextEncoder();
 			const encoded = encoder.encode("Missing Test Content");
 			const stream = new ReadableStream({
@@ -477,14 +486,14 @@ describe("WebFetcher", () => {
 		const resultMissing = await (fetcher as any).fetchSingle("https://example.com/missing-charset");
 		expect(resultMissing).toBe("Missing Test Content");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should gracefully handle malformed or non-UTF-8 charsets in Content-Type header", async () => {
-		const originalFetch = global.fetch;
+
 
 		// 1. Valid non-utf-8 charset
-		global.fetch = vi.fn().mockImplementation(async () => {
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			const encoder = new TextEncoder();
 			const encoded = encoder.encode("Valid Test Content");
 			const stream = new ReadableStream({
@@ -505,7 +514,7 @@ describe("WebFetcher", () => {
 		(fetcher as any).cache.clear();
 
 		// 2. Malformed/Unsupported charset fallback to utf-8
-		global.fetch = vi.fn().mockImplementation(async () => {
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			const encoder = new TextEncoder();
 			const encoded = encoder.encode("Malformed Test Content");
 			const stream = new ReadableStream({
@@ -525,7 +534,7 @@ describe("WebFetcher", () => {
 		expect(result).toBe("Malformed Test Content");
 
 		// 3. Extra spaces in Content-Type
-		global.fetch = vi.fn().mockImplementation(async () => {
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			const encoder = new TextEncoder();
 			const encoded = encoder.encode("Spaced Test Content");
 			const stream = new ReadableStream({
@@ -546,7 +555,7 @@ describe("WebFetcher", () => {
 		(fetcher as any).cache.clear();
 
 		// 4. Missing charset
-		global.fetch = vi.fn().mockImplementation(async () => {
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			const encoder = new TextEncoder();
 			const encoded = encoder.encode("Missing Test Content");
 			const stream = new ReadableStream({
@@ -564,12 +573,12 @@ describe("WebFetcher", () => {
 		});
 		const resultMissing = await (fetcher as any).fetchSingle("https://example.com/missing-charset");
 		expect(resultMissing).toBe("Missing Test Content");
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should decode different charsets correctly and fallback to utf-8 safely", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async (url) => {
+
+		vi.mocked(undici.fetch).mockImplementation(async (url) => {
 			if (url.includes("iso")) {
 				return {
 					status: 200,
@@ -654,12 +663,12 @@ describe("WebFetcher", () => {
 		const resultNoCharset = await (fetcher as any).fetchSingle("https://example.com/no-charset");
 		expect(resultNoCharset).toContain("No charset provided");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should evict normalizedUrl from cache on fetch error", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
+
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			return {
 				status: 500,
 				headers: new Headers({ "content-type": "text/html" }),
@@ -674,12 +683,12 @@ describe("WebFetcher", () => {
 
 		expect((fetcher as any).cache.has(normalizedUrl)).toBe(false);
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should remove both targetUrl and normalizedUrl from cache on failure", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
+
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			return {
 				status: 404,
 				headers: new Headers({ "content-type": "text/html" }),
@@ -700,13 +709,13 @@ describe("WebFetcher", () => {
 
 		expect((fetcher as any).cache.has(normalizedUrl)).toBe(false);
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should preserve input URL order in the results map regardless of fetch completion time", async () => {
-		const originalFetch = global.fetch;
 
-		global.fetch = vi.fn().mockImplementation(async (url) => {
+
+		vi.mocked(undici.fetch).mockImplementation(async (url) => {
 			if (url.includes("slow")) {
 				await new Promise((resolve) => setTimeout(resolve, 50));
 			}
@@ -726,12 +735,12 @@ describe("WebFetcher", () => {
 		const results = await fetcher.fetchBatch(urls);
 		expect(Array.from(results.keys())).toEqual(urls);
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should strip HTML comments safely", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
+
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
@@ -743,13 +752,13 @@ describe("WebFetcher", () => {
 		const result = await (fetcher as any).fetchSingle("https://example.com/test-strip-comments");
 		expect(result).toBe("Main content");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should correctly handle HTML comments within script tags without corrupting them", async () => {
 		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
+
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
@@ -761,12 +770,12 @@ describe("WebFetcher", () => {
 		const result = await (fetcher as any).fetchSingle("https://example.com/test-script-comments");
 		expect(result).toBe("Main content");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should strip boilerplate HTML tags to save context", async () => {
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
+
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
@@ -778,13 +787,13 @@ describe("WebFetcher", () => {
 		const result = await (fetcher as any).fetchSingle("https://example.com/test-strip");
 		expect(result).toBe("Main content");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 
 	it("should strip HTML comments to save context tokens", async () => {
 		const fetcher = new WebFetcher(3);
-		const originalFetch = global.fetch;
-		global.fetch = vi.fn().mockImplementation(async () => {
+
+		vi.mocked(undici.fetch).mockImplementation(async () => {
 			return {
 				status: 200,
 				headers: new Headers({ "content-type": "text/html" }),
@@ -796,6 +805,6 @@ describe("WebFetcher", () => {
 		const result = await (fetcher as any).fetchSingle("https://example.com/test-comment-strip");
 		expect(result).toBe("Before After");
 
-		global.fetch = originalFetch;
+		vi.mocked(undici.fetch).mockReset();
 	});
 });
