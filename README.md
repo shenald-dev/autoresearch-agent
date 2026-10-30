@@ -13,7 +13,7 @@
   [![Vitest](https://img.shields.io/badge/Tested%20with-Vitest-729B1B.svg?logo=vitest)](https://vitest.dev/)
   [![Tests](https://img.shields.io/badge/Tests-82%20passing-brightgreen.svg)]()
   [![Biome](https://img.shields.io/badge/Code%20Style-Biome-60a5fa.svg?logo=biome)](https://biomejs.dev/)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+  [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 </div>
 
 ---
@@ -317,4 +317,4 @@ Please review our [Contributing Guide](CONTRIBUTING.md) for architecture overvie
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE) © 2026 [shenald-dev](https://github.com/shenald-dev).
+This project is licensed under the [GNU General Public License v3.0 (GPL-3.0-or-later)](LICENSE) © 2026 [shenald-dev](https://github.com/shenald-dev).
