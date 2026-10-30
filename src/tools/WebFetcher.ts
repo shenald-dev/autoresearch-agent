@@ -6,6 +6,11 @@ import { Agent, fetch as undiciFetch } from "undici";
 import { extractCharset } from "../utils/http";
 
 export class WebFetcher {
+	/**
+	 * Cache intentionally uses `normalizedUrl` (target URL with the hash fragment removed) as its key.
+	 * This focuses on caching the resource itself for idempotent GETs, preventing redundant network
+	 * requests if multiple sections of the same page (using different #hashes) are requested concurrently.
+	 */
 	private cache: Map<string, Promise<string>>;
 	private hostValidationCache: Map<string, Promise<string | null>>;
 	private maxConcurrency: number;
