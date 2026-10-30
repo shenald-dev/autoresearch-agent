@@ -1,11 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import * as undici from "undici";
-
-vi.mock("undici", () => ({
-	fetch: vi.fn(),
-}));
-
 import { DuckDuckGoSearcher } from "../src/tools/DuckDuckGoSearcher";
+
+// Mock global fetch
+global.fetch = vi.fn() as any;
 
 describe("DuckDuckGoSearcher", () => {
 	let searcher: DuckDuckGoSearcher;
@@ -20,7 +17,7 @@ describe("DuckDuckGoSearcher", () => {
 		const res2 = await searcher.search("   ");
 		expect(res1).toEqual([]);
 		expect(res2).toEqual([]);
-		expect(undici.fetch).not.toHaveBeenCalled();
+		expect(global.fetch).not.toHaveBeenCalled();
 	});
 
 	it("should parse HTML results, unwrap uddg links, and decode HTML entities", async () => {
@@ -39,10 +36,10 @@ describe("DuckDuckGoSearcher", () => {
 		</html>
 		`;
 
-		vi.mocked(undici.fetch).mockResolvedValueOnce({
+		(global.fetch as any).mockResolvedValueOnce({
 			ok: true,
 			text: async () => sampleHtml,
-		} as any);
+		});
 
 		const results = await searcher.search("test query", 5);
 		expect(results.length).toBe(2);
@@ -68,30 +65,30 @@ describe("DuckDuckGoSearcher", () => {
 		</div>
 		`;
 
-		vi.mocked(undici.fetch).mockResolvedValueOnce({
+		(global.fetch as any).mockResolvedValueOnce({
 			ok: true,
 			text: async () => sampleHtml,
-		} as any);
+		});
 
 		const firstCall = await searcher.search("cached query", 2);
 		const secondCall = await searcher.search("cached query", 2);
 
 		expect(firstCall).toEqual(secondCall);
-		expect(undici.fetch).toHaveBeenCalledTimes(1);
+		expect(global.fetch).toHaveBeenCalledTimes(1);
 	});
 
 	it("should handle empty or malformed HTML safely without throwing", async () => {
-		vi.mocked(undici.fetch).mockResolvedValueOnce({
+		(global.fetch as any).mockResolvedValueOnce({
 			ok: true,
 			text: async () => "<html><body>No matching results</body></html>",
-		} as any);
+		});
 
 		const results = await searcher.search("obscure impossible query", 5);
 		expect(results).toEqual([]);
 	});
 
 	it("should catch fetch errors and return empty array gracefully", async () => {
-		vi.mocked(undici.fetch).mockRejectedValue(new Error("Network failure"));
+		(global.fetch as any).mockRejectedValue(new Error("Network failure"));
 
 		const results = await searcher.search("error query", 2);
 		expect(results).toEqual([]);

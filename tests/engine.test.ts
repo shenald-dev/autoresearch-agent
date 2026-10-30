@@ -7,6 +7,12 @@ vi.mock("../src/tools/GoogleSearcher", () => ({
 		search = vi.fn();
 	},
 }));
+vi.mock("../src/tools/SearchManager", () => ({
+	SearchManager: class {
+		search = vi.fn().mockResolvedValue([]);
+		searchMulti = vi.fn().mockResolvedValue([]);
+	},
+}));
 vi.mock("../src/tools/WebFetcher", () => ({
 	WebFetcher: class {
 		fetchBatch = vi.fn();

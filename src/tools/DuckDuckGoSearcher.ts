@@ -1,4 +1,3 @@
-import { fetch as undiciFetch } from "undici";
 import type { ISearchProvider, SearchResult } from "./search/types";
 
 function decodeBasicEntities(text: string): string {
@@ -42,7 +41,7 @@ export class DuckDuckGoSearcher implements ISearchProvider {
 					const encoded = encodeURIComponent(trimmedQuery);
 					const url = `https://html.duckduckgo.com/html/?q=${encoded}`;
 
-					const response = await undiciFetch(url, {
+					const response = await fetch(url, {
 						headers: {
 							"User-Agent":
 								"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
