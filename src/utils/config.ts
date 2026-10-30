@@ -2,10 +2,13 @@ import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
 
-interface AutoResearchConfig {
+export interface AutoResearchConfig {
 	OPENAI_API_KEY?: string;
 	OPENAI_MODEL?: string;
+	OPENAI_BASE_URL?: string;
 	SERPER_API_KEY?: string;
+	DEFAULT_OUTPUT_DIR?: string;
+	DEFAULT_FORMAT?: "markdown" | "html" | "json" | "all";
 }
 
 export class ConfigManager {

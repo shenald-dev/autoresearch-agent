@@ -1,6 +1,9 @@
 import * as p from "@clack/prompts";
 import pc from "picocolors";
 import { ConfigManager } from "../utils/config";
+import type { ISearchProvider, SearchResult } from "./search/types";
+
+export type { SearchResult };
 
 class HttpError extends Error {
 	constructor(
@@ -12,13 +15,8 @@ class HttpError extends Error {
 	}
 }
 
-interface SearchResult {
-	title: string;
-	link: string;
-	snippet: string;
-}
-
-export class GoogleSearcher {
+export class GoogleSearcher implements ISearchProvider {
+	public readonly name = "GoogleSerper";
 	private configManager: ConfigManager;
 	private cache: Map<string, Promise<SearchResult[]>>;
 

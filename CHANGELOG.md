@@ -1,7 +1,13 @@
 # CHANGELOG.md
 
 ## [Unreleased]
-* **[Documentation]:** Overhauled README with system architecture flow, verified CLI options, and accurate asset links; updated LICENSE copyright.
+* **[Added]:** Multi-vector query decomposition (`QueryDecomposer`) scaling orthogonal research vectors based on depth levels 1–5 via LLM reasoning with deterministic heuristic fallbacks.
+* **[Added]:** Zero-config DuckDuckGo search provider (`DuckDuckGoSearcher`) with redirect unwrapping, HTML entity decoding, and intelligent fallback orchestration (`SearchManager`) when Serper API keys are unconfigured.
+* **[Added]:** Multi-format publication exporters (`exportReport`) for structured Markdown with YAML frontmatter, standalone responsive HTML reports with dark/light mode and print-to-PDF styles, and structured JSON.
+* **[Added]:** Local research library management commands: `autoresearch list` and `autoresearch view <id|slug> [--open]` with browser launching and formatted terminal previews.
+* **[Added]:** Multi-provider LLM support for custom `OPENAI_BASE_URL` and custom `OPENAI_MODEL` in configuration and CLI auth wizard (Ollama, DeepSeek, Groq, LM Studio).
+* **[Added]:** 5 new comprehensive test suites covering DuckDuckGo search, multi-search orchestration, query decomposition, report exporters, and history management (expanding coverage to 82 tests).
+* **[Documentation]:** Complete overhaul of `README.md` with modern architecture flowchart, CLI manual, multi-provider setup guide, and verified test badges.
 * **[Fixed]:** Ensured contiguous, gapless citation numbering (`[Source 1]`, `[Source 2]`, etc.) in synthesized research context when earlier sources fail to fetch or contain empty content.
 * **[Fixed]:** Prevented literal `"undefined"` string coercion for missing search result titles and snippets, and filtered out entries missing valid URLs in `GoogleSearcher`.
 * **[Fixed]:** Added whitespace trimming to CLI input validation schema to reject empty or whitespace-only research topics.
