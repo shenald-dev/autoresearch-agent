@@ -1,6 +1,7 @@
 # CHANGELOG.md
 
 ## [Unreleased]
+* **[Documentation]:** Overhauled README with system architecture flow, verified CLI options, and accurate asset links; updated LICENSE copyright.
 * **[Fixed]:** Ensured contiguous, gapless citation numbering (`[Source 1]`, `[Source 2]`, etc.) in synthesized research context when earlier sources fail to fetch or contain empty content.
 * **[Fixed]:** Prevented literal `"undefined"` string coercion for missing search result titles and snippets, and filtered out entries missing valid URLs in `GoogleSearcher`.
 * **[Fixed]:** Added whitespace trimming to CLI input validation schema to reject empty or whitespace-only research topics.

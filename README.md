@@ -1,15 +1,17 @@
-# README.md
 <div align="center">
-  <img src="assets/enterprise-logo.png" alt="AutoResearch Agent Logo" width="250" />
+  <img src="assets/logo.png" alt="AutoResearch Agent Logo" width="220" />
 
   <h1>✨ AutoResearch Agent</h1>
-  <p><b>Modular AI Research Agent</b></p>
-  <i>An enterprise-grade, modular AI research agent built for high-performance content generation.</i>
-  
-  <br/>
+  <p><b>Autonomous Deep-Dive Research & Markdown Synthesis CLI</b></p>
+  <i>Search the web, extract verified content concurrently with enterprise-grade SSRF protection, and generate comprehensive, cited research reports in seconds.</i>
 
-  [![TypeScript](https://badgen.net/badge/icon/typescript?icon=typescript&label)](https://typescriptlang.org)
-  [![LangChain](https://img.shields.io/badge/LangChain-AI-orange.svg)](https://langchain.com)
+  <br/><br/>
+
+  [![CI](https://github.com/shenald-dev/autoresearch-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/shenald-dev/autoresearch-agent/actions/workflows/ci.yml)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
+  [![LangChain](https://img.shields.io/badge/LangChain-LCEL-orange.svg)](https://langchain.com)
+  [![Vitest](https://img.shields.io/badge/Tested%20with-Vitest-729B1B.svg?logo=vitest)](https://vitest.dev/)
+  [![Biome](https://img.shields.io/badge/Code%20Style-Biome-60a5fa.svg?logo=biome)](https://biomejs.dev/)
   [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 </div>
 
@@ -17,75 +19,213 @@
 
 ## 📑 Table of Contents
 - [🌟 Overview](#-overview)
-- [🚀 Enterprise Features](#-enterprise-features)
+- [🚀 Key Features](#-key-features)
 - [🗺️ System Architecture](#️-system-architecture)
 - [⚡ Quick Start Guide](#-quick-start-guide)
-- [💻 Comprehensive Usage](#-comprehensive-usage)
+- [🔐 Configuration](#-configuration)
+- [💻 CLI Usage](#-cli-usage)
+- [🧪 Development & Testing](#-development--testing)
 - [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
 ---
 
 ## 🌟 Overview
 
-The **AutoResearch Agent** is an intelligent, high-performance CLI tool powered by LangChain and LLMs. It acts as an autonomous digital researcher that browses the internet, synthesizes data, cross-references sources, and generates deep-dive, impeccably formatted markdown reports on any given topic.
+**AutoResearch Agent** is an autonomous CLI research assistant built with TypeScript, LangChain, and modern Node.js. It eliminates the manual friction of opening dozens of browser tabs, reading through cluttered web pages, and taking fragmented notes.
 
-Say goodbye to having 50 browser tabs open. Let the agent do the heavy lifting while you focus on the insights.
+Given any research topic, the agent:
+1. Queries real-time search engines via Serper API with exponential backoff.
+2. Discovers and deduplicates relevant URLs across the web.
+3. Fetches and sanitizes source documents concurrently using an SSRF-hardened HTTP client.
+4. Cleans boilerplate HTML, comments, and scripts to extract high-signal textual context.
+5. Synthesizes a structured, executive-ready Markdown report with contiguous, verified citations.
 
 ---
 
-## 🚀 Enterprise Features
+## 🚀 Key Features
 
-- **🧠 Modular Architecture**: Built with a plug-and-play architecture supporting drop-in memory, custom tools, and varied output formatters.
-- **⚡ Type-Safe & Robust**: Engineered entirely in TypeScript with strict schema validation via `zod` to prevent LLM hallucinations.
-- **🔗 LangChain Core**: Powered by robust LCEL (LangChain Expression Language) pipelines for complex reasoning chains.
-- **🕸️ Autonomous Web Browsing**: Natively hooks into search APIs to dynamically browse and scrape the web for the latest information.
-- **🌊 Zero Bloat**: Lightning-fast developer loop via `tsx` and `Biome`, ensuring maximal performance.
-- **📝 Automatic Markdown Compilation**: Synthesizes the raw data into gorgeous, structured markdown files instantly.
+- **🧠 Autonomous LCEL Pipeline**: Powered by LangChain Expression Language (LCEL) chains for deterministic, structured report synthesis.
+- **🛡️ Enterprise SSRF & DNS-Rebinding Hardening**: Custom `undici.Agent` dispatcher pre-resolves hostnames, validates strict public unicast IP ranges with `ipaddr.js`, and binds sockets directly to verified IPs to prevent TOCTOU DNS rebinding attacks.
+- **⚡ Bounded Concurrent Scraping**: Multi-threaded async batch fetching managed via `p-limit` with early payload size limits (500KB cap) to prevent out-of-memory overhead.
+- **🧹 Preemptive Context Sanitization**: Strips HTML comments, unclosed tags, and boilerplate containers (`<script>`, `<style>`, `<nav>`, `<footer>`, `<svg>`, `<iframe>`, `<noscript>`) while preserving core semantic content.
+- **🎯 Contiguous Source Citations**: Validated sources are indexed sequentially (`[Source 1]`, `[Source 2]`, etc.) without numbering gaps, ensuring clean, verifiable references in the final document.
+- **🔐 Secure Credential Management**: Encrypted storage for API keys at `~/.autoresearch/config.json` with restricted `0600` POSIX permissions, with automatic fallback to environment variables.
+- **🎨 Interactive Terminal Experience**: Beautiful terminal UI built with `@clack/prompts` and spinners, alongside support for headless scripting and CI/CD automation.
 
 ---
 
 ## 🗺️ System Architecture
 
-The agent follows an iterative "Plan-and-Solve" pattern, dynamically deciding which tools to call based on the complexity of the research topic.
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                    User CLI Prompt / Flags                      │
+└────────────────────────────────┬────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              Phase 1: Google Searcher (Serper API)              │
+│       • Query optimization & exponential backoff retries        │
+│       • Deduplication of candidate URLs by canonical host       │
+└────────────────────────────────┬────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│            Phase 2: Hardened Web Fetcher (Undici)               │
+│       • DNS lookup & strict public IP validation (ipaddr.js)    │
+│       • Custom Undici Agent pinning (DNS Rebinding protection)  │
+│       • Streaming decode & boilerplate HTML stripping           │
+└────────────────────────────────┬────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│          Phase 3: Context Assembler & LCEL Synthesis            │
+│       • Deduplication of identical content across domains       │
+│       • Contiguous [Source 1..N] reference indexing             │
+│       • LangChain ChatOpenAI prompt pipeline execution          │
+└────────────────────────────────┬────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│             Structured Executive Markdown Report                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
 ---
 
 ## ⚡ Quick Start Guide
 
 ### 1. Prerequisites
-Ensure you have Node.js 18+ and an API key for your preferred LLM (e.g., OpenAI, Anthropic).
+- **Node.js**: `v18.0.0` or later (Node.js 20+ recommended)
+- **API Keys**:
+  - [OpenAI API Key](https://platform.openai.com/api-keys) (for LLM synthesis)
+  - [Serper API Key](https://serper.dev/) (for real-time Google search indexing)
 
 ### 2. Installation
-Clone the repository and install the lightning-fast dependencies:
-### 3. Environment Configuration
-Copy the example environment file and add your API keys:
-Edit the `.env` file to include your LLM provider keys (e.g., `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`) and any search API keys required for web browsing.
-### 4. Run the Agent
-Start researching with a single command:
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/shenald-dev/autoresearch-agent.git
+cd autoresearch-agent
+npm install
+npm run build
+```
+
+Link globally if you want `autoresearch` accessible directly in your shell:
+
+```bash
+npm link
+```
+
 ---
 
-## 💻 Comprehensive Usage
+## 🔐 Configuration
 
-The AutoResearch Agent provides several CLI options to fine-tune your research workflow. The primary entry point is `src/cli/index.ts`.
+You can configure your API credentials using the built-in interactive wizard or via environment variables.
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `-t, --topic <string>` | The main research topic or query (Required) | - |
-| `-d, --depth <level>` | Research depth: `shallow`, `standard`, or `deep` | `standard` |
-| `-m, --model <model>` | LLM model to use (e.g., `gpt-4o`, `claude-3-opus`) | `gpt-4o` |
-| `-o, --output <dir>` | Output directory for generated markdown reports | `./reports` |
-| `--max-iterations <num>`| Maximum number of reasoning iterations before forcing a conclusion | `10` |
-| `--no-browser` | Disable autonomous web browsing (use only local context/memory) | `false` |
-| `-v, --verbose` | Enable verbose debug logging for the LCEL pipeline | `false` |
-| `-h, --help` | Display help information and exit | - |
+### Option A: Interactive Setup (Recommended)
+
+Run the authentication wizard to securely store keys in `~/.autoresearch/config.json`:
+
+```bash
+npm start -- auth
+# or if linked globally:
+autoresearch auth
+```
+
+### Option B: Environment Variables
+
+Alternatively, create a `.env` file in the project root:
+
+```bash
+cp .env.example .env
+```
+
+Set your keys inside `.env`:
+
+```env
+OPENAI_API_KEY=sk-proj-...
+SERPER_API_KEY=your_serper_api_key_here
+OPENAI_MODEL=gpt-4-turbo-preview
+```
+
+---
+
+## 💻 CLI Usage
+
+### Interactive Mode
+
+Simply start the research command without flags to launch the step-by-step interactive prompt:
+
+```bash
+npm start -- research
+```
+
+You will be guided through:
+1. Entering your research topic.
+2. Selecting research depth (from `1 - Quick Overview` to `5 - Deep Dive`).
+
+### Headless / Automated Mode
+
+Provide flags directly for scripted workflows or terminal one-liners:
+
+```bash
+npm start -- research -t "Post-Quantum Cryptography in 2026" -d 3
+```
+
+#### Available CLI Commands & Options
+
+```text
+Usage: autoresearch [command] [options]
+
+Enterprise AI Autonomous Research framework
+
+Commands:
+  auth                            Set your OpenAI and Serper API keys securely
+  research [options]              Run an autonomous deep-dive research on a topic
+
+Options:
+  -v, --version                   Output the current version
+  -h, --help                      Display help for command
+
+Research Options:
+  -t, --topic <string>            The topic to research (1-200 characters)
+  -d, --depth <number>            Research depth from 1 (Surface) to 5 (Deep Analysis)
+```
+
+---
+
+## 🧪 Development & Testing
+
+This project uses [Vitest](https://vitest.dev/) for unit and integration testing, and [Biome](https://biomejs.dev/) for ultra-fast linting and formatting.
+
+```bash
+# Run unit & integration tests
+npm test
+
+# Check code formatting & linting
+npm run lint
+
+# Automatically format code with Biome
+npm run format
+
+# Compile TypeScript to dist/
+npm run build
+
+# Run in development mode with live watch
+npm run dev
+```
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+Contributions, feedback, and pull requests are welcome!
+Please review [CONTRIBUTING.md](CONTRIBUTING.md) for details on code style, testing guidelines, and commit standards.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE) © 2026 [shenald-dev](https://github.com/shenald-dev).
