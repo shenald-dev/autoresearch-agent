@@ -246,3 +246,11 @@ When using `undici.Agent` to create custom dispatchers for `undici.fetch` (e.g. 
 
 **Action:**
 To safely inject custom `undici.Agent` dispatchers and properly mock `undici.fetch` across environments, provide an optional `dispatcher` configuration to the object using `undici` (e.g. via dependency injection in `WebFetcher` constructor). Additionally, when mocking `undici` with Vitest, explicitly use `vi.mock("undici", () => ({ ... }))` at the top of the file before imports, and then use `vi.mocked(undici.fetch).mockImplementation(...)` instead of reassigning the property.
+
+## 2026-11-23 — HTML Parsing Regex Truncation Bug
+
+**Learning:**
+When using regex to parse and strip HTML boilerplate blocks (like `<script>` or `<style>`), a closing tag capture group such as `(?:<\/\1>|$)` fails to match valid HTML closing tags that contain whitespace before the closing bracket (e.g., `</script >`). Because the block content uses a lazy matcher `[\s\S]*?` followed by the closing tag or end of string `$`, the failure to match the closing tag causes the regex engine to consume the entire remainder of the HTML document until `$`, resulting in catastrophic data loss during context extraction.
+
+**Action:**
+To prevent document truncation during regex-based HTML parsing, always include `\s*` before the closing bracket in the capture group (e.g., `(?:<\/\1\s*>|$)`) to handle valid whitespace variations safely.
