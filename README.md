@@ -310,8 +310,8 @@ npm run dev
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome!
-Feel free to open an issue or submit a pull request. Please make sure all tests pass and code is formatted with Biome before submitting.
+Contributions, issues, and feature requests are warmly welcome!
+Please review our [Contributing Guide](CONTRIBUTING.md) for architecture overviews, local development workflows, security guardrails, and commit conventions. All pull requests must pass our automated verification suite (`npm test`, `npm run lint`, `npm run build`).
 
 ---
 
