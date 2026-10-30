@@ -706,7 +706,7 @@ describe("WebFetcher", () => {
 		);
 
 		// Cache should not contain either URL
-
+		expect((fetcher as any).cache.has(targetUrl)).toBe(false);
 		expect((fetcher as any).cache.has(normalizedUrl)).toBe(false);
 
 		vi.mocked(undici.fetch).mockReset();
