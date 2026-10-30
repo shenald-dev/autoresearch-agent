@@ -20,6 +20,7 @@ const program = new Command();
 const ResearchInputSchema = z.object({
 	topic: z
 		.string()
+		.trim()
 		.min(1, "Topic cannot be empty")
 		.max(200, "Topic is too long"),
 	depth: z.coerce

@@ -69,4 +69,20 @@ describe("CLI WebFetcher index", () => {
 
 		expect(messageMock).toHaveBeenCalledWith("Test progress message");
 	});
+
+	it("should reject whitespace-only topic via CLI flag and exit with code 1", async () => {
+		process.argv = [
+			"node",
+			"index.js",
+			"research",
+			"-t",
+			"   ",
+			"-d",
+			"1",
+		];
+		const { cliPromise } = await import("../src/index.ts");
+		await cliPromise;
+
+		expect(process.exit).toHaveBeenCalledWith(1);
+	});
 });

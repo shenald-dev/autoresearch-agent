@@ -111,16 +111,18 @@ Return ONLY the markdown document.
 		// Build context from results
 		const contextChunks: string[] = [];
 		const seenContent = new Set<string>();
-		let i = 1;
+		let sourceIndex = 1;
 		for (const [url, content] of fetchResults.entries()) {
 			if (!content.startsWith("Error:")) {
 				const truncatedContent = content.substring(0, 1500).trim();
 				if (truncatedContent && !seenContent.has(truncatedContent)) {
 					seenContent.add(truncatedContent);
-					contextChunks.push(`[Source ${i} | ${url}]\n${truncatedContent}\n\n`);
+					contextChunks.push(
+						`[Source ${sourceIndex} | ${url}]\n${truncatedContent}\n\n`,
+					);
+					sourceIndex++;
 				}
 			}
-			i++;
 		}
 
 		if (contextChunks.length === 0) {

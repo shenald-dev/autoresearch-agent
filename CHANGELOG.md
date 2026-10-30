@@ -1,6 +1,11 @@
 # CHANGELOG.md
 
 ## [Unreleased]
+* **[Fixed]:** Ensured contiguous, gapless citation numbering (`[Source 1]`, `[Source 2]`, etc.) in synthesized research context when earlier sources fail to fetch or contain empty content.
+* **[Fixed]:** Prevented literal `"undefined"` string coercion for missing search result titles and snippets, and filtered out entries missing valid URLs in `GoogleSearcher`.
+* **[Fixed]:** Added whitespace trimming to CLI input validation schema to reject empty or whitespace-only research topics.
+* **[Pruned]:** Removed orphaned `report.txt` artifact.
+* **[Dependencies]:** Safely updated direct dependency `@langchain/core` to 1.3.2.
 * **[Optimized]:** Routine WARDEN maintenance. Verified recent error logging and tests. Codebase is clean.
 * **[Chore]:** Routine WARDEN maintenance. Validated #176 error logging enhancements, verified all tests pass. Bumped patch/minor dependencies.
 * **[Pruned]:** Removed unused dependencies (`langsmith`, `openai`, `uuid`) to fight codebase entropy.

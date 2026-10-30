@@ -122,4 +122,44 @@ describe("GoogleSearcher", () => {
 
 		vi.restoreAllMocks();
 	});
+
+	it("should return empty array immediately for empty or whitespace query without network call", async () => {
+		const resultEmpty = await searcher.search("");
+		const resultWhitespace = await searcher.search("   ");
+
+		expect(resultEmpty).toEqual([]);
+		expect(resultWhitespace).toEqual([]);
+		expect(global.fetch).not.toHaveBeenCalled();
+	});
+
+	it("should filter out results missing valid links and safely handle null or undefined titles and snippets", async () => {
+		const mockResponse = {
+			organic: [
+				{ title: "Valid Title", link: "https://valid.com", snippet: "Valid snippet" },
+				{ title: null, link: "https://notitle.com", snippet: undefined },
+				{ title: "No Link", link: "", snippet: "Should be filtered" },
+				{ title: "Missing Link", snippet: "Should be filtered" },
+				null,
+			],
+		};
+
+		(global.fetch as any).mockResolvedValueOnce({
+			ok: true,
+			json: async () => mockResponse,
+		});
+
+		const results = await searcher.search("sanitize test", 5);
+
+		expect(results).toHaveLength(2);
+		expect(results[0]).toEqual({
+			title: "Valid Title",
+			link: "https://valid.com",
+			snippet: "Valid snippet",
+		});
+		expect(results[1]).toEqual({
+			title: "",
+			link: "https://notitle.com",
+			snippet: "",
+		});
+	});
 });

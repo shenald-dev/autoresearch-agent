@@ -11,6 +11,14 @@ vi.mock("undici", () => {
 import { WebFetcher } from "../src/tools/WebFetcher";
 
 describe("WebFetcher", () => {
+	let fetcher: WebFetcher;
+
+	beforeEach(() => {
+		fetcher = new WebFetcher(3);
+		// Clear cache
+		(fetcher as any).cache.clear();
+	});
+
 	it("should preserve semantic HTML but strip boilerplate like <nav> and <footer>", async () => {
 
 		vi.mocked(undici.fetch).mockImplementation(async () => {
@@ -118,15 +126,6 @@ describe("WebFetcher", () => {
 		expect(result).not.toContain("tracker");
 
 		vi.mocked(undici.fetch).mockReset();
-	});
-
-
-	let fetcher: WebFetcher;
-
-	beforeEach(() => {
-		fetcher = new WebFetcher(3);
-		// Clear cache
-		(fetcher as any).cache.clear();
 	});
 
 	it("should reject domains that resolve to empty address arrays", async () => {

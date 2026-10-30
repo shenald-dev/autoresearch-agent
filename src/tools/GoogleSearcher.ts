@@ -73,7 +73,12 @@ export class GoogleSearcher {
 	 * Performs a Google search using Serper.dev API.
 	 */
 	public async search(query: string, numResults = 5): Promise<SearchResult[]> {
-		const cacheKey = `${query}:${numResults}`;
+		const trimmedQuery = query.trim();
+		if (!trimmedQuery) {
+			return [];
+		}
+
+		const cacheKey = `${trimmedQuery}:${numResults}`;
 		if (this.cache.has(cacheKey)) {
 			return this.cache.get(cacheKey) as Promise<SearchResult[]>;
 		}
@@ -122,11 +127,28 @@ export class GoogleSearcher {
 						return [];
 					}
 
-					return data.organic.map((item: Record<string, unknown>) => ({
-						title: String(item.title),
-						link: String(item.link),
-						snippet: String(item.snippet),
-					}));
+					return data.organic
+						.filter(
+							(item: Record<string, unknown>) =>
+								Boolean(item) &&
+								typeof item.link === "string" &&
+								item.link.trim() !== "",
+						)
+						.map((item: Record<string, unknown>) => ({
+							title:
+								typeof item.title === "string"
+									? item.title
+									: item.title != null
+										? String(item.title)
+										: "",
+							link: String(item.link).trim(),
+							snippet:
+								typeof item.snippet === "string"
+									? item.snippet
+									: item.snippet != null
+										? String(item.snippet)
+										: "",
+						}));
 				});
 			} catch (error) {
 				console.error(

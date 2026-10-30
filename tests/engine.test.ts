@@ -206,4 +206,33 @@ describe("ResearchEngine", () => {
 			"http://test.com/other"
 		]);
 	});
+
+	it("should number sources contiguously starting at 1 without gaps when earlier sources error", async () => {
+		engine.searcher.search.mockResolvedValueOnce([
+			{ link: "http://failing.com" },
+			{ link: "http://working1.com" },
+			{ link: "http://empty.com" },
+			{ link: "http://working2.com" },
+		]);
+
+		const fetchResults = new Map();
+		fetchResults.set("http://failing.com", "Error: HTTP 404");
+		fetchResults.set("http://working1.com", "Content from first working source");
+		fetchResults.set("http://empty.com", "    ");
+		fetchResults.set("http://working2.com", "Content from second working source");
+		engine.fetcher.fetchBatch.mockResolvedValueOnce(fetchResults);
+
+		engine.prompt.pipe = vi.fn().mockReturnValue({
+			invoke: vi.fn().mockImplementation(async (args: any) => {
+				return { content: args.context };
+			}),
+		});
+
+		const result = await engine.run("test sequential numbering");
+
+		expect(result).toContain("[Source 1 | http://working1.com]");
+		expect(result).toContain("[Source 2 | http://working2.com]");
+		expect(result).not.toContain("Source 3");
+		expect(result).not.toContain("Source 4");
+	});
 });
