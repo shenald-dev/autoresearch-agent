@@ -1,4 +1,4 @@
-export interface ReportMetadata {
+interface ReportMetadata {
 	id: string;
 	slug: string;
 	topic: string;
