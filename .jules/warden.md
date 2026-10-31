@@ -2,8 +2,8 @@
 
 ## 2026-10-29 — Lifecycle & Assurance Ledger
 - **QA & Veto Actions:** Audited recent changes and verified test suite execution. No veto necessary.
-- **Entropy Pruned:** 0 lines deleted. Codebase is clean.
-- **Deferred / Blocked:** None.
+- **Entropy Pruned:** Removed unused re-exports (`generateMarkdownReport`, `generateHtmlReport`, `generateJsonReport`) in `src/exporters/index.ts`, the `export` keyword from `interface ReportMetadata` in `src/exporters/types.ts`, and `export type { SearchResult };` from `src/tools/GoogleSearcher.ts` as reported by `knip` and `ts-prune`.
+- **Deferred / Blocked:** Safely bumped minor and patch dependencies via npm update.
 
 ## 2026-10-28 — Lifecycle & Assurance Ledger
 - **QA & Veto Actions:** Verified #176 error logging enhancements, all tests passing. No veto necessary.
