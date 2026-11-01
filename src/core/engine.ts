@@ -140,8 +140,8 @@ Return ONLY the markdown document.
 			}
 		}
 
-		// If no Serper key is configured, fallback to DuckDuckGo searcher
-		if (searchResults.length === 0 && !serperKey) {
+		// If the Serper search yielded no results (or failed/rate-limited), fallback to DuckDuckGo
+		if (searchResults.length === 0) {
 			searchResults = await this.searchManager.searchMulti(
 				subQueries,
 				Math.max(2, this.config.depth),
