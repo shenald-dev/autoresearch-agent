@@ -1,6 +1,6 @@
 import type { ChatOpenAI } from "@langchain/openai";
 
-export function heuristicDecompose(topic: string, count: number): string[] {
+function heuristicDecompose(topic: string, count: number): string[] {
 	const angles = [
 		topic,
 		`${topic} technical architecture implementation`,
@@ -16,7 +16,7 @@ export function heuristicDecompose(topic: string, count: number): string[] {
  * Decomposes a research topic into targeted investigative search queries.
  * Scales query count based on depth (1 to 5).
  */
-export async function decomposeQuery(
+async function decomposeQuery(
 	topic: string,
 	depth = 3,
 	llm?: ChatOpenAI,
@@ -65,5 +65,4 @@ Guidelines:
 
 export const QueryDecomposer = {
 	decompose: decomposeQuery,
-	heuristicDecompose,
 };

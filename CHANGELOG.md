@@ -1,6 +1,7 @@
 # CHANGELOG.md
 
 ## [Unreleased]
+* **[Pruned]:** Removed unused exports (`heuristicDecompose` and `decomposeQuery`) in `src/core/query-decomposer.ts`.
 * **[Pruned]:** Removed unused re-exports in exporters and GoogleSearcher. Updated dependencies.
 * **[Added]:** Multi-vector query decomposition (`QueryDecomposer`) scaling orthogonal research vectors based on depth levels 1–5 via LLM reasoning with deterministic heuristic fallbacks.
 * **[Added]:** Zero-config DuckDuckGo search provider (`DuckDuckGoSearcher`) with redirect unwrapping, HTML entity decoding, and intelligent fallback orchestration (`SearchManager`) when Serper API keys are unconfigured.

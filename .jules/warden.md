@@ -1,5 +1,10 @@
 # .jules/warden.md
 
+## 2026-11-01 — Lifecycle & Assurance Ledger
+- **QA & Veto Actions:** Audited recent changes, ran `ts-prune` to find unused exports. Verified tests and build are unbroken after refactoring tests to use public APIs.
+- **Entropy Pruned:** Removed unused exports (`heuristicDecompose` and `decomposeQuery`) in `src/core/query-decomposer.ts`. Net lines deleted: 0 (removed keywords).
+- **Deferred / Blocked:** None.
+
 ## 2026-10-29 — Lifecycle & Assurance Ledger
 - **QA & Veto Actions:** Audited recent changes and verified test suite execution. No veto necessary.
 - **Entropy Pruned:** Removed unused re-exports (`generateMarkdownReport`, `generateHtmlReport`, `generateJsonReport`) in `src/exporters/index.ts`, the `export` keyword from `interface ReportMetadata` in `src/exporters/types.ts`, and `export type { SearchResult };` from `src/tools/GoogleSearcher.ts` as reported by `knip` and `ts-prune`.
