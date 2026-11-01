@@ -6,9 +6,6 @@ import { generateMarkdownReport } from "./markdown";
 import type { ExportResult, ReportData } from "./types";
 
 export * from "./types";
-export { generateMarkdownReport } from "./markdown";
-export { generateHtmlReport } from "./html";
-export { generateJsonReport } from "./json";
 
 export interface ExportReportOptions {
 	outputDir?: string;

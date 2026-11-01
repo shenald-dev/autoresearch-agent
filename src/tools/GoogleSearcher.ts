@@ -3,8 +3,6 @@ import pc from "picocolors";
 import { ConfigManager } from "../utils/config";
 import type { ISearchProvider, SearchResult } from "./search/types";
 
-export type { SearchResult };
-
 class HttpError extends Error {
 	constructor(
 		message: string,
