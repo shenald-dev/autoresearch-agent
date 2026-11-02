@@ -1,5 +1,10 @@
 # .jules/warden.md
 
+## 2026-11-02 — Lifecycle & Assurance Ledger
+- **QA & Veto Actions:** Audited recent changes and verified test suite execution. No veto necessary. Safely bumped minor and patch dependencies via npm update.
+- **Entropy Pruned:** 0 lines deleted. `cliPromise` in `src/index.ts` is required by tests.
+- **Deferred / Blocked:** None.
+
 ## 2026-10-29 — Lifecycle & Assurance Ledger
 - **QA & Veto Actions:** Audited recent changes and verified test suite execution. No veto necessary.
 - **Entropy Pruned:** Removed unused re-exports (`generateMarkdownReport`, `generateHtmlReport`, `generateJsonReport`) in `src/exporters/index.ts`, the `export` keyword from `interface ReportMetadata` in `src/exporters/types.ts`, and `export type { SearchResult };` from `src/tools/GoogleSearcher.ts` as reported by `knip` and `ts-prune`.
