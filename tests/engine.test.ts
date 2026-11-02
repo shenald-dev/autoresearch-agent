@@ -241,4 +241,40 @@ describe("ResearchEngine", () => {
 		expect(result).not.toContain("Source 3");
 		expect(result).not.toContain("Source 4");
 	});
+
+	it("should fallback to DuckDuckGo (searchMulti) if Serper returns 0 results despite having a key configured", async () => {
+		// Mock that SERPER_API_KEY exists
+		engine.configManager.get = vi.fn().mockImplementation((key) => {
+			if (key === "SERPER_API_KEY") return Promise.resolve("mock-serper-key");
+			if (key === "OPENAI_API_KEY") return Promise.resolve("mock-openai-key");
+			return Promise.resolve(undefined);
+		});
+
+		// Serper returns no results
+		engine.searcher.search.mockResolvedValueOnce([]);
+
+		// Fallback (DuckDuckGo / searchMulti) returns a valid result
+		engine.searchManager.searchMulti.mockResolvedValueOnce([
+			{ link: "http://fallback.com" }
+		]);
+
+		const fetchResults = new Map();
+		fetchResults.set("http://fallback.com", "Fallback content");
+		engine.fetcher.fetchBatch.mockResolvedValueOnce(fetchResults);
+
+		engine.prompt.pipe = vi.fn().mockReturnValue({
+			invoke: vi.fn().mockImplementation(async (args: any) => {
+				return { content: args.context };
+			}),
+		});
+
+		const result = await engine.run("fallback topic");
+
+		// Should have tried searcher.search first
+		expect(engine.searcher.search).toHaveBeenCalled();
+		// Should have then fallen back to searchManager.searchMulti
+		expect(engine.searchManager.searchMulti).toHaveBeenCalled();
+		// Should have successfully fetched the fallback result
+		expect(result).toContain("Fallback content");
+	});
 });
