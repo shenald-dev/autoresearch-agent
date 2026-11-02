@@ -3,6 +3,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import type { ReportData, SourceItem } from "../exporters/types";
 import { GoogleSearcher } from "../tools/GoogleSearcher";
 import { SearchManager } from "../tools/SearchManager";
+import { DuckDuckGoSearcher } from "../tools/DuckDuckGoSearcher";
 import { WebFetcher } from "../tools/WebFetcher";
 import type { SearchResult } from "../tools/search/types";
 import { ConfigManager } from "../utils/config";
@@ -142,10 +143,20 @@ Return ONLY the markdown document.
 
 		// If the Serper search yielded no results (or failed/rate-limited), fallback to DuckDuckGo
 		if (searchResults.length === 0) {
-			searchResults = await this.searchManager.searchMulti(
-				subQueries,
-				Math.max(2, this.config.depth),
+			// Explicitly trigger the fallback provider for the primary topic first to ensure sufficient results
+			const ddgSearcher = new DuckDuckGoSearcher();
+			searchResults = await ddgSearcher.search(
+				cleanTopic,
+				this.config.depth * 2
 			);
+
+			if (subQueries.length > 1 && this.config.depth >= 3) {
+				const secondaryResults = await this.searchManager.searchMulti(
+					subQueries.slice(1),
+					2
+				);
+				searchResults = [...searchResults, ...secondaryResults];
+			}
 		} else if (
 			searchResults.length > 0 &&
 			subQueries.length > 1 &&
@@ -216,6 +227,9 @@ Return ONLY the markdown document.
 		const validSources: SourceItem[] = [];
 		let sourceIndex = 1;
 
+		// O(1) lookup map to prevent O(n^2) hot-path performance bottlenecks in the fetchResults loop
+		const searchResultsByUrl = new Map(uniqueSearchResults.map((s) => [s.link, s]));
+
 		for (const [url, content] of fetchResults.entries()) {
 			if (!content.startsWith("Error:")) {
 				const truncatedContent = content.substring(0, 1500).trim();
@@ -223,7 +237,7 @@ Return ONLY the markdown document.
 					seenContent.add(truncatedContent);
 
 					// Locate title & snippet from original search results
-					const matchedSearch = uniqueSearchResults.find((s) => s.link === url);
+					const matchedSearch = searchResultsByUrl.get(url);
 					const title = matchedSearch?.title || "Web Source";
 					const snippet = matchedSearch?.snippet || "";
 
