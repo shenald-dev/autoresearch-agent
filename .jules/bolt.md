@@ -254,3 +254,11 @@ When using regex to parse and strip HTML boilerplate blocks (like `<script>` or 
 
 **Action:**
 To prevent document truncation during regex-based HTML parsing, always include `\s*` before the closing bracket in the capture group (e.g., `(?:<\/\1\s*>|$)`) to handle valid whitespace variations safely.
+
+## $(date +%Y-%m-%d) — Engine Synthesis $O(n^2)$ Bottleneck
+
+**Learning:**
+In `src/core/engine.ts` Phase 4 (Synthesis), a nested $O(n^2)$ lookup existed where `uniqueSearchResults.find((s) => s.link === url)` was called iteratively inside the `fetchResults.entries()` loop. This algorithmic inefficiency could become a hot-path performance bottleneck when scaling to larger research depths and source counts.
+
+**Action:**
+To prevent the $O(n^2)$ hot-path bottleneck, pre-compute an $O(1)$ lookup Map (`const searchResultsByUrl = new Map(uniqueSearchResults.map((s) => [s.link, s]))`) prior to iterating through fetch results and replace the array `.find()` with `.get(url)`.

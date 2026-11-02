@@ -7,6 +7,12 @@ vi.mock("../src/tools/GoogleSearcher", () => ({
 		search = vi.fn();
 	},
 }));
+const mockDdgSearch = vi.fn().mockResolvedValue([]);
+vi.mock("../src/tools/DuckDuckGoSearcher", () => ({
+	DuckDuckGoSearcher: class {
+		search = mockDdgSearch;
+	}
+}));
 vi.mock("../src/tools/SearchManager", () => ({
 	SearchManager: class {
 		search = vi.fn().mockResolvedValue([]);
@@ -242,7 +248,7 @@ describe("ResearchEngine", () => {
 		expect(result).not.toContain("Source 4");
 	});
 
-	it("should fallback to DuckDuckGo (searchMulti) if Serper returns 0 results despite having a key configured", async () => {
+	it("should fallback to DuckDuckGo if Serper returns 0 results despite having a key configured", async () => {
 		// Mock that SERPER_API_KEY exists
 		engine.configManager.get = vi.fn().mockImplementation((key) => {
 			if (key === "SERPER_API_KEY") return Promise.resolve("mock-serper-key");
@@ -253,8 +259,7 @@ describe("ResearchEngine", () => {
 		// Serper returns no results
 		engine.searcher.search.mockResolvedValueOnce([]);
 
-		// Fallback (DuckDuckGo / searchMulti) returns a valid result
-		engine.searchManager.searchMulti.mockResolvedValueOnce([
+		mockDdgSearch.mockResolvedValueOnce([
 			{ link: "http://fallback.com" }
 		]);
 
@@ -272,8 +277,8 @@ describe("ResearchEngine", () => {
 
 		// Should have tried searcher.search first
 		expect(engine.searcher.search).toHaveBeenCalled();
-		// Should have then fallen back to searchManager.searchMulti
-		expect(engine.searchManager.searchMulti).toHaveBeenCalled();
+		// Should have then fallen back to DuckDuckGoSearcher explicitly
+		expect(mockDdgSearch).toHaveBeenCalled();
 		// Should have successfully fetched the fallback result
 		expect(result).toContain("Fallback content");
 	});
