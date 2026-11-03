@@ -47,6 +47,11 @@ describe("ResearchEngine", () => {
 		await expect(engine.run("test topic")).rejects.toThrow("OPENAI_API_KEY is missing.");
 	});
 
+	it("throws an error if topic is empty or whitespace", async () => {
+		await expect(engine.run("")).rejects.toThrow("Research topic cannot be empty");
+		await expect(engine.run("   \n\t ")).rejects.toThrow("Research topic cannot be empty");
+	});
+
 	it("should handle invalid URL silently during filtering", async () => {
 		engine.searcher.search.mockResolvedValueOnce([
 			{ link: "invalid-url" },

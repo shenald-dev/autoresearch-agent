@@ -1,9 +1,9 @@
 import { PromptTemplate } from "@langchain/core/prompts";
 import { ChatOpenAI } from "@langchain/openai";
 import type { ReportData, SourceItem } from "../exporters/types";
+import { DuckDuckGoSearcher } from "../tools/DuckDuckGoSearcher";
 import { GoogleSearcher } from "../tools/GoogleSearcher";
 import { SearchManager } from "../tools/SearchManager";
-import { DuckDuckGoSearcher } from "../tools/DuckDuckGoSearcher";
 import { WebFetcher } from "../tools/WebFetcher";
 import type { SearchResult } from "../tools/search/types";
 import { ConfigManager } from "../utils/config";
@@ -103,6 +103,9 @@ Return ONLY the markdown document.
 		};
 
 		const cleanTopic = topic.trim();
+		if (!cleanTopic) {
+			throw new Error("Research topic cannot be empty");
+		}
 		const reportId = generateReportId();
 		const slug = `${slugify(cleanTopic)}-${Date.now().toString(36)}`;
 
@@ -147,13 +150,13 @@ Return ONLY the markdown document.
 			const ddgSearcher = new DuckDuckGoSearcher();
 			searchResults = await ddgSearcher.search(
 				cleanTopic,
-				this.config.depth * 2
+				this.config.depth * 2,
 			);
 
 			if (subQueries.length > 1 && this.config.depth >= 3) {
 				const secondaryResults = await this.searchManager.searchMulti(
 					subQueries.slice(1),
-					2
+					2,
 				);
 				searchResults = [...searchResults, ...secondaryResults];
 			}
@@ -228,7 +231,9 @@ Return ONLY the markdown document.
 		let sourceIndex = 1;
 
 		// O(1) lookup map to prevent O(n^2) hot-path performance bottlenecks in the fetchResults loop
-		const searchResultsByUrl = new Map(uniqueSearchResults.map((s) => [s.link, s]));
+		const searchResultsByUrl = new Map(
+			uniqueSearchResults.map((s) => [s.link, s]),
+		);
 
 		for (const [url, content] of fetchResults.entries()) {
 			if (!content.startsWith("Error:")) {
