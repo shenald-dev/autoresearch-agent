@@ -59,36 +59,40 @@ export class DuckDuckGoSearcher implements ISearchProvider {
 					const html = await response.text();
 					const results: SearchResult[] = [];
 
-					// Parse title links and snippet blocks
-					// Pattern: <a class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>
+					// Parse result blocks to keep titles and snippets synchronized
+					// Pattern: <div class="result results_links">...</div>
+					const blockRegex =
+						/<div[^>]*class="[^"]*\bresult\b[^"]*"[^>]*>([\s\S]*?)<\/div>/gi;
 					const titleRegex =
-						/<a[^>]+class="[^"]*result__a[^"]*"[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+						/<a[^>]+class="[^"]*result__a[^"]*"[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i;
 					const snippetRegex =
-						/<a[^>]+class="[^"]*result__snippet[^"]*"[^>]*>([\s\S]*?)<\/a>/gi;
+						/<a[^>]+class="[^"]*result__snippet[^"]*"[^>]*>([\s\S]*?)<\/a>/i;
 
-					const titles: { href: string; title: string }[] = [];
-					let titleMatch: RegExpExecArray | null = titleRegex.exec(html);
-					while (titleMatch !== null) {
-						titles.push({
-							href: titleMatch[1],
-							title: cleanHtml(titleMatch[2]),
-						});
-						titleMatch = titleRegex.exec(html);
-					}
+					const rawResults: { href: string; title: string; snippet: string }[] =
+						[];
+					let blockMatch = blockRegex.exec(html);
 
-					const snippets: string[] = [];
-					let snippetMatch: RegExpExecArray | null = snippetRegex.exec(html);
-					while (snippetMatch !== null) {
-						snippets.push(cleanHtml(snippetMatch[1]));
-						snippetMatch = snippetRegex.exec(html);
+					while (blockMatch !== null) {
+						const block = blockMatch[1];
+						const titleMatch = titleRegex.exec(block);
+
+						if (titleMatch) {
+							const snippetMatch = snippetRegex.exec(block);
+							rawResults.push({
+								href: titleMatch[1],
+								title: cleanHtml(titleMatch[2]),
+								snippet: snippetMatch ? cleanHtml(snippetMatch[1]) : "",
+							});
+						}
+						blockMatch = blockRegex.exec(html);
 					}
 
 					for (
 						let i = 0;
-						i < titles.length && results.length < numResults;
+						i < rawResults.length && results.length < numResults;
 						i++
 					) {
-						let rawLink = titles[i].href;
+						let rawLink = rawResults[i].href;
 
 						// Extract target link from DuckDuckGo redirect wrapper: /l/?uddg=<url>&...
 						if (rawLink.includes("uddg=")) {
@@ -112,9 +116,9 @@ export class DuckDuckGoSearcher implements ISearchProvider {
 								parsedUrl.protocol === "https:"
 							) {
 								results.push({
-									title: titles[i].title || "Untitled",
+									title: rawResults[i].title || "Untitled",
 									link: parsedUrl.toString(),
-									snippet: snippets[i] || "",
+									snippet: rawResults[i].snippet || "",
 								});
 							}
 						} catch {}

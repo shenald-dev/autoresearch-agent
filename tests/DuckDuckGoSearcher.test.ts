@@ -57,6 +57,43 @@ describe("DuckDuckGoSearcher", () => {
 		);
 	});
 
+	it("should properly align titles and snippets even if a snippet is missing", async () => {
+		const sampleHtml = `
+		<html>
+		<body>
+			<div class="result results_links">
+				<a class="result__a" href="https://example.com/1">Result 1</a>
+				<a class="result__snippet">Snippet 1</a>
+			</div>
+			<div class="result results_links">
+				<a class="result__a" href="https://example.com/2">Result 2 Without Snippet</a>
+			</div>
+			<div class="result results_links">
+				<a class="result__a" href="https://example.com/3">Result 3</a>
+				<a class="result__snippet">Snippet 3</a>
+			</div>
+		</body>
+		</html>
+		`;
+
+		(global.fetch as any).mockResolvedValueOnce({
+			ok: true,
+			text: async () => sampleHtml,
+		});
+
+		const results = await searcher.search("missing snippet query", 5);
+		expect(results.length).toBe(3);
+
+		expect(results[0].title).toBe("Result 1");
+		expect(results[0].snippet).toBe("Snippet 1");
+
+		expect(results[1].title).toBe("Result 2 Without Snippet");
+		expect(results[1].snippet).toBe(""); // Missing snippet should be empty string
+
+		expect(results[2].title).toBe("Result 3");
+		expect(results[2].snippet).toBe("Snippet 3"); // Snippet 3 should align with Result 3
+	});
+
 	it("should cache identical search requests in memory", async () => {
 		const sampleHtml = `
 		<div class="result">
