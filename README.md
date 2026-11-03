@@ -7,6 +7,7 @@
 
   <br/><br/>
 
+  [![npm version](https://img.shields.io/npm/v/@shenald/autoresearch-agent.svg?style=for-the-badge&color=60a5fa&labelColor=0d1117)](https://www.npmjs.com/package/@shenald/autoresearch-agent)
   [![CI](https://github.com/shenald-dev/autoresearch-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/shenald-dev/autoresearch-agent/actions/workflows/ci.yml)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
   [![LangChain](https://img.shields.io/badge/LangChain-LCEL-orange.svg)](https://langchain.com)
@@ -129,8 +130,20 @@ Given any research inquiry, the agent:
 - **LLM API Key**: OpenAI, or any OpenAI-compatible provider (Ollama, DeepSeek, etc.)
 - **Search Key (Optional)**: [Serper API](https://serper.dev/) (If omitted, AutoResearch automatically uses zero-config DuckDuckGo search)
 
-### 2. Installation
+### 2. Quick Run or Installation
 
+Execute instantly with `npx`:
+```bash
+npx @shenald/autoresearch-agent research "Vector search benchmarks 2026"
+```
+
+Or install globally via npm:
+```bash
+npm install -g @shenald/autoresearch-agent
+autoresearch research "State of Local SLMs 2026"
+```
+
+Or clone for local development:
 ```bash
 # Clone the repository
 git clone https://github.com/shenald-dev/autoresearch-agent.git
