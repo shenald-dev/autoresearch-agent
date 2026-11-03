@@ -1,6 +1,7 @@
 # CHANGELOG.md
 
 ## [Unreleased]
+* **[Optimized]:** Safely bumped minor and patch dependencies via npm update.
 * **[Fixed]:** Added validation in `ResearchEngine` to reject empty or whitespace research topics and organized imports/formatting to conform with Biome standards.
 * **[Optimized]:** Safely bumped minor and patch dependencies via npm update.
 * **[Pruned]:** Removed unused re-exports in exporters and GoogleSearcher. Updated dependencies.
