@@ -1,5 +1,5 @@
 {
-  "name": "autoresearch-agent",
+  "name": "@shenald/autoresearch-agent",
   "version": "1.0.41",
   "description": "Enterprise-grade autonomous AI research framework.",
   "main": "dist/index.js",
@@ -20,8 +20,23 @@
     "research",
     "langchain"
   ],
-  "author": "shenald.dev",
+  "author": "shenald-dev",
   "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shenald-dev/autoresearch-agent.git"
+  },
+  "homepage": "https://github.com/shenald-dev/autoresearch-agent#readme",
+  "bugs": {
+    "url": "https://github.com/shenald-dev/autoresearch-agent/issues"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "assets",
+    "README.md",
+    "LICENSE"
+  ],
   "dependencies": {
     "@clack/prompts": "1.2.0",
     "@langchain/core": "^1.3.0",
