@@ -262,3 +262,11 @@ In `src/core/engine.ts` Phase 4 (Synthesis), a nested $O(n^2)$ lookup existed wh
 
 **Action:**
 To prevent the $O(n^2)$ hot-path bottleneck, pre-compute an $O(1)$ lookup Map (`const searchResultsByUrl = new Map(uniqueSearchResults.map((s) => [s.link, s]))`) prior to iterating through fetch results and replace the array `.find()` with `.get(url)`.
+
+## $(date +%Y-%m-%d) — DuckDuckGo HTML Parsing Synchronization Bug
+
+**Learning:**
+When parsing HTML search results where fields like "snippet" might be occasionally missing, using independent global regex runs (`/g`) across the entire document for titles and snippets causes severe misalignment (desynchronization). A missing snippet causes the parser to incorrectly associate the *next* snippet with the current title, corrupting all subsequent data extraction for the remainder of the document.
+
+**Action:**
+To safely extract grouped structured data from HTML via regex, always capture the parent wrapper block first (e.g., `<div class="result">`), then apply field-specific regexes with the `/i` (non-global) flag *within* that localized block, assigning safe fallbacks (like `""`) if a field is missing.
