@@ -270,3 +270,11 @@ When parsing HTML search results where fields like "snippet" might be occasional
 
 **Action:**
 To safely extract grouped structured data from HTML via regex, always capture the parent wrapper block first (e.g., `<div class="result">`), then apply field-specific regexes with the `/i` (non-global) flag *within* that localized block, assigning safe fallbacks (like `""`) if a field is missing.
+
+## $(date +%Y-%m-%d) — Cache Eviction Consolidation
+
+**Learning:**
+When an asynchronous promise chain manages its own error caching (e.g., throwing a string starting with "Error:" or rejecting on failure), littering manual \`cache.delete(normalizedUrl)\` calls throughout every error branch creates redundant logic that is difficult to maintain and prone to bugs (like forgetting to evict on new error paths).
+
+**Action:**
+To enforce clean architecture and prevent orphaned cache entries on error, centralize cache eviction logic at the point of cache insertion by appending a \`.then()\` (to check for "Error:" strings) and a \`.catch()\` (to catch rejections) block to the Promise before storing it in the cache, and remove all redundant manual \`cache.delete\` calls within the async function.
