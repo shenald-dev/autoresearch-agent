@@ -127,8 +127,6 @@ export class WebFetcher {
 			let safeIp = await this.isValidUrl(normalizedUrl);
 
 			if (!safeIp) {
-				this.cache.delete(normalizedUrl);
-
 				return `Error: Invalid or insecure URL provided (${targetUrl})`;
 			}
 
@@ -178,7 +176,6 @@ export class WebFetcher {
 							} catch (err) {
 								console.warn("WebFetcher cancel error:", err);
 							}
-							this.cache.delete(normalizedUrl);
 
 							return `Error: Too many redirects for ${targetUrl}`;
 						}
@@ -193,7 +190,6 @@ export class WebFetcher {
 							} catch (err) {
 								console.warn("WebFetcher cancel error:", err);
 							}
-							this.cache.delete(normalizedUrl);
 
 							return `Error: Redirected to invalid or insecure URL (${nextUrl})`;
 						}
@@ -219,7 +215,6 @@ export class WebFetcher {
 					} catch (err) {
 						console.warn("WebFetcher cancel error:", err);
 					}
-					this.cache.delete(normalizedUrl);
 
 					return `Error: HTTP ${response?.status || "unknown"} from ${targetUrl}`;
 				}
@@ -240,7 +235,6 @@ export class WebFetcher {
 					} catch (err) {
 						console.warn("WebFetcher cancel error:", err);
 					}
-					this.cache.delete(normalizedUrl);
 
 					return `Error: Unsupported content type (${contentType}) from ${targetUrl}`;
 				}
@@ -317,7 +311,6 @@ export class WebFetcher {
 						console.warn("WebFetcher cancel error:", err);
 					}
 				}
-				this.cache.delete(normalizedUrl);
 
 				return `Error: Failed to fetch ${targetUrl} - ${error instanceof Error ? error.message : String(error)}`;
 			} finally {
@@ -329,7 +322,20 @@ export class WebFetcher {
 			}
 		})();
 
-		this.cache.set(normalizedUrl, fetchPromise);
+		this.cache.set(
+			normalizedUrl,
+			fetchPromise
+				.then((result) => {
+					if (result.startsWith("Error:")) {
+						this.cache.delete(normalizedUrl);
+					}
+					return result;
+				})
+				.catch((err) => {
+					this.cache.delete(normalizedUrl);
+					throw err;
+				}),
+		);
 
 		return fetchPromise;
 	}
