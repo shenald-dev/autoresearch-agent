@@ -62,7 +62,7 @@ export class DuckDuckGoSearcher implements ISearchProvider {
 					// Parse result blocks to keep titles and snippets synchronized
 					// Pattern: <div class="result results_links">...</div>
 					const blockRegex =
-						/<div[^>]*class="[^"]*\bresult\b[^"]*"[^>]*>([\s\S]*?)<\/div>/gi;
+						/<div[^>]*class="[^"]*\bresult\b[^"]*"[^>]*>([\s\S]*?)(?=<div[^>]*class="[^"]*\bresult\b[^"]*"|$)/gi;
 					const titleRegex =
 						/<a[^>]+class="[^"]*result__a[^"]*"[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i;
 					const snippetRegex =
@@ -128,8 +128,7 @@ export class DuckDuckGoSearcher implements ISearchProvider {
 				} catch (error) {
 					attempt++;
 					if (attempt > this.maxRetries) {
-						this.cache.delete(cacheKey);
-						return [];
+						throw new Error("Max retries exceeded");
 					}
 					await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
 				}
@@ -138,7 +137,13 @@ export class DuckDuckGoSearcher implements ISearchProvider {
 			return [];
 		})();
 
-		this.cache.set(cacheKey, searchPromise);
-		return searchPromise;
+		this.cache.set(
+			cacheKey,
+			searchPromise.catch((err) => {
+				this.cache.delete(cacheKey);
+				return [];
+			}),
+		);
+		return this.cache.get(cacheKey) as Promise<SearchResult[]>;
 	}
 }

@@ -278,3 +278,7 @@ When an asynchronous promise chain manages its own error caching (e.g., throwing
 
 **Action:**
 To enforce clean architecture and prevent orphaned cache entries on error, centralize cache eviction logic at the point of cache insertion by appending a \`.then()\` (to check for "Error:" strings) and a \`.catch()\` (to catch rejections) block to the Promise before storing it in the cache, and remove all redundant manual \`cache.delete\` calls within the async function.
+
+## 2026-11-05 — Fix DuckDuckGo HTML Parsing and Cache Eviction
+- **Learning:** When parsing HTML search results where elements like snippet or title might contain nested wrapper tags, regex that blindly looks for a closing `</div>` can truncate the block prematurely, losing data. Additionally, scattering `cache.delete` across async code can lead to orphaned entries if an unexpected error occurs.
+- **Action:** Fixed DuckDuckGo HTML parser to match blocks based on next result div or EOF. Centralized cache eviction logic by chaining `.catch()` before storing the promise in the cache, returning the validated promise to ensure cleanup on error.

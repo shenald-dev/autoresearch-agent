@@ -150,12 +150,17 @@ export class GoogleSearcher implements ISearchProvider {
 				console.error(
 					`[GoogleSearcher] Search failed for query "${query}": ${error instanceof Error ? error.message : String(error)}`,
 				);
-				this.cache.delete(cacheKey);
 				throw error;
 			}
 		})();
 
-		this.cache.set(cacheKey, searchPromise);
-		return searchPromise;
+		this.cache.set(
+			cacheKey,
+			searchPromise.catch((err) => {
+				this.cache.delete(cacheKey);
+				throw err;
+			}),
+		);
+		return this.cache.get(cacheKey) as Promise<SearchResult[]>;
 	}
 }
