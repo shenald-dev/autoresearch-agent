@@ -1,5 +1,5 @@
 ## 2026-11-06 — Lifecycle & Assurance Ledger
-- **QA & Veto Actions:** Audited recent commits which added test coverage. Verified test suite execution. No veto necessary. Safely bumped minor and patch dependencies via npm update.
+- **QA & Veto Actions:** Audited recent commits which added test coverage. Verified test suite execution. Added URL array deduplication to WebFetcher. Safely bumped minor and patch dependencies via npm update.
 - **Entropy Pruned:** 0 lines deleted. Codebase is clean.
 - **Deferred / Blocked:** None.
 
