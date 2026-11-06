@@ -344,6 +344,7 @@ export class WebFetcher {
 	 * Fetches multiple URLs with bounded concurrency.
 	 */
 	public async fetchBatch(urls: string[]): Promise<Map<string, string>> {
+		urls = Array.from(new Set(urls));
 		const results = new Map<string, string>();
 
 		// Pre-initialize to maintain exact input ranking order

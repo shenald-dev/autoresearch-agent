@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* **[Optimized]:** Added URL array deduplication to `WebFetcher.fetchBatch` to prevent redundant overhead from duplicate URLs before resolving normalized targets.
 * **[Optimized]:** Audited recent codebase additions. Confirmed CI is stable, tests pass without regressions, and there is no dead code. Safely bumped minor and patch dependencies via npm update.
 
 **[Optimized]:** Updated package dependencies and audited codebase.
