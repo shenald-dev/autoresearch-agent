@@ -1,6 +1,7 @@
 # CHANGELOG.md
 
 ## [Unreleased]
+- **[Fixed]:** Fixed Biome linter error `lint/style/noParameterAssign` in WebFetcher by assigning deduplicated urls to a new local variable instead of reassigning the function parameter.
 
 * **[Optimized]:** Added URL array deduplication to `WebFetcher.fetchBatch` to prevent redundant overhead from duplicate URLs before resolving normalized targets.
 * **[Optimized]:** Audited recent codebase additions. Confirmed CI is stable, tests pass without regressions, and there is no dead code. Safely bumped minor and patch dependencies via npm update.
