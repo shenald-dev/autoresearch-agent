@@ -344,17 +344,17 @@ export class WebFetcher {
 	 * Fetches multiple URLs with bounded concurrency.
 	 */
 	public async fetchBatch(urls: string[]): Promise<Map<string, string>> {
-		urls = Array.from(new Set(urls));
+		const uniqueUrls = Array.from(new Set(urls));
 		const results = new Map<string, string>();
 
 		// Pre-initialize to maintain exact input ranking order
-		for (const u of urls) {
+		for (const u of uniqueUrls) {
 			results.set(u, "");
 		}
 
 		// Map normalized URL (no hash) to a set of original URLs that requested it
 		const normalizedToOriginals = new Map<string, Set<string>>();
-		for (const u of urls) {
+		for (const u of uniqueUrls) {
 			try {
 				const parsed = new URL(u);
 				parsed.hash = "";
